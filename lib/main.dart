@@ -6,7 +6,6 @@ import 'core/logging/sentry_setup.dart';
 
 Future<void> main() async {
   await initSentry(
-    appRunner: () =>
-        runApp(const ProviderScope(child: AiMarineApp())),
+    appRunner: () => runApp(const ProviderScope(child: AiMarineApp())),
   );
 }

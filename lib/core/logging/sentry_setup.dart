@@ -22,9 +22,8 @@ Future<void> initSentry({required FutureOr<void> Function() appRunner}) {
     (options) {
       options.dsn = const String.fromEnvironment('SENTRY_DSN');
       options.tracesSampleRate = 0.1;
-      options.environment = kReleaseMode
-          ? 'release'
-          : (kProfileMode ? 'profile' : 'debug');
+      options.environment =
+          kReleaseMode ? 'release' : (kProfileMode ? 'profile' : 'debug');
       options.beforeSend = _beforeSend;
     },
     appRunner: appRunner,
