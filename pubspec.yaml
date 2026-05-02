@@ -1,0 +1,93 @@
+name: ai_marine_engine
+description: "AI Marine Recommendation Engine — transparent, on-device fishing recommendations."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+  # State management
+  flutter_riverpod: ^2.5.0
+  riverpod_annotation: ^2.3.5
+
+  # Local database (SQLite via Drift)
+  drift: ^2.18.0
+  drift_flutter: ^0.2.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.1.0
+  path: ^1.9.0
+
+  # HTTP
+  dio: ^5.4.0
+  dio_smart_retry: ^6.0.0
+
+  # Serialization / value types
+  freezed_annotation: ^2.4.0
+  json_annotation: ^4.9.0
+
+  # Map rendering (NOAA ENC tiles)
+  maplibre_gl: ^0.20.0
+
+  # Platform / device
+  geolocator: ^12.0.0
+  connectivity_plus: ^6.0.0
+
+  # Observability
+  sentry_flutter: ^8.0.0
+
+  # Backend (provisioned in v1, sync deferred to v1.5+)
+  supabase_flutter: ^2.5.0
+
+  # Utilities
+  intl: ^0.19.0
+  collection: ^1.18.0
+  crypto: ^3.0.0
+  uuid: ^4.4.0
+
+  # Background work
+  workmanager: ^0.5.0
+
+  # Phase 2: NMEA 2000 BLE bridge — deferred
+  # flutter_blue_plus: ^1.32.0
+
+# Transitive pins — these packages have versions newer than what the
+# Flutter 3.22.0 Gradle plugin supports. Revisit after Flutter SDK bump.
+dependency_overrides:
+  # v9+ uses the flutter.compileSdkVersion convention introduced in Flutter 3.27
+  package_info_plus: ^8.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+  # Code generation
+  build_runner: ^2.4.0
+  freezed: ^2.5.0
+  json_serializable: ^6.8.0
+  drift_dev: ^2.18.0
+  riverpod_generator: ^2.4.0
+
+  # Testing
+  mocktail: ^1.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets are added incrementally as bundled species, station lists,
+  # and map styles arrive (see Implementation Guide §1.3).
+  assets:
+    - assets/map_styles/
+  #   - assets/species/
+  #   - assets/species/_common/
+  #   - assets/ndbc_stations.json
+  #   - assets/tide_stations.json
+  #   - assets/nws_zones.json
