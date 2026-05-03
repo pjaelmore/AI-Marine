@@ -1,5 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/cache/cache_manager.dart';
+import '../data/cache/cold_cache.dart';
+import '../data/cache/hot_cache.dart';
+import '../data/cache/live_sensor_buffer.dart';
+import '../data/cache/warm_cache.dart';
 import '../data/sources/ndbc/ndbc_adapter.dart';
 import '../data/sources/nws_forecast/nws_adapter.dart';
 import '../data/sources/solunar/solunar_adapter.dart';
@@ -33,6 +38,22 @@ final solunarAdapterProvider = Provider<SolunarAdapter>((ref) {
   return SolunarAdapter();
 });
 
+/// Four-tier cache manager (TDD §2.1.4). Composed once per app session.
+/// Live and hot tiers are in-memory and disposed with the provider; warm
+/// and cold are Drift-backed and survive restart.
+final cacheManagerProvider = Provider<CacheManager>((ref) {
+  final db = ref.watch(databaseProvider);
+  return CacheManager(
+    live: LiveSensorBuffer(),
+    hot: HotCache(),
+    warm: WarmCache(dao: db.conditionsCacheDao),
+    cold: ColdCache(
+      tideDao: db.tideCacheDao,
+      forecastDao: db.forecastCacheDao,
+    ),
+  );
+});
+
 /// Composite Conditions Service — composes the four source adapters.
 /// Async because the NDBC and Tides & Currents station lists load lazily
 /// via [rootBundle].
@@ -50,5 +71,6 @@ final conditionsServiceProvider = FutureProvider<ConditionsService>((
     nws: nws,
     solunar: solunar,
     catches: db.catchesDao,
+    cache: ref.watch(cacheManagerProvider),
   );
 });

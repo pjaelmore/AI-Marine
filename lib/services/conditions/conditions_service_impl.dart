@@ -2,6 +2,8 @@ import '../../core/types/catch_record.dart';
 import '../../core/types/condition_result.dart';
 import '../../core/types/conditions.dart';
 import '../../core/types/lat_lng.dart';
+import '../../data/cache/cache_manager.dart';
+import '../../data/cache/result_codec.dart';
 import '../../data/database/daos/catches_dao.dart';
 import '../../data/sources/ndbc/buoy_observation.dart';
 import '../../data/sources/ndbc/ndbc_adapter.dart';
@@ -26,6 +28,7 @@ class ConditionsServiceImpl implements ConditionsService {
     required this.nws,
     required this.solunar,
     this.catches,
+    this.cache,
   });
 
   final NdbcAdapter ndbc;
@@ -34,20 +37,50 @@ class ConditionsServiceImpl implements ConditionsService {
   final SolunarAdapter solunar;
   final CatchesDao? catches;
 
+  /// Optional four-tier cache. When null, every method goes straight
+  /// to its adapter — preserves the existing test-fixture path that
+  /// constructs the service without a database. The Riverpod
+  /// `conditionsServiceProvider` always wires a real manager.
+  final CacheManager? cache;
+
+  /// Lat/lng bucketed to 0.1° (~10 km) for cache keys. Two lookups in
+  /// the same general area share one warm-cache entry — that's the
+  /// score-grid loop's cache hit. Different fishing spots tens of km
+  /// apart get their own entries.
+  String _locKey(LatLng loc) => '${(loc.latitude * 10).round() / 10},'
+      '${(loc.longitude * 10).round() / 10}';
+
   @override
   Future<ConditionResult<double>> getWaterTemp(
     LatLng loc,
     DateTime time,
   ) async {
-    if (!ndbc.canServe(loc, time)) return _unavailableDouble(time);
-    try {
-      final r = await ndbc.fetch(loc, time);
-      final c = r.value.waterTempC;
-      if (c == null) return _unavailableDouble(time);
-      return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
-    } on SourceException {
-      return _unavailableDouble(time);
+    Future<ConditionResult<double>?> fetch() async {
+      if (!ndbc.canServe(loc, time)) return null;
+      try {
+        final r = await ndbc.fetch(loc, time);
+        final c = r.value.waterTempC;
+        if (c == null) return null;
+        return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
+      } on SourceException {
+        return null;
+      }
     }
+
+    final mgr = cache;
+    final result = mgr == null
+        ? await fetch()
+        : await mgr.readThrough<ConditionResult<double>>(
+            key: 'water_temp:${_locKey(loc)}',
+            dataType: 'water_temp',
+            source: 'noaa_ndbc',
+            warmTtl: const Duration(hours: 1),
+            encode: (r) => encodeConditionResult(r, (v) => v),
+            decode: (s) =>
+                decodeConditionResult(s, (j) => (j as num).toDouble()),
+            fetcher: fetch,
+          );
+    return result ?? _unavailableDouble(time);
   }
 
   @override
