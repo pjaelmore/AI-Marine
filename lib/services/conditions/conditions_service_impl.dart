@@ -50,36 +50,58 @@ class ConditionsServiceImpl implements ConditionsService {
   String _locKey(LatLng loc) => '${(loc.latitude * 10).round() / 10},'
       '${(loc.longitude * 10).round() / 10}';
 
+  /// Bridges a typed adapter [fetch] through the four-tier cache when a
+  /// manager is wired, or runs it bare when the service was constructed
+  /// without one. Centralizes the encode/decode + warmTtl wiring so per-
+  /// method bodies stay focused on the source-specific extraction.
+  Future<ConditionResult<T>?> _cachedFetch<T>({
+    required String key,
+    required String dataType,
+    required String source,
+    required Object? Function(T value) toJsonT,
+    required T Function(Object? raw) fromJsonT,
+    required Future<ConditionResult<T>?> Function() fetch,
+  }) async {
+    final mgr = cache;
+    if (mgr == null) return fetch();
+    return mgr.readThrough<ConditionResult<T>>(
+      key: key,
+      dataType: dataType,
+      source: source,
+      // Uniform 1h TTL across condition types in v1: NDBC realtime2 and
+      // NWS hourly forecast both update on roughly hourly cadence, so
+      // tighter wastes refetches and looser is stale-on-the-hour. Slice
+      // post-Phase-5 calibration can tune per data type.
+      warmTtl: const Duration(hours: 1),
+      encode: (r) => encodeConditionResult(r, toJsonT),
+      decode: (s) => decodeConditionResult(s, fromJsonT),
+      fetcher: fetch,
+    );
+  }
+
   @override
   Future<ConditionResult<double>> getWaterTemp(
     LatLng loc,
     DateTime time,
   ) async {
-    Future<ConditionResult<double>?> fetch() async {
-      if (!ndbc.canServe(loc, time)) return null;
-      try {
-        final r = await ndbc.fetch(loc, time);
-        final c = r.value.waterTempC;
-        if (c == null) return null;
-        return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
-      } on SourceException {
-        return null;
-      }
-    }
-
-    final mgr = cache;
-    final result = mgr == null
-        ? await fetch()
-        : await mgr.readThrough<ConditionResult<double>>(
-            key: 'water_temp:${_locKey(loc)}',
-            dataType: 'water_temp',
-            source: 'noaa_ndbc',
-            warmTtl: const Duration(hours: 1),
-            encode: (r) => encodeConditionResult(r, (v) => v),
-            decode: (s) =>
-                decodeConditionResult(s, (j) => (j as num).toDouble()),
-            fetcher: fetch,
-          );
+    final result = await _cachedFetch<double>(
+      key: 'water_temp:${_locKey(loc)}',
+      dataType: 'water_temp',
+      source: 'noaa_ndbc',
+      toJsonT: (v) => v,
+      fromJsonT: (j) => (j as num).toDouble(),
+      fetch: () async {
+        if (!ndbc.canServe(loc, time)) return null;
+        try {
+          final r = await ndbc.fetch(loc, time);
+          final c = r.value.waterTempC;
+          if (c == null) return null;
+          return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
+        } on SourceException {
+          return null;
+        }
+      },
+    );
     return result ?? _unavailableDouble(time);
   }
 
@@ -129,38 +151,56 @@ class ConditionsServiceImpl implements ConditionsService {
     LatLng loc,
     DateTime time,
   ) async {
-    // NWS forecast first (point-resolved, no station-distance falloff);
-    // fall back to NDBC if NWS can't serve.
-    if (nws.canServe(loc, time)) {
-      try {
-        return await nws.fetch(loc, time);
-      } on SourceException {
-        // Try NDBC.
-      }
-    }
-    if (!ndbc.canServe(loc, time)) return _unavailableWind(time);
-    try {
-      final r = await ndbc.fetch(loc, time);
-      final speed = r.value.windSpeedMps;
-      final dir = r.value.windDirDegT;
-      if (speed == null || dir == null) return _unavailableWind(time);
-      return ConditionResult<WindVector>(
-        value: WindVector(
-          speedKnots: speed * 1.94384, // m/s → knots
-          directionDegrees: dir,
-          gustsKnots:
-              r.value.gustMps == null ? null : r.value.gustMps! * 1.94384,
-        ),
-        unit: 'kt',
-        source: r.source,
-        sourceDetails: r.sourceDetails,
-        fetchedAt: r.fetchedAt,
-        validUntil: r.validUntil,
-        confidence: r.confidence,
-      );
-    } on SourceException {
-      return _unavailableWind(time);
-    }
+    // One cache entry per location, regardless of which adapter filled
+    // it — the cached ConditionResult.source records NWS vs NDBC. The
+    // warm-cache row's `source` column is stamped with the *preferred*
+    // adapter (noaa_marine_forecast); when an entry was actually filled
+    // by the NDBC fallback, the inner ConditionResult stays accurate
+    // and the row tag lies a little. v1 doesn't drive eviction-by-
+    // source so this loss of fidelity is tolerable; Phase 5+ can
+    // refine.
+    final result = await _cachedFetch<WindVector>(
+      key: 'wind:${_locKey(loc)}',
+      dataType: 'wind',
+      source: 'noaa_marine_forecast',
+      toJsonT: (v) => v.toJson(),
+      fromJsonT: (j) => WindVector.fromJson(j! as Map<String, dynamic>),
+      fetch: () async {
+        // NWS forecast first (point-resolved, no station-distance
+        // falloff); fall back to NDBC if NWS can't serve.
+        if (nws.canServe(loc, time)) {
+          try {
+            return await nws.fetch(loc, time);
+          } on SourceException {
+            // Try NDBC.
+          }
+        }
+        if (!ndbc.canServe(loc, time)) return null;
+        try {
+          final r = await ndbc.fetch(loc, time);
+          final speed = r.value.windSpeedMps;
+          final dir = r.value.windDirDegT;
+          if (speed == null || dir == null) return null;
+          return ConditionResult<WindVector>(
+            value: WindVector(
+              speedKnots: speed * 1.94384, // m/s → knots
+              directionDegrees: dir,
+              gustsKnots:
+                  r.value.gustMps == null ? null : r.value.gustMps! * 1.94384,
+            ),
+            unit: 'kt',
+            source: r.source,
+            sourceDetails: r.sourceDetails,
+            fetchedAt: r.fetchedAt,
+            validUntil: r.validUntil,
+            confidence: r.confidence,
+          );
+        } on SourceException {
+          return null;
+        }
+      },
+    );
+    return result ?? _unavailableWind(time);
   }
 
   @override
@@ -168,26 +208,36 @@ class ConditionsServiceImpl implements ConditionsService {
     LatLng loc,
     DateTime time,
   ) async {
-    if (!ndbc.canServe(loc, time)) return _unavailableWaves(time);
-    try {
-      final r = await ndbc.fetch(loc, time);
-      final h = r.value.waveHeightM;
-      if (h == null) return _unavailableWaves(time);
-      return ConditionResult<WaveState>(
-        value: WaveState(
-          significantHeightFt: h * 3.28084,
-          dominantPeriodSec: r.value.dominantPeriodSec,
-        ),
-        unit: 'ft',
-        source: r.source,
-        sourceDetails: r.sourceDetails,
-        fetchedAt: r.fetchedAt,
-        validUntil: r.validUntil,
-        confidence: r.confidence,
-      );
-    } on SourceException {
-      return _unavailableWaves(time);
-    }
+    final result = await _cachedFetch<WaveState>(
+      key: 'waves:${_locKey(loc)}',
+      dataType: 'waves',
+      source: 'noaa_ndbc',
+      toJsonT: (v) => v.toJson(),
+      fromJsonT: (j) => WaveState.fromJson(j! as Map<String, dynamic>),
+      fetch: () async {
+        if (!ndbc.canServe(loc, time)) return null;
+        try {
+          final r = await ndbc.fetch(loc, time);
+          final h = r.value.waveHeightM;
+          if (h == null) return null;
+          return ConditionResult<WaveState>(
+            value: WaveState(
+              significantHeightFt: h * 3.28084,
+              dominantPeriodSec: r.value.dominantPeriodSec,
+            ),
+            unit: 'ft',
+            source: r.source,
+            sourceDetails: r.sourceDetails,
+            fetchedAt: r.fetchedAt,
+            validUntil: r.validUntil,
+            confidence: r.confidence,
+          );
+        } on SourceException {
+          return null;
+        }
+      },
+    );
+    return result ?? _unavailableWaves(time);
   }
 
   @override
@@ -219,30 +269,40 @@ class ConditionsServiceImpl implements ConditionsService {
     LatLng loc,
     DateTime time,
   ) async {
-    if (!ndbc.canServe(loc, time)) return _unavailableBaro(time);
-    try {
-      final r = await ndbc.fetch(loc, time);
-      final p = r.value.pressureHpa;
-      if (p == null) return _unavailableBaro(time);
-      // NDBC realtime2 doesn't expose a tendency value reliably; v1
-      // reports stable + zero rate-of-change. Phase 4+ derives a real
-      // trend from the cache history (multiple successive observations).
-      return ConditionResult<BarometricState>(
-        value: BarometricState(
-          pressureMillibars: p,
-          trend: BarometricTrend.stable,
-          rateOfChangeMillibarsPerHour: 0,
-        ),
-        unit: 'hPa',
-        source: r.source,
-        sourceDetails: r.sourceDetails,
-        fetchedAt: r.fetchedAt,
-        validUntil: r.validUntil,
-        confidence: r.confidence,
-      );
-    } on SourceException {
-      return _unavailableBaro(time);
-    }
+    final result = await _cachedFetch<BarometricState>(
+      key: 'barometric:${_locKey(loc)}',
+      dataType: 'barometric',
+      source: 'noaa_ndbc',
+      toJsonT: (v) => v.toJson(),
+      fromJsonT: (j) => BarometricState.fromJson(j! as Map<String, dynamic>),
+      fetch: () async {
+        if (!ndbc.canServe(loc, time)) return null;
+        try {
+          final r = await ndbc.fetch(loc, time);
+          final p = r.value.pressureHpa;
+          if (p == null) return null;
+          // NDBC realtime2 doesn't expose a tendency value reliably; v1
+          // reports stable + zero rate-of-change. Phase 4+ derives a real
+          // trend from the cache history (successive observations).
+          return ConditionResult<BarometricState>(
+            value: BarometricState(
+              pressureMillibars: p,
+              trend: BarometricTrend.stable,
+              rateOfChangeMillibarsPerHour: 0,
+            ),
+            unit: 'hPa',
+            source: r.source,
+            sourceDetails: r.sourceDetails,
+            fetchedAt: r.fetchedAt,
+            validUntil: r.validUntil,
+            confidence: r.confidence,
+          );
+        } on SourceException {
+          return null;
+        }
+      },
+    );
+    return result ?? _unavailableBaro(time);
   }
 
   @override

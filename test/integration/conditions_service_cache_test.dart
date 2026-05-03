@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:ai_marine_engine/core/types/condition_result.dart';
+import 'package:ai_marine_engine/core/types/conditions.dart';
 import 'package:ai_marine_engine/core/types/lat_lng.dart';
 import 'package:ai_marine_engine/data/cache/cache_manager.dart';
 import 'package:ai_marine_engine/data/cache/cold_cache.dart';
@@ -70,6 +71,14 @@ const _bostonBuoy = BuoyStation(
 
 String _ndbcFixture() =>
     File('test/fixtures/http_responses/ndbc_44013.txt').readAsStringSync();
+
+String _nwsPointsFixture() => File(
+      'test/fixtures/http_responses/nws_points_42.36_-71.06.json',
+    ).readAsStringSync();
+
+String _nwsForecastFixture() => File(
+      'test/fixtures/http_responses/nws_forecast_box_71_101.json',
+    ).readAsStringSync();
 
 ({ConditionsServiceImpl service, _CountingStub stub, AppDatabase db})
     _buildService() {
@@ -174,6 +183,136 @@ void main() {
         expect(r2.sourceDetails.stationId, r1.sourceDetails.stationId);
         expect(r2.fetchedAt, r1.fetchedAt);
         expect(r2.confidence, r1.confidence);
+      },
+      skip: skipReason,
+    );
+  });
+
+  group('ConditionsService — cache wiring on getWaves', () {
+    test(
+      'second call hits hot and skips NDBC; freezed value round-trips',
+      () async {
+        final t = _buildService();
+        addTearDown(() => t.db.close());
+
+        final time = DateTime.utc(2026, 5, 3, 12);
+        final r1 = await t.service.getWaves(_bostonHarbor, time);
+        expect(r1.source, DataSource.noaaNdbc);
+        expect(r1.value, isA<WaveState>());
+        expect(r1.value.significantHeightFt, greaterThan(0));
+        expect(t.stub.callCounts['/realtime2/'], 1);
+
+        final r2 = await t.service.getWaves(_bostonHarbor, time);
+        expect(t.stub.callCounts['/realtime2/'], 1);
+        // Freezed value survived encode/decode through warm + hot.
+        expect(r2.value.significantHeightFt, r1.value.significantHeightFt);
+        expect(r2.value.dominantPeriodSec, r1.value.dominantPeriodSec);
+      },
+      skip: skipReason,
+    );
+  });
+
+  group('ConditionsService — cache wiring on getBarometric', () {
+    test(
+      'second call hits hot and skips NDBC',
+      () async {
+        final t = _buildService();
+        addTearDown(() => t.db.close());
+
+        final time = DateTime.utc(2026, 5, 3, 12);
+        final r1 = await t.service.getBarometric(_bostonHarbor, time);
+        expect(r1.source, DataSource.noaaNdbc);
+        expect(r1.value, isA<BarometricState>());
+        expect(r1.value.pressureMillibars, greaterThan(900));
+        expect(t.stub.callCounts['/realtime2/'], 1);
+
+        final r2 = await t.service.getBarometric(_bostonHarbor, time);
+        expect(t.stub.callCounts['/realtime2/'], 1);
+        expect(r2.value.pressureMillibars, r1.value.pressureMillibars);
+        expect(r2.value.trend, r1.value.trend);
+      },
+      skip: skipReason,
+    );
+  });
+
+  group('ConditionsService — cache wiring on getWind', () {
+    test(
+      'NWS-served wind: second call hits hot, neither NWS nor NDBC re-fetched',
+      () async {
+        // Both NWS routes plus NDBC route stubbed; NWS wins on first call.
+        final stub = _CountingStub({
+          '/points/': _nwsPointsFixture(),
+          '/gridpoints/BOX/71,101/forecast': _nwsForecastFixture(),
+          '/realtime2/': _ndbcFixture(),
+        });
+        final dio = Dio()..httpClientAdapter = stub;
+        final ndbc = NdbcAdapter(http: dio)
+          ..seedStationsForTesting(const [_bostonBuoy]);
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
+        addTearDown(() => db.close());
+        final cache = CacheManager(
+          live: LiveSensorBuffer(),
+          hot: HotCache(),
+          warm: WarmCache(dao: db.conditionsCacheDao),
+          cold: ColdCache(
+            tideDao: db.tideCacheDao,
+            forecastDao: db.forecastCacheDao,
+          ),
+        );
+        final svc = ConditionsServiceImpl(
+          ndbc: ndbc,
+          tides: TidesAndCurrentsAdapter(http: dio),
+          nws: NwsAdapter(http: dio),
+          solunar: SolunarAdapter(),
+          cache: cache,
+        );
+
+        final time = DateTime.utc(2026, 5, 3, 15, 30);
+        final r1 = await svc.getWind(_bostonHarbor, time);
+        expect(r1.source, DataSource.noaaMarineForecast);
+        // Both NWS endpoints were hit (points lookup + grid forecast).
+        expect(stub.callCounts['/points/'], 1);
+        expect(stub.callCounts['/gridpoints/BOX/71,101/forecast'], 1);
+        expect(stub.callCounts['/realtime2/'], isNull);
+
+        final r2 = await svc.getWind(_bostonHarbor, time);
+        expect(stub.callCounts['/points/'], 1);
+        expect(stub.callCounts['/gridpoints/BOX/71,101/forecast'], 1);
+        expect(
+          r2.source,
+          DataSource.noaaMarineForecast,
+          reason: 'cached value retains NWS source',
+        );
+        expect(r2.value.directionDegrees, r1.value.directionDegrees);
+        expect(r2.value.speedKnots, r1.value.speedKnots);
+      },
+      skip: skipReason,
+    );
+
+    test(
+      'NDBC fallback on NWS failure: cached value records the NDBC source',
+      () async {
+        // No NWS routes → SourceException → fall back to NDBC.
+        final t = _buildService();
+        addTearDown(() => t.db.close());
+
+        final time = DateTime.utc(2026, 5, 3, 12);
+        final r1 = await t.service.getWind(_bostonHarbor, time);
+        expect(
+          r1.source,
+          DataSource.noaaNdbc,
+          reason: 'NWS missing → NDBC fallback',
+        );
+        final ndbcCalls1 = t.stub.callCounts['/realtime2/'];
+        expect(ndbcCalls1, 1);
+
+        // Second call: hot hit, no further NDBC traffic. The cached
+        // ConditionResult.source still reads as NDBC even though the
+        // warm row's `source` column was stamped with the preferred
+        // 'noaa_marine_forecast'.
+        final r2 = await t.service.getWind(_bostonHarbor, time);
+        expect(t.stub.callCounts['/realtime2/'], ndbcCalls1);
+        expect(r2.source, DataSource.noaaNdbc);
       },
       skip: skipReason,
     );
