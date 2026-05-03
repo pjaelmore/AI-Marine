@@ -192,18 +192,47 @@ void main() {
     test(
       'second call hits hot and skips NDBC; freezed value round-trips',
       () async {
-        final t = _buildService();
-        addTearDown(() => t.db.close());
+        // Real Boston fixture has WVHT=MM in the latest row (the
+        // existing unit test verifies that path returns unavailable),
+        // so use a synthetic body with WVHT populated to exercise the
+        // cache-fill path here.
+        const body =
+            '#YY MM DD hh mm WDIR WSPD GST WVHT DPD APD MWD PRES ATMP WTMP DEWP VIS PTDY TIDE\n'
+            '#yr mo dy hr mn degT m/s m/s m sec sec degT hPa degC degC degC nmi hPa ft\n'
+            '2026 05 03 12 00 220 6.0 8.0 1.5 7 4.0 200 1015.0 17.0 14.0 10.0 MM 0.0 MM\n';
+        final stub = _CountingStub({'/realtime2/': body});
+        final dio = Dio()..httpClientAdapter = stub;
+        final ndbc = NdbcAdapter(http: dio)
+          ..seedStationsForTesting(const [_bostonBuoy]);
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
+        addTearDown(() => db.close());
+        final cache = CacheManager(
+          live: LiveSensorBuffer(),
+          hot: HotCache(),
+          warm: WarmCache(dao: db.conditionsCacheDao),
+          cold: ColdCache(
+            tideDao: db.tideCacheDao,
+            forecastDao: db.forecastCacheDao,
+          ),
+        );
+        final svc = ConditionsServiceImpl(
+          ndbc: ndbc,
+          tides: TidesAndCurrentsAdapter(http: dio),
+          nws: NwsAdapter(http: dio),
+          solunar: SolunarAdapter(),
+          cache: cache,
+        );
 
         final time = DateTime.utc(2026, 5, 3, 12);
-        final r1 = await t.service.getWaves(_bostonHarbor, time);
+        final r1 = await svc.getWaves(_bostonHarbor, time);
         expect(r1.source, DataSource.noaaNdbc);
         expect(r1.value, isA<WaveState>());
-        expect(r1.value.significantHeightFt, greaterThan(0));
-        expect(t.stub.callCounts['/realtime2/'], 1);
+        // 1.5 m × 3.28084 ≈ 4.92 ft.
+        expect(r1.value.significantHeightFt, closeTo(4.92, 0.01));
+        expect(stub.callCounts['/realtime2/'], 1);
 
-        final r2 = await t.service.getWaves(_bostonHarbor, time);
-        expect(t.stub.callCounts['/realtime2/'], 1);
+        final r2 = await svc.getWaves(_bostonHarbor, time);
+        expect(stub.callCounts['/realtime2/'], 1);
         // Freezed value survived encode/decode through warm + hot.
         expect(r2.value.significantHeightFt, r1.value.significantHeightFt);
         expect(r2.value.dominantPeriodSec, r1.value.dominantPeriodSec);
