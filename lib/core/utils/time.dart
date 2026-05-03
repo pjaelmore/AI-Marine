@@ -18,7 +18,18 @@ int weekOfYear(DateTime time) {
 /// don't perturb the result by a day.
 int _dayOfYear(DateTime time) {
   const daysBeforeMonth = <int>[
-    0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334,
+    0,
+    31,
+    59,
+    90,
+    120,
+    151,
+    181,
+    212,
+    243,
+    273,
+    304,
+    334,
   ];
   var doy = daysBeforeMonth[time.month - 1] + time.day;
   if (time.month > 2 && _isLeapYear(time.year)) doy += 1;
