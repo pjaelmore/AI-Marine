@@ -39,4 +39,16 @@ class TideCacheDao extends DatabaseAccessor<AppDatabase>
     final keys = victims.map((r) => r.cacheKey).toList();
     return (delete(tideCache)..where((t) => t.cacheKey.isIn(keys))).go();
   }
+
+  /// Drops every unpinned row whose `valid_until_utc <= [nowUtcMs]`.
+  /// Pinned rows survive even when stale — that's the offline trip
+  /// use case (user wants the data even though it's old). Returns
+  /// the number of rows removed.
+  Future<int> deleteExpiredUnpinned(int nowUtcMs) => (delete(tideCache)
+        ..where(
+          (t) =>
+              t.pinned.equals(false) &
+              t.validUntilUtc.isSmallerOrEqualValue(nowUtcMs),
+        ))
+      .go();
 }

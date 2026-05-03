@@ -37,4 +37,13 @@ class ConditionsCacheDao extends DatabaseAccessor<AppDatabase>
     final row = await query.getSingleOrNull();
     return row?.read(conditionsCache.sizeBytes.sum()) ?? 0;
   }
+
+  /// Drops every row whose `valid_until_utc <= [nowUtcMs]`. Returns
+  /// the number of rows removed. Called by the EvictionService on
+  /// scheduled sweeps so stale entries don't accumulate between
+  /// accesses (the warm-cache get-path drops stale rows inline only
+  /// when they're actually queried).
+  Future<int> deleteExpired(int nowUtcMs) => (delete(conditionsCache)
+        ..where((t) => t.validUntilUtc.isSmallerOrEqualValue(nowUtcMs)))
+      .go();
 }

@@ -40,4 +40,14 @@ class ForecastCacheDao extends DatabaseAccessor<AppDatabase>
     final keys = victims.map((r) => r.cacheKey).toList();
     return (delete(forecastCache)..where((t) => t.cacheKey.isIn(keys))).go();
   }
+
+  /// Drops every unpinned row whose `valid_until_utc <= [nowUtcMs]`.
+  /// Pinned rows survive even when stale (offline trip use case).
+  Future<int> deleteExpiredUnpinned(int nowUtcMs) => (delete(forecastCache)
+        ..where(
+          (t) =>
+              t.pinned.equals(false) &
+              t.validUntilUtc.isSmallerOrEqualValue(nowUtcMs),
+        ))
+      .go();
 }

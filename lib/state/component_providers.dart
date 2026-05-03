@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/cache/cache_manager.dart';
 import '../data/cache/cold_cache.dart';
+import '../data/cache/eviction_service.dart';
 import '../data/cache/hot_cache.dart';
 import '../data/cache/live_sensor_buffer.dart';
 import '../data/cache/warm_cache.dart';
@@ -46,6 +47,21 @@ final cacheManagerProvider = Provider<CacheManager>((ref) {
   return CacheManager(
     live: LiveSensorBuffer(),
     hot: HotCache(),
+    warm: WarmCache(dao: db.conditionsCacheDao),
+    cold: ColdCache(
+      tideDao: db.tideCacheDao,
+      forecastDao: db.forecastCacheDao,
+    ),
+  );
+});
+
+/// Drives TTL-expired sweeps across warm + cold tiers. Phase 6 will
+/// wire this to lifecycle observers (foreground / background) and a
+/// periodic timer; for now it's exposed for callers that want to
+/// trigger a pass on demand.
+final evictionServiceProvider = Provider<EvictionService>((ref) {
+  final db = ref.watch(databaseProvider);
+  return EvictionService(
     warm: WarmCache(dao: db.conditionsCacheDao),
     cold: ColdCache(
       tideDao: db.tideCacheDao,

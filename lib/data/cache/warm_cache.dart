@@ -84,4 +84,11 @@ class WarmCache {
   /// is stale (e.g. after a write to the underlying source) and
   /// doesn't want to wait for TTL.
   Future<void> invalidate(String key) => _dao.deleteByKey(key);
+
+  /// Drops every row whose `validUntilUtc <= now`. Returns the number
+  /// of rows removed. The EvictionService calls this on scheduled
+  /// sweeps; idle entries that are never re-read otherwise sit until
+  /// next access.
+  Future<int> sweepExpired() =>
+      _dao.deleteExpired(_clock.now().millisecondsSinceEpoch);
 }

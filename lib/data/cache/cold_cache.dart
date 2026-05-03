@@ -94,6 +94,11 @@ class ColdCache {
   Future<int> evictUnpinnedTides({required int limit}) =>
       _tideDao.evictUnpinned(limit: limit);
 
+  /// Drops every unpinned tide row whose TTL has passed. Pinned rows
+  /// survive even when stale — that's the offline trip use case.
+  Future<int> sweepExpiredTides() =>
+      _tideDao.deleteExpiredUnpinned(_clock.now().millisecondsSinceEpoch);
+
   // ---- Marine forecasts -------------------------------------------------
 
   Future<String?> getForecast({
@@ -148,6 +153,11 @@ class ColdCache {
 
   Future<int> evictUnpinnedForecasts({required int limit}) =>
       _forecastDao.evictUnpinned(limit: limit);
+
+  /// Drops every unpinned forecast row whose TTL has passed. Pinned
+  /// rows survive even when stale.
+  Future<int> sweepExpiredForecasts() =>
+      _forecastDao.deleteExpiredUnpinned(_clock.now().millisecondsSinceEpoch);
 
   // ---- Key conventions -------------------------------------------------
 
