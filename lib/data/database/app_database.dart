@@ -1,0 +1,60 @@
+import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
+
+import 'daos/catches_dao.dart';
+import 'tables/catches.dart';
+
+part 'app_database.g.dart';
+
+/// Root on-device database. Mirrors TDD §4.1.
+///
+/// v1 ships at schema version 1 — there are no prior versions to migrate
+/// from. The TDD references a §4.1.11 migration system that does not
+/// exist in the document; the practical interpretation is the standard
+/// Drift [MigrationStrategy] pattern with `onCreate` running the table
+/// DDL and the index statements specified per table in §4.1.2 onward.
+/// `onUpgrade` is in place for future schema bumps.
+@DriftDatabase(tables: [Catches], daos: [CatchesDao])
+class AppDatabase extends _$AppDatabase {
+  /// Production constructor — opens a file-backed SQLite database in the
+  /// app documents directory via drift_flutter.
+  AppDatabase() : super(_openConnection());
+
+  /// Test/injection constructor — accepts an arbitrary [QueryExecutor]
+  /// (typically `NativeDatabase.memory()`).
+  AppDatabase.forTesting(super.executor);
+
+  @override
+  int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+          // Indexes from TDD §4.1.2. Drift does not declare these in the
+          // table classes; we issue the SQL once at create time. Names
+          // match the spec verbatim so a database opened by another tool
+          // sees the same names.
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_catches_timestamp '
+            'ON catches(timestamp_utc DESC)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_catches_species '
+            'ON catches(species_id, timestamp_utc DESC)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_catches_location '
+            'ON catches(latitude, longitude)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_catches_sync '
+            "ON catches(sync_status) WHERE sync_status != 'synced'",
+          );
+        },
+      );
+}
+
+QueryExecutor _openConnection() {
+  return driftDatabase(name: 'ai_marine');
+}

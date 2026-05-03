@@ -79,6 +79,13 @@ dev_dependencies:
   # Testing
   mocktail: ^1.0.0
 
+  # Test-only: explicit declaration so test/_helpers/sqlite3_setup.dart
+  # can import 'package:sqlite3/open.dart' to override the native loader
+  # on hosts where sqlite3 lives in a non-default location (Windows scoop).
+  # Already a transitive dependency via drift; this just satisfies the
+  # depend_on_referenced_packages lint.
+  sqlite3: ^2.4.0
+
 flutter:
   uses-material-design: true
 
