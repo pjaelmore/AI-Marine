@@ -32,6 +32,12 @@ env:
   # Mirror .fvmrc — bump together when the local Flutter pin moves.
   FLUTTER_VERSION: '3.22.0'
   JAVA_VERSION: '17'
+  # Opt in to the Node.js 24 runner ahead of GitHub's June 2026 cutover.
+  # The action versions we use (checkout@v4, setup-java@v4, upload-artifact@v4)
+  # still ship Node 20 binaries; this flag forces the runner to execute them
+  # on Node 24, which is what they're moving to anyway. Remove once we move
+  # to v5+ versions of those actions.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   analyze-and-test:
