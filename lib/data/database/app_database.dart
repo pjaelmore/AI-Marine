@@ -2,7 +2,13 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 import 'daos/catches_dao.dart';
+import 'daos/sync_queue_dao.dart';
+import 'daos/trip_plans_dao.dart';
+import 'daos/user_preferences_dao.dart';
 import 'tables/catches.dart';
+import 'tables/sync_queue.dart';
+import 'tables/trip_plans.dart';
+import 'tables/user_preferences.dart';
 
 part 'app_database.g.dart';
 
@@ -14,7 +20,10 @@ part 'app_database.g.dart';
 /// Drift [MigrationStrategy] pattern with `onCreate` running the table
 /// DDL and the index statements specified per table in §4.1.2 onward.
 /// `onUpgrade` is in place for future schema bumps.
-@DriftDatabase(tables: [Catches], daos: [CatchesDao])
+@DriftDatabase(
+  tables: [Catches, TripPlans, UserPreferencesTable, SyncQueue],
+  daos: [CatchesDao, TripPlansDao, UserPreferencesDao, SyncQueueDao],
+)
 class AppDatabase extends _$AppDatabase {
   /// Production constructor — opens a file-backed SQLite database in the
   /// app documents directory via drift_flutter.
