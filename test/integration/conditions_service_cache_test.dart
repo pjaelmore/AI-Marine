@@ -125,8 +125,9 @@ void main() {
         );
 
         // Warm tier should have a row written through on the first call.
+        // _locKey rounds -70.55 to -70.6 (Dart's half-away-from-zero).
         final row =
-            await t.db.conditionsCacheDao.getByKey('water_temp:42.4,-70.5');
+            await t.db.conditionsCacheDao.getByKey('water_temp:42.4,-70.6');
         expect(row, isNotNull);
         expect(row!.dataType, 'water_temp');
         expect(row.source, 'noaa_ndbc');
