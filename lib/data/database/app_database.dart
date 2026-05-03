@@ -2,11 +2,21 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 import 'daos/catches_dao.dart';
+import 'daos/chart_tile_cache_dao.dart';
+import 'daos/conditions_cache_dao.dart';
+import 'daos/forecast_cache_dao.dart';
+import 'daos/score_cache_dao.dart';
 import 'daos/sync_queue_dao.dart';
+import 'daos/tide_cache_dao.dart';
 import 'daos/trip_plans_dao.dart';
 import 'daos/user_preferences_dao.dart';
 import 'tables/catches.dart';
+import 'tables/chart_tile_cache.dart';
+import 'tables/conditions_cache.dart';
+import 'tables/forecast_cache.dart';
+import 'tables/score_cache.dart';
 import 'tables/sync_queue.dart';
+import 'tables/tide_cache.dart';
 import 'tables/trip_plans.dart';
 import 'tables/user_preferences.dart';
 
@@ -21,8 +31,28 @@ part 'app_database.g.dart';
 /// DDL and the index statements specified per table in §4.1.2 onward.
 /// `onUpgrade` is in place for future schema bumps.
 @DriftDatabase(
-  tables: [Catches, TripPlans, UserPreferencesTable, SyncQueue],
-  daos: [CatchesDao, TripPlansDao, UserPreferencesDao, SyncQueueDao],
+  tables: [
+    Catches,
+    TripPlans,
+    UserPreferencesTable,
+    SyncQueue,
+    ConditionsCache,
+    ScoreCache,
+    ChartTileCache,
+    ForecastCache,
+    TideCache,
+  ],
+  daos: [
+    CatchesDao,
+    TripPlansDao,
+    UserPreferencesDao,
+    SyncQueueDao,
+    ConditionsCacheDao,
+    ScoreCacheDao,
+    ChartTileCacheDao,
+    ForecastCacheDao,
+    TideCacheDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Production constructor — opens a file-backed SQLite database in the
@@ -59,6 +89,15 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
             'CREATE INDEX IF NOT EXISTS idx_catches_sync '
             "ON catches(sync_status) WHERE sync_status != 'synced'",
+          );
+          // §4.1.4 conditions_cache indexes — freshness and LRU eviction.
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_conditions_valid '
+            'ON conditions_cache(valid_until_utc)',
+          );
+          await customStatement(
+            'CREATE INDEX IF NOT EXISTS idx_conditions_lru '
+            'ON conditions_cache(last_accessed_utc)',
           );
         },
       );

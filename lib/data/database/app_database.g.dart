@@ -2597,6 +2597,2486 @@ class SyncQueueCompanion extends UpdateCompanion<SyncQueueEntry> {
   }
 }
 
+class $ConditionsCacheTable extends ConditionsCache
+    with TableInfo<$ConditionsCacheTable, ConditionsCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ConditionsCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta =
+      const VerificationMeta('cacheKey');
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+      'cache_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dataTypeMeta =
+      const VerificationMeta('dataType');
+  @override
+  late final GeneratedColumn<String> dataType = GeneratedColumn<String>(
+      'data_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _valueJsonMeta =
+      const VerificationMeta('valueJson');
+  @override
+  late final GeneratedColumn<String> valueJson = GeneratedColumn<String>(
+      'value_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fetchedAtUtcMeta =
+      const VerificationMeta('fetchedAtUtc');
+  @override
+  late final GeneratedColumn<int> fetchedAtUtc = GeneratedColumn<int>(
+      'fetched_at_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _validUntilUtcMeta =
+      const VerificationMeta('validUntilUtc');
+  @override
+  late final GeneratedColumn<int> validUntilUtc = GeneratedColumn<int>(
+      'valid_until_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _sizeBytesMeta =
+      const VerificationMeta('sizeBytes');
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+      'size_bytes', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _lastAccessedUtcMeta =
+      const VerificationMeta('lastAccessedUtc');
+  @override
+  late final GeneratedColumn<int> lastAccessedUtc = GeneratedColumn<int>(
+      'last_accessed_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        cacheKey,
+        dataType,
+        source,
+        valueJson,
+        fetchedAtUtc,
+        validUntilUtc,
+        sizeBytes,
+        lastAccessedUtc
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'conditions_cache';
+  @override
+  VerificationContext validateIntegrity(Insertable<ConditionsCacheRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(_cacheKeyMeta,
+          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('data_type')) {
+      context.handle(_dataTypeMeta,
+          dataType.isAcceptableOrUnknown(data['data_type']!, _dataTypeMeta));
+    } else if (isInserting) {
+      context.missing(_dataTypeMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('value_json')) {
+      context.handle(_valueJsonMeta,
+          valueJson.isAcceptableOrUnknown(data['value_json']!, _valueJsonMeta));
+    } else if (isInserting) {
+      context.missing(_valueJsonMeta);
+    }
+    if (data.containsKey('fetched_at_utc')) {
+      context.handle(
+          _fetchedAtUtcMeta,
+          fetchedAtUtc.isAcceptableOrUnknown(
+              data['fetched_at_utc']!, _fetchedAtUtcMeta));
+    } else if (isInserting) {
+      context.missing(_fetchedAtUtcMeta);
+    }
+    if (data.containsKey('valid_until_utc')) {
+      context.handle(
+          _validUntilUtcMeta,
+          validUntilUtc.isAcceptableOrUnknown(
+              data['valid_until_utc']!, _validUntilUtcMeta));
+    } else if (isInserting) {
+      context.missing(_validUntilUtcMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(_sizeBytesMeta,
+          sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta));
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    if (data.containsKey('last_accessed_utc')) {
+      context.handle(
+          _lastAccessedUtcMeta,
+          lastAccessedUtc.isAcceptableOrUnknown(
+              data['last_accessed_utc']!, _lastAccessedUtcMeta));
+    } else if (isInserting) {
+      context.missing(_lastAccessedUtcMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  ConditionsCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ConditionsCacheRow(
+      cacheKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
+      dataType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}data_type'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source'])!,
+      valueJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}value_json'])!,
+      fetchedAtUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fetched_at_utc'])!,
+      validUntilUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}valid_until_utc'])!,
+      sizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size_bytes'])!,
+      lastAccessedUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_accessed_utc'])!,
+    );
+  }
+
+  @override
+  $ConditionsCacheTable createAlias(String alias) {
+    return $ConditionsCacheTable(attachedDatabase, alias);
+  }
+}
+
+class ConditionsCacheRow extends DataClass
+    implements Insertable<ConditionsCacheRow> {
+  final String cacheKey;
+  final String dataType;
+  final String source;
+  final String valueJson;
+  final int fetchedAtUtc;
+  final int validUntilUtc;
+  final int sizeBytes;
+  final int lastAccessedUtc;
+  const ConditionsCacheRow(
+      {required this.cacheKey,
+      required this.dataType,
+      required this.source,
+      required this.valueJson,
+      required this.fetchedAtUtc,
+      required this.validUntilUtc,
+      required this.sizeBytes,
+      required this.lastAccessedUtc});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['data_type'] = Variable<String>(dataType);
+    map['source'] = Variable<String>(source);
+    map['value_json'] = Variable<String>(valueJson);
+    map['fetched_at_utc'] = Variable<int>(fetchedAtUtc);
+    map['valid_until_utc'] = Variable<int>(validUntilUtc);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['last_accessed_utc'] = Variable<int>(lastAccessedUtc);
+    return map;
+  }
+
+  ConditionsCacheCompanion toCompanion(bool nullToAbsent) {
+    return ConditionsCacheCompanion(
+      cacheKey: Value(cacheKey),
+      dataType: Value(dataType),
+      source: Value(source),
+      valueJson: Value(valueJson),
+      fetchedAtUtc: Value(fetchedAtUtc),
+      validUntilUtc: Value(validUntilUtc),
+      sizeBytes: Value(sizeBytes),
+      lastAccessedUtc: Value(lastAccessedUtc),
+    );
+  }
+
+  factory ConditionsCacheRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ConditionsCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      dataType: serializer.fromJson<String>(json['dataType']),
+      source: serializer.fromJson<String>(json['source']),
+      valueJson: serializer.fromJson<String>(json['valueJson']),
+      fetchedAtUtc: serializer.fromJson<int>(json['fetchedAtUtc']),
+      validUntilUtc: serializer.fromJson<int>(json['validUntilUtc']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      lastAccessedUtc: serializer.fromJson<int>(json['lastAccessedUtc']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'dataType': serializer.toJson<String>(dataType),
+      'source': serializer.toJson<String>(source),
+      'valueJson': serializer.toJson<String>(valueJson),
+      'fetchedAtUtc': serializer.toJson<int>(fetchedAtUtc),
+      'validUntilUtc': serializer.toJson<int>(validUntilUtc),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'lastAccessedUtc': serializer.toJson<int>(lastAccessedUtc),
+    };
+  }
+
+  ConditionsCacheRow copyWith(
+          {String? cacheKey,
+          String? dataType,
+          String? source,
+          String? valueJson,
+          int? fetchedAtUtc,
+          int? validUntilUtc,
+          int? sizeBytes,
+          int? lastAccessedUtc}) =>
+      ConditionsCacheRow(
+        cacheKey: cacheKey ?? this.cacheKey,
+        dataType: dataType ?? this.dataType,
+        source: source ?? this.source,
+        valueJson: valueJson ?? this.valueJson,
+        fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+        validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      );
+  ConditionsCacheRow copyWithCompanion(ConditionsCacheCompanion data) {
+    return ConditionsCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      dataType: data.dataType.present ? data.dataType.value : this.dataType,
+      source: data.source.present ? data.source.value : this.source,
+      valueJson: data.valueJson.present ? data.valueJson.value : this.valueJson,
+      fetchedAtUtc: data.fetchedAtUtc.present
+          ? data.fetchedAtUtc.value
+          : this.fetchedAtUtc,
+      validUntilUtc: data.validUntilUtc.present
+          ? data.validUntilUtc.value
+          : this.validUntilUtc,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      lastAccessedUtc: data.lastAccessedUtc.present
+          ? data.lastAccessedUtc.value
+          : this.lastAccessedUtc,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConditionsCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('dataType: $dataType, ')
+          ..write('source: $source, ')
+          ..write('valueJson: $valueJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cacheKey, dataType, source, valueJson,
+      fetchedAtUtc, validUntilUtc, sizeBytes, lastAccessedUtc);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ConditionsCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.dataType == this.dataType &&
+          other.source == this.source &&
+          other.valueJson == this.valueJson &&
+          other.fetchedAtUtc == this.fetchedAtUtc &&
+          other.validUntilUtc == this.validUntilUtc &&
+          other.sizeBytes == this.sizeBytes &&
+          other.lastAccessedUtc == this.lastAccessedUtc);
+}
+
+class ConditionsCacheCompanion extends UpdateCompanion<ConditionsCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> dataType;
+  final Value<String> source;
+  final Value<String> valueJson;
+  final Value<int> fetchedAtUtc;
+  final Value<int> validUntilUtc;
+  final Value<int> sizeBytes;
+  final Value<int> lastAccessedUtc;
+  final Value<int> rowid;
+  const ConditionsCacheCompanion({
+    this.cacheKey = const Value.absent(),
+    this.dataType = const Value.absent(),
+    this.source = const Value.absent(),
+    this.valueJson = const Value.absent(),
+    this.fetchedAtUtc = const Value.absent(),
+    this.validUntilUtc = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.lastAccessedUtc = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ConditionsCacheCompanion.insert({
+    required String cacheKey,
+    required String dataType,
+    required String source,
+    required String valueJson,
+    required int fetchedAtUtc,
+    required int validUntilUtc,
+    required int sizeBytes,
+    required int lastAccessedUtc,
+    this.rowid = const Value.absent(),
+  })  : cacheKey = Value(cacheKey),
+        dataType = Value(dataType),
+        source = Value(source),
+        valueJson = Value(valueJson),
+        fetchedAtUtc = Value(fetchedAtUtc),
+        validUntilUtc = Value(validUntilUtc),
+        sizeBytes = Value(sizeBytes),
+        lastAccessedUtc = Value(lastAccessedUtc);
+  static Insertable<ConditionsCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? dataType,
+    Expression<String>? source,
+    Expression<String>? valueJson,
+    Expression<int>? fetchedAtUtc,
+    Expression<int>? validUntilUtc,
+    Expression<int>? sizeBytes,
+    Expression<int>? lastAccessedUtc,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (dataType != null) 'data_type': dataType,
+      if (source != null) 'source': source,
+      if (valueJson != null) 'value_json': valueJson,
+      if (fetchedAtUtc != null) 'fetched_at_utc': fetchedAtUtc,
+      if (validUntilUtc != null) 'valid_until_utc': validUntilUtc,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (lastAccessedUtc != null) 'last_accessed_utc': lastAccessedUtc,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ConditionsCacheCompanion copyWith(
+      {Value<String>? cacheKey,
+      Value<String>? dataType,
+      Value<String>? source,
+      Value<String>? valueJson,
+      Value<int>? fetchedAtUtc,
+      Value<int>? validUntilUtc,
+      Value<int>? sizeBytes,
+      Value<int>? lastAccessedUtc,
+      Value<int>? rowid}) {
+    return ConditionsCacheCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      dataType: dataType ?? this.dataType,
+      source: source ?? this.source,
+      valueJson: valueJson ?? this.valueJson,
+      fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+      validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (dataType.present) {
+      map['data_type'] = Variable<String>(dataType.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (valueJson.present) {
+      map['value_json'] = Variable<String>(valueJson.value);
+    }
+    if (fetchedAtUtc.present) {
+      map['fetched_at_utc'] = Variable<int>(fetchedAtUtc.value);
+    }
+    if (validUntilUtc.present) {
+      map['valid_until_utc'] = Variable<int>(validUntilUtc.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (lastAccessedUtc.present) {
+      map['last_accessed_utc'] = Variable<int>(lastAccessedUtc.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ConditionsCacheCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('dataType: $dataType, ')
+          ..write('source: $source, ')
+          ..write('valueJson: $valueJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ScoreCacheTable extends ScoreCache
+    with TableInfo<$ScoreCacheTable, ScoreCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScoreCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta =
+      const VerificationMeta('cacheKey');
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+      'cache_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _speciesIdMeta =
+      const VerificationMeta('speciesId');
+  @override
+  late final GeneratedColumn<String> speciesId = GeneratedColumn<String>(
+      'species_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _cellLatMeta =
+      const VerificationMeta('cellLat');
+  @override
+  late final GeneratedColumn<double> cellLat = GeneratedColumn<double>(
+      'cell_lat', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _cellLonMeta =
+      const VerificationMeta('cellLon');
+  @override
+  late final GeneratedColumn<double> cellLon = GeneratedColumn<double>(
+      'cell_lon', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _conditionsHashMeta =
+      const VerificationMeta('conditionsHash');
+  @override
+  late final GeneratedColumn<String> conditionsHash = GeneratedColumn<String>(
+      'conditions_hash', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<double> score = GeneratedColumn<double>(
+      'score', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _reasoningJsonMeta =
+      const VerificationMeta('reasoningJson');
+  @override
+  late final GeneratedColumn<String> reasoningJson = GeneratedColumn<String>(
+      'reasoning_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _computedAtUtcMeta =
+      const VerificationMeta('computedAtUtc');
+  @override
+  late final GeneratedColumn<int> computedAtUtc = GeneratedColumn<int>(
+      'computed_at_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _validUntilUtcMeta =
+      const VerificationMeta('validUntilUtc');
+  @override
+  late final GeneratedColumn<int> validUntilUtc = GeneratedColumn<int>(
+      'valid_until_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _lastAccessedUtcMeta =
+      const VerificationMeta('lastAccessedUtc');
+  @override
+  late final GeneratedColumn<int> lastAccessedUtc = GeneratedColumn<int>(
+      'last_accessed_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        cacheKey,
+        speciesId,
+        cellLat,
+        cellLon,
+        conditionsHash,
+        score,
+        reasoningJson,
+        computedAtUtc,
+        validUntilUtc,
+        lastAccessedUtc
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'score_cache';
+  @override
+  VerificationContext validateIntegrity(Insertable<ScoreCacheRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(_cacheKeyMeta,
+          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('species_id')) {
+      context.handle(_speciesIdMeta,
+          speciesId.isAcceptableOrUnknown(data['species_id']!, _speciesIdMeta));
+    } else if (isInserting) {
+      context.missing(_speciesIdMeta);
+    }
+    if (data.containsKey('cell_lat')) {
+      context.handle(_cellLatMeta,
+          cellLat.isAcceptableOrUnknown(data['cell_lat']!, _cellLatMeta));
+    } else if (isInserting) {
+      context.missing(_cellLatMeta);
+    }
+    if (data.containsKey('cell_lon')) {
+      context.handle(_cellLonMeta,
+          cellLon.isAcceptableOrUnknown(data['cell_lon']!, _cellLonMeta));
+    } else if (isInserting) {
+      context.missing(_cellLonMeta);
+    }
+    if (data.containsKey('conditions_hash')) {
+      context.handle(
+          _conditionsHashMeta,
+          conditionsHash.isAcceptableOrUnknown(
+              data['conditions_hash']!, _conditionsHashMeta));
+    } else if (isInserting) {
+      context.missing(_conditionsHashMeta);
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+          _scoreMeta, score.isAcceptableOrUnknown(data['score']!, _scoreMeta));
+    } else if (isInserting) {
+      context.missing(_scoreMeta);
+    }
+    if (data.containsKey('reasoning_json')) {
+      context.handle(
+          _reasoningJsonMeta,
+          reasoningJson.isAcceptableOrUnknown(
+              data['reasoning_json']!, _reasoningJsonMeta));
+    } else if (isInserting) {
+      context.missing(_reasoningJsonMeta);
+    }
+    if (data.containsKey('computed_at_utc')) {
+      context.handle(
+          _computedAtUtcMeta,
+          computedAtUtc.isAcceptableOrUnknown(
+              data['computed_at_utc']!, _computedAtUtcMeta));
+    } else if (isInserting) {
+      context.missing(_computedAtUtcMeta);
+    }
+    if (data.containsKey('valid_until_utc')) {
+      context.handle(
+          _validUntilUtcMeta,
+          validUntilUtc.isAcceptableOrUnknown(
+              data['valid_until_utc']!, _validUntilUtcMeta));
+    } else if (isInserting) {
+      context.missing(_validUntilUtcMeta);
+    }
+    if (data.containsKey('last_accessed_utc')) {
+      context.handle(
+          _lastAccessedUtcMeta,
+          lastAccessedUtc.isAcceptableOrUnknown(
+              data['last_accessed_utc']!, _lastAccessedUtcMeta));
+    } else if (isInserting) {
+      context.missing(_lastAccessedUtcMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  ScoreCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ScoreCacheRow(
+      cacheKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
+      speciesId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}species_id'])!,
+      cellLat: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}cell_lat'])!,
+      cellLon: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}cell_lon'])!,
+      conditionsHash: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}conditions_hash'])!,
+      score: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}score'])!,
+      reasoningJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reasoning_json'])!,
+      computedAtUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}computed_at_utc'])!,
+      validUntilUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}valid_until_utc'])!,
+      lastAccessedUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_accessed_utc'])!,
+    );
+  }
+
+  @override
+  $ScoreCacheTable createAlias(String alias) {
+    return $ScoreCacheTable(attachedDatabase, alias);
+  }
+}
+
+class ScoreCacheRow extends DataClass implements Insertable<ScoreCacheRow> {
+  final String cacheKey;
+  final String speciesId;
+  final double cellLat;
+  final double cellLon;
+  final String conditionsHash;
+  final double score;
+  final String reasoningJson;
+  final int computedAtUtc;
+  final int validUntilUtc;
+  final int lastAccessedUtc;
+  const ScoreCacheRow(
+      {required this.cacheKey,
+      required this.speciesId,
+      required this.cellLat,
+      required this.cellLon,
+      required this.conditionsHash,
+      required this.score,
+      required this.reasoningJson,
+      required this.computedAtUtc,
+      required this.validUntilUtc,
+      required this.lastAccessedUtc});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['species_id'] = Variable<String>(speciesId);
+    map['cell_lat'] = Variable<double>(cellLat);
+    map['cell_lon'] = Variable<double>(cellLon);
+    map['conditions_hash'] = Variable<String>(conditionsHash);
+    map['score'] = Variable<double>(score);
+    map['reasoning_json'] = Variable<String>(reasoningJson);
+    map['computed_at_utc'] = Variable<int>(computedAtUtc);
+    map['valid_until_utc'] = Variable<int>(validUntilUtc);
+    map['last_accessed_utc'] = Variable<int>(lastAccessedUtc);
+    return map;
+  }
+
+  ScoreCacheCompanion toCompanion(bool nullToAbsent) {
+    return ScoreCacheCompanion(
+      cacheKey: Value(cacheKey),
+      speciesId: Value(speciesId),
+      cellLat: Value(cellLat),
+      cellLon: Value(cellLon),
+      conditionsHash: Value(conditionsHash),
+      score: Value(score),
+      reasoningJson: Value(reasoningJson),
+      computedAtUtc: Value(computedAtUtc),
+      validUntilUtc: Value(validUntilUtc),
+      lastAccessedUtc: Value(lastAccessedUtc),
+    );
+  }
+
+  factory ScoreCacheRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ScoreCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      speciesId: serializer.fromJson<String>(json['speciesId']),
+      cellLat: serializer.fromJson<double>(json['cellLat']),
+      cellLon: serializer.fromJson<double>(json['cellLon']),
+      conditionsHash: serializer.fromJson<String>(json['conditionsHash']),
+      score: serializer.fromJson<double>(json['score']),
+      reasoningJson: serializer.fromJson<String>(json['reasoningJson']),
+      computedAtUtc: serializer.fromJson<int>(json['computedAtUtc']),
+      validUntilUtc: serializer.fromJson<int>(json['validUntilUtc']),
+      lastAccessedUtc: serializer.fromJson<int>(json['lastAccessedUtc']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'speciesId': serializer.toJson<String>(speciesId),
+      'cellLat': serializer.toJson<double>(cellLat),
+      'cellLon': serializer.toJson<double>(cellLon),
+      'conditionsHash': serializer.toJson<String>(conditionsHash),
+      'score': serializer.toJson<double>(score),
+      'reasoningJson': serializer.toJson<String>(reasoningJson),
+      'computedAtUtc': serializer.toJson<int>(computedAtUtc),
+      'validUntilUtc': serializer.toJson<int>(validUntilUtc),
+      'lastAccessedUtc': serializer.toJson<int>(lastAccessedUtc),
+    };
+  }
+
+  ScoreCacheRow copyWith(
+          {String? cacheKey,
+          String? speciesId,
+          double? cellLat,
+          double? cellLon,
+          String? conditionsHash,
+          double? score,
+          String? reasoningJson,
+          int? computedAtUtc,
+          int? validUntilUtc,
+          int? lastAccessedUtc}) =>
+      ScoreCacheRow(
+        cacheKey: cacheKey ?? this.cacheKey,
+        speciesId: speciesId ?? this.speciesId,
+        cellLat: cellLat ?? this.cellLat,
+        cellLon: cellLon ?? this.cellLon,
+        conditionsHash: conditionsHash ?? this.conditionsHash,
+        score: score ?? this.score,
+        reasoningJson: reasoningJson ?? this.reasoningJson,
+        computedAtUtc: computedAtUtc ?? this.computedAtUtc,
+        validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+        lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      );
+  ScoreCacheRow copyWithCompanion(ScoreCacheCompanion data) {
+    return ScoreCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      speciesId: data.speciesId.present ? data.speciesId.value : this.speciesId,
+      cellLat: data.cellLat.present ? data.cellLat.value : this.cellLat,
+      cellLon: data.cellLon.present ? data.cellLon.value : this.cellLon,
+      conditionsHash: data.conditionsHash.present
+          ? data.conditionsHash.value
+          : this.conditionsHash,
+      score: data.score.present ? data.score.value : this.score,
+      reasoningJson: data.reasoningJson.present
+          ? data.reasoningJson.value
+          : this.reasoningJson,
+      computedAtUtc: data.computedAtUtc.present
+          ? data.computedAtUtc.value
+          : this.computedAtUtc,
+      validUntilUtc: data.validUntilUtc.present
+          ? data.validUntilUtc.value
+          : this.validUntilUtc,
+      lastAccessedUtc: data.lastAccessedUtc.present
+          ? data.lastAccessedUtc.value
+          : this.lastAccessedUtc,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScoreCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('speciesId: $speciesId, ')
+          ..write('cellLat: $cellLat, ')
+          ..write('cellLon: $cellLon, ')
+          ..write('conditionsHash: $conditionsHash, ')
+          ..write('score: $score, ')
+          ..write('reasoningJson: $reasoningJson, ')
+          ..write('computedAtUtc: $computedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      cacheKey,
+      speciesId,
+      cellLat,
+      cellLon,
+      conditionsHash,
+      score,
+      reasoningJson,
+      computedAtUtc,
+      validUntilUtc,
+      lastAccessedUtc);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ScoreCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.speciesId == this.speciesId &&
+          other.cellLat == this.cellLat &&
+          other.cellLon == this.cellLon &&
+          other.conditionsHash == this.conditionsHash &&
+          other.score == this.score &&
+          other.reasoningJson == this.reasoningJson &&
+          other.computedAtUtc == this.computedAtUtc &&
+          other.validUntilUtc == this.validUntilUtc &&
+          other.lastAccessedUtc == this.lastAccessedUtc);
+}
+
+class ScoreCacheCompanion extends UpdateCompanion<ScoreCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> speciesId;
+  final Value<double> cellLat;
+  final Value<double> cellLon;
+  final Value<String> conditionsHash;
+  final Value<double> score;
+  final Value<String> reasoningJson;
+  final Value<int> computedAtUtc;
+  final Value<int> validUntilUtc;
+  final Value<int> lastAccessedUtc;
+  final Value<int> rowid;
+  const ScoreCacheCompanion({
+    this.cacheKey = const Value.absent(),
+    this.speciesId = const Value.absent(),
+    this.cellLat = const Value.absent(),
+    this.cellLon = const Value.absent(),
+    this.conditionsHash = const Value.absent(),
+    this.score = const Value.absent(),
+    this.reasoningJson = const Value.absent(),
+    this.computedAtUtc = const Value.absent(),
+    this.validUntilUtc = const Value.absent(),
+    this.lastAccessedUtc = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ScoreCacheCompanion.insert({
+    required String cacheKey,
+    required String speciesId,
+    required double cellLat,
+    required double cellLon,
+    required String conditionsHash,
+    required double score,
+    required String reasoningJson,
+    required int computedAtUtc,
+    required int validUntilUtc,
+    required int lastAccessedUtc,
+    this.rowid = const Value.absent(),
+  })  : cacheKey = Value(cacheKey),
+        speciesId = Value(speciesId),
+        cellLat = Value(cellLat),
+        cellLon = Value(cellLon),
+        conditionsHash = Value(conditionsHash),
+        score = Value(score),
+        reasoningJson = Value(reasoningJson),
+        computedAtUtc = Value(computedAtUtc),
+        validUntilUtc = Value(validUntilUtc),
+        lastAccessedUtc = Value(lastAccessedUtc);
+  static Insertable<ScoreCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? speciesId,
+    Expression<double>? cellLat,
+    Expression<double>? cellLon,
+    Expression<String>? conditionsHash,
+    Expression<double>? score,
+    Expression<String>? reasoningJson,
+    Expression<int>? computedAtUtc,
+    Expression<int>? validUntilUtc,
+    Expression<int>? lastAccessedUtc,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (speciesId != null) 'species_id': speciesId,
+      if (cellLat != null) 'cell_lat': cellLat,
+      if (cellLon != null) 'cell_lon': cellLon,
+      if (conditionsHash != null) 'conditions_hash': conditionsHash,
+      if (score != null) 'score': score,
+      if (reasoningJson != null) 'reasoning_json': reasoningJson,
+      if (computedAtUtc != null) 'computed_at_utc': computedAtUtc,
+      if (validUntilUtc != null) 'valid_until_utc': validUntilUtc,
+      if (lastAccessedUtc != null) 'last_accessed_utc': lastAccessedUtc,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ScoreCacheCompanion copyWith(
+      {Value<String>? cacheKey,
+      Value<String>? speciesId,
+      Value<double>? cellLat,
+      Value<double>? cellLon,
+      Value<String>? conditionsHash,
+      Value<double>? score,
+      Value<String>? reasoningJson,
+      Value<int>? computedAtUtc,
+      Value<int>? validUntilUtc,
+      Value<int>? lastAccessedUtc,
+      Value<int>? rowid}) {
+    return ScoreCacheCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      speciesId: speciesId ?? this.speciesId,
+      cellLat: cellLat ?? this.cellLat,
+      cellLon: cellLon ?? this.cellLon,
+      conditionsHash: conditionsHash ?? this.conditionsHash,
+      score: score ?? this.score,
+      reasoningJson: reasoningJson ?? this.reasoningJson,
+      computedAtUtc: computedAtUtc ?? this.computedAtUtc,
+      validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+      lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (speciesId.present) {
+      map['species_id'] = Variable<String>(speciesId.value);
+    }
+    if (cellLat.present) {
+      map['cell_lat'] = Variable<double>(cellLat.value);
+    }
+    if (cellLon.present) {
+      map['cell_lon'] = Variable<double>(cellLon.value);
+    }
+    if (conditionsHash.present) {
+      map['conditions_hash'] = Variable<String>(conditionsHash.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<double>(score.value);
+    }
+    if (reasoningJson.present) {
+      map['reasoning_json'] = Variable<String>(reasoningJson.value);
+    }
+    if (computedAtUtc.present) {
+      map['computed_at_utc'] = Variable<int>(computedAtUtc.value);
+    }
+    if (validUntilUtc.present) {
+      map['valid_until_utc'] = Variable<int>(validUntilUtc.value);
+    }
+    if (lastAccessedUtc.present) {
+      map['last_accessed_utc'] = Variable<int>(lastAccessedUtc.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScoreCacheCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('speciesId: $speciesId, ')
+          ..write('cellLat: $cellLat, ')
+          ..write('cellLon: $cellLon, ')
+          ..write('conditionsHash: $conditionsHash, ')
+          ..write('score: $score, ')
+          ..write('reasoningJson: $reasoningJson, ')
+          ..write('computedAtUtc: $computedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChartTileCacheTable extends ChartTileCache
+    with TableInfo<$ChartTileCacheTable, ChartTileCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChartTileCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta =
+      const VerificationMeta('cacheKey');
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+      'cache_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _zoomMeta = const VerificationMeta('zoom');
+  @override
+  late final GeneratedColumn<int> zoom = GeneratedColumn<int>(
+      'zoom', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _xMeta = const VerificationMeta('x');
+  @override
+  late final GeneratedColumn<int> x = GeneratedColumn<int>(
+      'x', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _yMeta = const VerificationMeta('y');
+  @override
+  late final GeneratedColumn<int> y = GeneratedColumn<int>(
+      'y', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _chartRevisionMeta =
+      const VerificationMeta('chartRevision');
+  @override
+  late final GeneratedColumn<String> chartRevision = GeneratedColumn<String>(
+      'chart_revision', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _tileBlobMeta =
+      const VerificationMeta('tileBlob');
+  @override
+  late final GeneratedColumn<Uint8List> tileBlob = GeneratedColumn<Uint8List>(
+      'tile_blob', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _sizeBytesMeta =
+      const VerificationMeta('sizeBytes');
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+      'size_bytes', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _fetchedAtUtcMeta =
+      const VerificationMeta('fetchedAtUtc');
+  @override
+  late final GeneratedColumn<int> fetchedAtUtc = GeneratedColumn<int>(
+      'fetched_at_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _lastAccessedUtcMeta =
+      const VerificationMeta('lastAccessedUtc');
+  @override
+  late final GeneratedColumn<int> lastAccessedUtc = GeneratedColumn<int>(
+      'last_accessed_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+      'pinned', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("pinned" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        cacheKey,
+        zoom,
+        x,
+        y,
+        chartRevision,
+        tileBlob,
+        sizeBytes,
+        fetchedAtUtc,
+        lastAccessedUtc,
+        pinned
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chart_tile_cache';
+  @override
+  VerificationContext validateIntegrity(Insertable<ChartTileCacheRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(_cacheKeyMeta,
+          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('zoom')) {
+      context.handle(
+          _zoomMeta, zoom.isAcceptableOrUnknown(data['zoom']!, _zoomMeta));
+    } else if (isInserting) {
+      context.missing(_zoomMeta);
+    }
+    if (data.containsKey('x')) {
+      context.handle(_xMeta, x.isAcceptableOrUnknown(data['x']!, _xMeta));
+    } else if (isInserting) {
+      context.missing(_xMeta);
+    }
+    if (data.containsKey('y')) {
+      context.handle(_yMeta, y.isAcceptableOrUnknown(data['y']!, _yMeta));
+    } else if (isInserting) {
+      context.missing(_yMeta);
+    }
+    if (data.containsKey('chart_revision')) {
+      context.handle(
+          _chartRevisionMeta,
+          chartRevision.isAcceptableOrUnknown(
+              data['chart_revision']!, _chartRevisionMeta));
+    } else if (isInserting) {
+      context.missing(_chartRevisionMeta);
+    }
+    if (data.containsKey('tile_blob')) {
+      context.handle(_tileBlobMeta,
+          tileBlob.isAcceptableOrUnknown(data['tile_blob']!, _tileBlobMeta));
+    } else if (isInserting) {
+      context.missing(_tileBlobMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(_sizeBytesMeta,
+          sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta));
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    if (data.containsKey('fetched_at_utc')) {
+      context.handle(
+          _fetchedAtUtcMeta,
+          fetchedAtUtc.isAcceptableOrUnknown(
+              data['fetched_at_utc']!, _fetchedAtUtcMeta));
+    } else if (isInserting) {
+      context.missing(_fetchedAtUtcMeta);
+    }
+    if (data.containsKey('last_accessed_utc')) {
+      context.handle(
+          _lastAccessedUtcMeta,
+          lastAccessedUtc.isAcceptableOrUnknown(
+              data['last_accessed_utc']!, _lastAccessedUtcMeta));
+    } else if (isInserting) {
+      context.missing(_lastAccessedUtcMeta);
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(_pinnedMeta,
+          pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  ChartTileCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChartTileCacheRow(
+      cacheKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
+      zoom: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}zoom'])!,
+      x: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}x'])!,
+      y: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}y'])!,
+      chartRevision: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}chart_revision'])!,
+      tileBlob: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}tile_blob'])!,
+      sizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size_bytes'])!,
+      fetchedAtUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fetched_at_utc'])!,
+      lastAccessedUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_accessed_utc'])!,
+      pinned: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}pinned'])!,
+    );
+  }
+
+  @override
+  $ChartTileCacheTable createAlias(String alias) {
+    return $ChartTileCacheTable(attachedDatabase, alias);
+  }
+}
+
+class ChartTileCacheRow extends DataClass
+    implements Insertable<ChartTileCacheRow> {
+  final String cacheKey;
+  final int zoom;
+  final int x;
+  final int y;
+  final String chartRevision;
+  final Uint8List tileBlob;
+  final int sizeBytes;
+  final int fetchedAtUtc;
+  final int lastAccessedUtc;
+  final bool pinned;
+  const ChartTileCacheRow(
+      {required this.cacheKey,
+      required this.zoom,
+      required this.x,
+      required this.y,
+      required this.chartRevision,
+      required this.tileBlob,
+      required this.sizeBytes,
+      required this.fetchedAtUtc,
+      required this.lastAccessedUtc,
+      required this.pinned});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['zoom'] = Variable<int>(zoom);
+    map['x'] = Variable<int>(x);
+    map['y'] = Variable<int>(y);
+    map['chart_revision'] = Variable<String>(chartRevision);
+    map['tile_blob'] = Variable<Uint8List>(tileBlob);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['fetched_at_utc'] = Variable<int>(fetchedAtUtc);
+    map['last_accessed_utc'] = Variable<int>(lastAccessedUtc);
+    map['pinned'] = Variable<bool>(pinned);
+    return map;
+  }
+
+  ChartTileCacheCompanion toCompanion(bool nullToAbsent) {
+    return ChartTileCacheCompanion(
+      cacheKey: Value(cacheKey),
+      zoom: Value(zoom),
+      x: Value(x),
+      y: Value(y),
+      chartRevision: Value(chartRevision),
+      tileBlob: Value(tileBlob),
+      sizeBytes: Value(sizeBytes),
+      fetchedAtUtc: Value(fetchedAtUtc),
+      lastAccessedUtc: Value(lastAccessedUtc),
+      pinned: Value(pinned),
+    );
+  }
+
+  factory ChartTileCacheRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChartTileCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      zoom: serializer.fromJson<int>(json['zoom']),
+      x: serializer.fromJson<int>(json['x']),
+      y: serializer.fromJson<int>(json['y']),
+      chartRevision: serializer.fromJson<String>(json['chartRevision']),
+      tileBlob: serializer.fromJson<Uint8List>(json['tileBlob']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      fetchedAtUtc: serializer.fromJson<int>(json['fetchedAtUtc']),
+      lastAccessedUtc: serializer.fromJson<int>(json['lastAccessedUtc']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'zoom': serializer.toJson<int>(zoom),
+      'x': serializer.toJson<int>(x),
+      'y': serializer.toJson<int>(y),
+      'chartRevision': serializer.toJson<String>(chartRevision),
+      'tileBlob': serializer.toJson<Uint8List>(tileBlob),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'fetchedAtUtc': serializer.toJson<int>(fetchedAtUtc),
+      'lastAccessedUtc': serializer.toJson<int>(lastAccessedUtc),
+      'pinned': serializer.toJson<bool>(pinned),
+    };
+  }
+
+  ChartTileCacheRow copyWith(
+          {String? cacheKey,
+          int? zoom,
+          int? x,
+          int? y,
+          String? chartRevision,
+          Uint8List? tileBlob,
+          int? sizeBytes,
+          int? fetchedAtUtc,
+          int? lastAccessedUtc,
+          bool? pinned}) =>
+      ChartTileCacheRow(
+        cacheKey: cacheKey ?? this.cacheKey,
+        zoom: zoom ?? this.zoom,
+        x: x ?? this.x,
+        y: y ?? this.y,
+        chartRevision: chartRevision ?? this.chartRevision,
+        tileBlob: tileBlob ?? this.tileBlob,
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+        lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+        pinned: pinned ?? this.pinned,
+      );
+  ChartTileCacheRow copyWithCompanion(ChartTileCacheCompanion data) {
+    return ChartTileCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      zoom: data.zoom.present ? data.zoom.value : this.zoom,
+      x: data.x.present ? data.x.value : this.x,
+      y: data.y.present ? data.y.value : this.y,
+      chartRevision: data.chartRevision.present
+          ? data.chartRevision.value
+          : this.chartRevision,
+      tileBlob: data.tileBlob.present ? data.tileBlob.value : this.tileBlob,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      fetchedAtUtc: data.fetchedAtUtc.present
+          ? data.fetchedAtUtc.value
+          : this.fetchedAtUtc,
+      lastAccessedUtc: data.lastAccessedUtc.present
+          ? data.lastAccessedUtc.value
+          : this.lastAccessedUtc,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChartTileCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('zoom: $zoom, ')
+          ..write('x: $x, ')
+          ..write('y: $y, ')
+          ..write('chartRevision: $chartRevision, ')
+          ..write('tileBlob: $tileBlob, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      cacheKey,
+      zoom,
+      x,
+      y,
+      chartRevision,
+      $driftBlobEquality.hash(tileBlob),
+      sizeBytes,
+      fetchedAtUtc,
+      lastAccessedUtc,
+      pinned);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChartTileCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.zoom == this.zoom &&
+          other.x == this.x &&
+          other.y == this.y &&
+          other.chartRevision == this.chartRevision &&
+          $driftBlobEquality.equals(other.tileBlob, this.tileBlob) &&
+          other.sizeBytes == this.sizeBytes &&
+          other.fetchedAtUtc == this.fetchedAtUtc &&
+          other.lastAccessedUtc == this.lastAccessedUtc &&
+          other.pinned == this.pinned);
+}
+
+class ChartTileCacheCompanion extends UpdateCompanion<ChartTileCacheRow> {
+  final Value<String> cacheKey;
+  final Value<int> zoom;
+  final Value<int> x;
+  final Value<int> y;
+  final Value<String> chartRevision;
+  final Value<Uint8List> tileBlob;
+  final Value<int> sizeBytes;
+  final Value<int> fetchedAtUtc;
+  final Value<int> lastAccessedUtc;
+  final Value<bool> pinned;
+  final Value<int> rowid;
+  const ChartTileCacheCompanion({
+    this.cacheKey = const Value.absent(),
+    this.zoom = const Value.absent(),
+    this.x = const Value.absent(),
+    this.y = const Value.absent(),
+    this.chartRevision = const Value.absent(),
+    this.tileBlob = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.fetchedAtUtc = const Value.absent(),
+    this.lastAccessedUtc = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChartTileCacheCompanion.insert({
+    required String cacheKey,
+    required int zoom,
+    required int x,
+    required int y,
+    required String chartRevision,
+    required Uint8List tileBlob,
+    required int sizeBytes,
+    required int fetchedAtUtc,
+    required int lastAccessedUtc,
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : cacheKey = Value(cacheKey),
+        zoom = Value(zoom),
+        x = Value(x),
+        y = Value(y),
+        chartRevision = Value(chartRevision),
+        tileBlob = Value(tileBlob),
+        sizeBytes = Value(sizeBytes),
+        fetchedAtUtc = Value(fetchedAtUtc),
+        lastAccessedUtc = Value(lastAccessedUtc);
+  static Insertable<ChartTileCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<int>? zoom,
+    Expression<int>? x,
+    Expression<int>? y,
+    Expression<String>? chartRevision,
+    Expression<Uint8List>? tileBlob,
+    Expression<int>? sizeBytes,
+    Expression<int>? fetchedAtUtc,
+    Expression<int>? lastAccessedUtc,
+    Expression<bool>? pinned,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (zoom != null) 'zoom': zoom,
+      if (x != null) 'x': x,
+      if (y != null) 'y': y,
+      if (chartRevision != null) 'chart_revision': chartRevision,
+      if (tileBlob != null) 'tile_blob': tileBlob,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (fetchedAtUtc != null) 'fetched_at_utc': fetchedAtUtc,
+      if (lastAccessedUtc != null) 'last_accessed_utc': lastAccessedUtc,
+      if (pinned != null) 'pinned': pinned,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChartTileCacheCompanion copyWith(
+      {Value<String>? cacheKey,
+      Value<int>? zoom,
+      Value<int>? x,
+      Value<int>? y,
+      Value<String>? chartRevision,
+      Value<Uint8List>? tileBlob,
+      Value<int>? sizeBytes,
+      Value<int>? fetchedAtUtc,
+      Value<int>? lastAccessedUtc,
+      Value<bool>? pinned,
+      Value<int>? rowid}) {
+    return ChartTileCacheCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      zoom: zoom ?? this.zoom,
+      x: x ?? this.x,
+      y: y ?? this.y,
+      chartRevision: chartRevision ?? this.chartRevision,
+      tileBlob: tileBlob ?? this.tileBlob,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+      lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      pinned: pinned ?? this.pinned,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (zoom.present) {
+      map['zoom'] = Variable<int>(zoom.value);
+    }
+    if (x.present) {
+      map['x'] = Variable<int>(x.value);
+    }
+    if (y.present) {
+      map['y'] = Variable<int>(y.value);
+    }
+    if (chartRevision.present) {
+      map['chart_revision'] = Variable<String>(chartRevision.value);
+    }
+    if (tileBlob.present) {
+      map['tile_blob'] = Variable<Uint8List>(tileBlob.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (fetchedAtUtc.present) {
+      map['fetched_at_utc'] = Variable<int>(fetchedAtUtc.value);
+    }
+    if (lastAccessedUtc.present) {
+      map['last_accessed_utc'] = Variable<int>(lastAccessedUtc.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChartTileCacheCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('zoom: $zoom, ')
+          ..write('x: $x, ')
+          ..write('y: $y, ')
+          ..write('chartRevision: $chartRevision, ')
+          ..write('tileBlob: $tileBlob, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ForecastCacheTable extends ForecastCache
+    with TableInfo<$ForecastCacheTable, ForecastCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ForecastCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta =
+      const VerificationMeta('cacheKey');
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+      'cache_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _zoneIdMeta = const VerificationMeta('zoneId');
+  @override
+  late final GeneratedColumn<String> zoneId = GeneratedColumn<String>(
+      'zone_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dayBucketMeta =
+      const VerificationMeta('dayBucket');
+  @override
+  late final GeneratedColumn<String> dayBucket = GeneratedColumn<String>(
+      'day_bucket', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _forecastJsonMeta =
+      const VerificationMeta('forecastJson');
+  @override
+  late final GeneratedColumn<String> forecastJson = GeneratedColumn<String>(
+      'forecast_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fetchedAtUtcMeta =
+      const VerificationMeta('fetchedAtUtc');
+  @override
+  late final GeneratedColumn<int> fetchedAtUtc = GeneratedColumn<int>(
+      'fetched_at_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _validUntilUtcMeta =
+      const VerificationMeta('validUntilUtc');
+  @override
+  late final GeneratedColumn<int> validUntilUtc = GeneratedColumn<int>(
+      'valid_until_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _sizeBytesMeta =
+      const VerificationMeta('sizeBytes');
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+      'size_bytes', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _lastAccessedUtcMeta =
+      const VerificationMeta('lastAccessedUtc');
+  @override
+  late final GeneratedColumn<int> lastAccessedUtc = GeneratedColumn<int>(
+      'last_accessed_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+      'pinned', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("pinned" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        cacheKey,
+        zoneId,
+        dayBucket,
+        forecastJson,
+        fetchedAtUtc,
+        validUntilUtc,
+        sizeBytes,
+        lastAccessedUtc,
+        pinned
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'forecast_cache';
+  @override
+  VerificationContext validateIntegrity(Insertable<ForecastCacheRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(_cacheKeyMeta,
+          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('zone_id')) {
+      context.handle(_zoneIdMeta,
+          zoneId.isAcceptableOrUnknown(data['zone_id']!, _zoneIdMeta));
+    } else if (isInserting) {
+      context.missing(_zoneIdMeta);
+    }
+    if (data.containsKey('day_bucket')) {
+      context.handle(_dayBucketMeta,
+          dayBucket.isAcceptableOrUnknown(data['day_bucket']!, _dayBucketMeta));
+    } else if (isInserting) {
+      context.missing(_dayBucketMeta);
+    }
+    if (data.containsKey('forecast_json')) {
+      context.handle(
+          _forecastJsonMeta,
+          forecastJson.isAcceptableOrUnknown(
+              data['forecast_json']!, _forecastJsonMeta));
+    } else if (isInserting) {
+      context.missing(_forecastJsonMeta);
+    }
+    if (data.containsKey('fetched_at_utc')) {
+      context.handle(
+          _fetchedAtUtcMeta,
+          fetchedAtUtc.isAcceptableOrUnknown(
+              data['fetched_at_utc']!, _fetchedAtUtcMeta));
+    } else if (isInserting) {
+      context.missing(_fetchedAtUtcMeta);
+    }
+    if (data.containsKey('valid_until_utc')) {
+      context.handle(
+          _validUntilUtcMeta,
+          validUntilUtc.isAcceptableOrUnknown(
+              data['valid_until_utc']!, _validUntilUtcMeta));
+    } else if (isInserting) {
+      context.missing(_validUntilUtcMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(_sizeBytesMeta,
+          sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta));
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    if (data.containsKey('last_accessed_utc')) {
+      context.handle(
+          _lastAccessedUtcMeta,
+          lastAccessedUtc.isAcceptableOrUnknown(
+              data['last_accessed_utc']!, _lastAccessedUtcMeta));
+    } else if (isInserting) {
+      context.missing(_lastAccessedUtcMeta);
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(_pinnedMeta,
+          pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  ForecastCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ForecastCacheRow(
+      cacheKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
+      zoneId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}zone_id'])!,
+      dayBucket: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}day_bucket'])!,
+      forecastJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}forecast_json'])!,
+      fetchedAtUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fetched_at_utc'])!,
+      validUntilUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}valid_until_utc'])!,
+      sizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size_bytes'])!,
+      lastAccessedUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_accessed_utc'])!,
+      pinned: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}pinned'])!,
+    );
+  }
+
+  @override
+  $ForecastCacheTable createAlias(String alias) {
+    return $ForecastCacheTable(attachedDatabase, alias);
+  }
+}
+
+class ForecastCacheRow extends DataClass
+    implements Insertable<ForecastCacheRow> {
+  final String cacheKey;
+  final String zoneId;
+  final String dayBucket;
+  final String forecastJson;
+  final int fetchedAtUtc;
+  final int validUntilUtc;
+  final int sizeBytes;
+  final int lastAccessedUtc;
+  final bool pinned;
+  const ForecastCacheRow(
+      {required this.cacheKey,
+      required this.zoneId,
+      required this.dayBucket,
+      required this.forecastJson,
+      required this.fetchedAtUtc,
+      required this.validUntilUtc,
+      required this.sizeBytes,
+      required this.lastAccessedUtc,
+      required this.pinned});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['zone_id'] = Variable<String>(zoneId);
+    map['day_bucket'] = Variable<String>(dayBucket);
+    map['forecast_json'] = Variable<String>(forecastJson);
+    map['fetched_at_utc'] = Variable<int>(fetchedAtUtc);
+    map['valid_until_utc'] = Variable<int>(validUntilUtc);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['last_accessed_utc'] = Variable<int>(lastAccessedUtc);
+    map['pinned'] = Variable<bool>(pinned);
+    return map;
+  }
+
+  ForecastCacheCompanion toCompanion(bool nullToAbsent) {
+    return ForecastCacheCompanion(
+      cacheKey: Value(cacheKey),
+      zoneId: Value(zoneId),
+      dayBucket: Value(dayBucket),
+      forecastJson: Value(forecastJson),
+      fetchedAtUtc: Value(fetchedAtUtc),
+      validUntilUtc: Value(validUntilUtc),
+      sizeBytes: Value(sizeBytes),
+      lastAccessedUtc: Value(lastAccessedUtc),
+      pinned: Value(pinned),
+    );
+  }
+
+  factory ForecastCacheRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ForecastCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      zoneId: serializer.fromJson<String>(json['zoneId']),
+      dayBucket: serializer.fromJson<String>(json['dayBucket']),
+      forecastJson: serializer.fromJson<String>(json['forecastJson']),
+      fetchedAtUtc: serializer.fromJson<int>(json['fetchedAtUtc']),
+      validUntilUtc: serializer.fromJson<int>(json['validUntilUtc']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      lastAccessedUtc: serializer.fromJson<int>(json['lastAccessedUtc']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'zoneId': serializer.toJson<String>(zoneId),
+      'dayBucket': serializer.toJson<String>(dayBucket),
+      'forecastJson': serializer.toJson<String>(forecastJson),
+      'fetchedAtUtc': serializer.toJson<int>(fetchedAtUtc),
+      'validUntilUtc': serializer.toJson<int>(validUntilUtc),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'lastAccessedUtc': serializer.toJson<int>(lastAccessedUtc),
+      'pinned': serializer.toJson<bool>(pinned),
+    };
+  }
+
+  ForecastCacheRow copyWith(
+          {String? cacheKey,
+          String? zoneId,
+          String? dayBucket,
+          String? forecastJson,
+          int? fetchedAtUtc,
+          int? validUntilUtc,
+          int? sizeBytes,
+          int? lastAccessedUtc,
+          bool? pinned}) =>
+      ForecastCacheRow(
+        cacheKey: cacheKey ?? this.cacheKey,
+        zoneId: zoneId ?? this.zoneId,
+        dayBucket: dayBucket ?? this.dayBucket,
+        forecastJson: forecastJson ?? this.forecastJson,
+        fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+        validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+        pinned: pinned ?? this.pinned,
+      );
+  ForecastCacheRow copyWithCompanion(ForecastCacheCompanion data) {
+    return ForecastCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      zoneId: data.zoneId.present ? data.zoneId.value : this.zoneId,
+      dayBucket: data.dayBucket.present ? data.dayBucket.value : this.dayBucket,
+      forecastJson: data.forecastJson.present
+          ? data.forecastJson.value
+          : this.forecastJson,
+      fetchedAtUtc: data.fetchedAtUtc.present
+          ? data.fetchedAtUtc.value
+          : this.fetchedAtUtc,
+      validUntilUtc: data.validUntilUtc.present
+          ? data.validUntilUtc.value
+          : this.validUntilUtc,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      lastAccessedUtc: data.lastAccessedUtc.present
+          ? data.lastAccessedUtc.value
+          : this.lastAccessedUtc,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ForecastCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('dayBucket: $dayBucket, ')
+          ..write('forecastJson: $forecastJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(cacheKey, zoneId, dayBucket, forecastJson,
+      fetchedAtUtc, validUntilUtc, sizeBytes, lastAccessedUtc, pinned);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ForecastCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.zoneId == this.zoneId &&
+          other.dayBucket == this.dayBucket &&
+          other.forecastJson == this.forecastJson &&
+          other.fetchedAtUtc == this.fetchedAtUtc &&
+          other.validUntilUtc == this.validUntilUtc &&
+          other.sizeBytes == this.sizeBytes &&
+          other.lastAccessedUtc == this.lastAccessedUtc &&
+          other.pinned == this.pinned);
+}
+
+class ForecastCacheCompanion extends UpdateCompanion<ForecastCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> zoneId;
+  final Value<String> dayBucket;
+  final Value<String> forecastJson;
+  final Value<int> fetchedAtUtc;
+  final Value<int> validUntilUtc;
+  final Value<int> sizeBytes;
+  final Value<int> lastAccessedUtc;
+  final Value<bool> pinned;
+  final Value<int> rowid;
+  const ForecastCacheCompanion({
+    this.cacheKey = const Value.absent(),
+    this.zoneId = const Value.absent(),
+    this.dayBucket = const Value.absent(),
+    this.forecastJson = const Value.absent(),
+    this.fetchedAtUtc = const Value.absent(),
+    this.validUntilUtc = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.lastAccessedUtc = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ForecastCacheCompanion.insert({
+    required String cacheKey,
+    required String zoneId,
+    required String dayBucket,
+    required String forecastJson,
+    required int fetchedAtUtc,
+    required int validUntilUtc,
+    required int sizeBytes,
+    required int lastAccessedUtc,
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : cacheKey = Value(cacheKey),
+        zoneId = Value(zoneId),
+        dayBucket = Value(dayBucket),
+        forecastJson = Value(forecastJson),
+        fetchedAtUtc = Value(fetchedAtUtc),
+        validUntilUtc = Value(validUntilUtc),
+        sizeBytes = Value(sizeBytes),
+        lastAccessedUtc = Value(lastAccessedUtc);
+  static Insertable<ForecastCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? zoneId,
+    Expression<String>? dayBucket,
+    Expression<String>? forecastJson,
+    Expression<int>? fetchedAtUtc,
+    Expression<int>? validUntilUtc,
+    Expression<int>? sizeBytes,
+    Expression<int>? lastAccessedUtc,
+    Expression<bool>? pinned,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (zoneId != null) 'zone_id': zoneId,
+      if (dayBucket != null) 'day_bucket': dayBucket,
+      if (forecastJson != null) 'forecast_json': forecastJson,
+      if (fetchedAtUtc != null) 'fetched_at_utc': fetchedAtUtc,
+      if (validUntilUtc != null) 'valid_until_utc': validUntilUtc,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (lastAccessedUtc != null) 'last_accessed_utc': lastAccessedUtc,
+      if (pinned != null) 'pinned': pinned,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ForecastCacheCompanion copyWith(
+      {Value<String>? cacheKey,
+      Value<String>? zoneId,
+      Value<String>? dayBucket,
+      Value<String>? forecastJson,
+      Value<int>? fetchedAtUtc,
+      Value<int>? validUntilUtc,
+      Value<int>? sizeBytes,
+      Value<int>? lastAccessedUtc,
+      Value<bool>? pinned,
+      Value<int>? rowid}) {
+    return ForecastCacheCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      zoneId: zoneId ?? this.zoneId,
+      dayBucket: dayBucket ?? this.dayBucket,
+      forecastJson: forecastJson ?? this.forecastJson,
+      fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+      validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      pinned: pinned ?? this.pinned,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (zoneId.present) {
+      map['zone_id'] = Variable<String>(zoneId.value);
+    }
+    if (dayBucket.present) {
+      map['day_bucket'] = Variable<String>(dayBucket.value);
+    }
+    if (forecastJson.present) {
+      map['forecast_json'] = Variable<String>(forecastJson.value);
+    }
+    if (fetchedAtUtc.present) {
+      map['fetched_at_utc'] = Variable<int>(fetchedAtUtc.value);
+    }
+    if (validUntilUtc.present) {
+      map['valid_until_utc'] = Variable<int>(validUntilUtc.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (lastAccessedUtc.present) {
+      map['last_accessed_utc'] = Variable<int>(lastAccessedUtc.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ForecastCacheCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('zoneId: $zoneId, ')
+          ..write('dayBucket: $dayBucket, ')
+          ..write('forecastJson: $forecastJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TideCacheTable extends TideCache
+    with TableInfo<$TideCacheTable, TideCacheRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TideCacheTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _cacheKeyMeta =
+      const VerificationMeta('cacheKey');
+  @override
+  late final GeneratedColumn<String> cacheKey = GeneratedColumn<String>(
+      'cache_key', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _stationIdMeta =
+      const VerificationMeta('stationId');
+  @override
+  late final GeneratedColumn<String> stationId = GeneratedColumn<String>(
+      'station_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dayBucketMeta =
+      const VerificationMeta('dayBucket');
+  @override
+  late final GeneratedColumn<String> dayBucket = GeneratedColumn<String>(
+      'day_bucket', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _predictionsJsonMeta =
+      const VerificationMeta('predictionsJson');
+  @override
+  late final GeneratedColumn<String> predictionsJson = GeneratedColumn<String>(
+      'predictions_json', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _fetchedAtUtcMeta =
+      const VerificationMeta('fetchedAtUtc');
+  @override
+  late final GeneratedColumn<int> fetchedAtUtc = GeneratedColumn<int>(
+      'fetched_at_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _validUntilUtcMeta =
+      const VerificationMeta('validUntilUtc');
+  @override
+  late final GeneratedColumn<int> validUntilUtc = GeneratedColumn<int>(
+      'valid_until_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _sizeBytesMeta =
+      const VerificationMeta('sizeBytes');
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+      'size_bytes', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _lastAccessedUtcMeta =
+      const VerificationMeta('lastAccessedUtc');
+  @override
+  late final GeneratedColumn<int> lastAccessedUtc = GeneratedColumn<int>(
+      'last_accessed_utc', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _pinnedMeta = const VerificationMeta('pinned');
+  @override
+  late final GeneratedColumn<bool> pinned = GeneratedColumn<bool>(
+      'pinned', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("pinned" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [
+        cacheKey,
+        stationId,
+        dayBucket,
+        predictionsJson,
+        fetchedAtUtc,
+        validUntilUtc,
+        sizeBytes,
+        lastAccessedUtc,
+        pinned
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tide_cache';
+  @override
+  VerificationContext validateIntegrity(Insertable<TideCacheRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('cache_key')) {
+      context.handle(_cacheKeyMeta,
+          cacheKey.isAcceptableOrUnknown(data['cache_key']!, _cacheKeyMeta));
+    } else if (isInserting) {
+      context.missing(_cacheKeyMeta);
+    }
+    if (data.containsKey('station_id')) {
+      context.handle(_stationIdMeta,
+          stationId.isAcceptableOrUnknown(data['station_id']!, _stationIdMeta));
+    } else if (isInserting) {
+      context.missing(_stationIdMeta);
+    }
+    if (data.containsKey('day_bucket')) {
+      context.handle(_dayBucketMeta,
+          dayBucket.isAcceptableOrUnknown(data['day_bucket']!, _dayBucketMeta));
+    } else if (isInserting) {
+      context.missing(_dayBucketMeta);
+    }
+    if (data.containsKey('predictions_json')) {
+      context.handle(
+          _predictionsJsonMeta,
+          predictionsJson.isAcceptableOrUnknown(
+              data['predictions_json']!, _predictionsJsonMeta));
+    } else if (isInserting) {
+      context.missing(_predictionsJsonMeta);
+    }
+    if (data.containsKey('fetched_at_utc')) {
+      context.handle(
+          _fetchedAtUtcMeta,
+          fetchedAtUtc.isAcceptableOrUnknown(
+              data['fetched_at_utc']!, _fetchedAtUtcMeta));
+    } else if (isInserting) {
+      context.missing(_fetchedAtUtcMeta);
+    }
+    if (data.containsKey('valid_until_utc')) {
+      context.handle(
+          _validUntilUtcMeta,
+          validUntilUtc.isAcceptableOrUnknown(
+              data['valid_until_utc']!, _validUntilUtcMeta));
+    } else if (isInserting) {
+      context.missing(_validUntilUtcMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(_sizeBytesMeta,
+          sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta));
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    if (data.containsKey('last_accessed_utc')) {
+      context.handle(
+          _lastAccessedUtcMeta,
+          lastAccessedUtc.isAcceptableOrUnknown(
+              data['last_accessed_utc']!, _lastAccessedUtcMeta));
+    } else if (isInserting) {
+      context.missing(_lastAccessedUtcMeta);
+    }
+    if (data.containsKey('pinned')) {
+      context.handle(_pinnedMeta,
+          pinned.isAcceptableOrUnknown(data['pinned']!, _pinnedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {cacheKey};
+  @override
+  TideCacheRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TideCacheRow(
+      cacheKey: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}cache_key'])!,
+      stationId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}station_id'])!,
+      dayBucket: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}day_bucket'])!,
+      predictionsJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}predictions_json'])!,
+      fetchedAtUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}fetched_at_utc'])!,
+      validUntilUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}valid_until_utc'])!,
+      sizeBytes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}size_bytes'])!,
+      lastAccessedUtc: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}last_accessed_utc'])!,
+      pinned: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}pinned'])!,
+    );
+  }
+
+  @override
+  $TideCacheTable createAlias(String alias) {
+    return $TideCacheTable(attachedDatabase, alias);
+  }
+}
+
+class TideCacheRow extends DataClass implements Insertable<TideCacheRow> {
+  final String cacheKey;
+  final String stationId;
+  final String dayBucket;
+  final String predictionsJson;
+  final int fetchedAtUtc;
+  final int validUntilUtc;
+  final int sizeBytes;
+  final int lastAccessedUtc;
+  final bool pinned;
+  const TideCacheRow(
+      {required this.cacheKey,
+      required this.stationId,
+      required this.dayBucket,
+      required this.predictionsJson,
+      required this.fetchedAtUtc,
+      required this.validUntilUtc,
+      required this.sizeBytes,
+      required this.lastAccessedUtc,
+      required this.pinned});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['cache_key'] = Variable<String>(cacheKey);
+    map['station_id'] = Variable<String>(stationId);
+    map['day_bucket'] = Variable<String>(dayBucket);
+    map['predictions_json'] = Variable<String>(predictionsJson);
+    map['fetched_at_utc'] = Variable<int>(fetchedAtUtc);
+    map['valid_until_utc'] = Variable<int>(validUntilUtc);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['last_accessed_utc'] = Variable<int>(lastAccessedUtc);
+    map['pinned'] = Variable<bool>(pinned);
+    return map;
+  }
+
+  TideCacheCompanion toCompanion(bool nullToAbsent) {
+    return TideCacheCompanion(
+      cacheKey: Value(cacheKey),
+      stationId: Value(stationId),
+      dayBucket: Value(dayBucket),
+      predictionsJson: Value(predictionsJson),
+      fetchedAtUtc: Value(fetchedAtUtc),
+      validUntilUtc: Value(validUntilUtc),
+      sizeBytes: Value(sizeBytes),
+      lastAccessedUtc: Value(lastAccessedUtc),
+      pinned: Value(pinned),
+    );
+  }
+
+  factory TideCacheRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TideCacheRow(
+      cacheKey: serializer.fromJson<String>(json['cacheKey']),
+      stationId: serializer.fromJson<String>(json['stationId']),
+      dayBucket: serializer.fromJson<String>(json['dayBucket']),
+      predictionsJson: serializer.fromJson<String>(json['predictionsJson']),
+      fetchedAtUtc: serializer.fromJson<int>(json['fetchedAtUtc']),
+      validUntilUtc: serializer.fromJson<int>(json['validUntilUtc']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      lastAccessedUtc: serializer.fromJson<int>(json['lastAccessedUtc']),
+      pinned: serializer.fromJson<bool>(json['pinned']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'cacheKey': serializer.toJson<String>(cacheKey),
+      'stationId': serializer.toJson<String>(stationId),
+      'dayBucket': serializer.toJson<String>(dayBucket),
+      'predictionsJson': serializer.toJson<String>(predictionsJson),
+      'fetchedAtUtc': serializer.toJson<int>(fetchedAtUtc),
+      'validUntilUtc': serializer.toJson<int>(validUntilUtc),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'lastAccessedUtc': serializer.toJson<int>(lastAccessedUtc),
+      'pinned': serializer.toJson<bool>(pinned),
+    };
+  }
+
+  TideCacheRow copyWith(
+          {String? cacheKey,
+          String? stationId,
+          String? dayBucket,
+          String? predictionsJson,
+          int? fetchedAtUtc,
+          int? validUntilUtc,
+          int? sizeBytes,
+          int? lastAccessedUtc,
+          bool? pinned}) =>
+      TideCacheRow(
+        cacheKey: cacheKey ?? this.cacheKey,
+        stationId: stationId ?? this.stationId,
+        dayBucket: dayBucket ?? this.dayBucket,
+        predictionsJson: predictionsJson ?? this.predictionsJson,
+        fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+        validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+        sizeBytes: sizeBytes ?? this.sizeBytes,
+        lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+        pinned: pinned ?? this.pinned,
+      );
+  TideCacheRow copyWithCompanion(TideCacheCompanion data) {
+    return TideCacheRow(
+      cacheKey: data.cacheKey.present ? data.cacheKey.value : this.cacheKey,
+      stationId: data.stationId.present ? data.stationId.value : this.stationId,
+      dayBucket: data.dayBucket.present ? data.dayBucket.value : this.dayBucket,
+      predictionsJson: data.predictionsJson.present
+          ? data.predictionsJson.value
+          : this.predictionsJson,
+      fetchedAtUtc: data.fetchedAtUtc.present
+          ? data.fetchedAtUtc.value
+          : this.fetchedAtUtc,
+      validUntilUtc: data.validUntilUtc.present
+          ? data.validUntilUtc.value
+          : this.validUntilUtc,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      lastAccessedUtc: data.lastAccessedUtc.present
+          ? data.lastAccessedUtc.value
+          : this.lastAccessedUtc,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TideCacheRow(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('stationId: $stationId, ')
+          ..write('dayBucket: $dayBucket, ')
+          ..write('predictionsJson: $predictionsJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      cacheKey,
+      stationId,
+      dayBucket,
+      predictionsJson,
+      fetchedAtUtc,
+      validUntilUtc,
+      sizeBytes,
+      lastAccessedUtc,
+      pinned);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TideCacheRow &&
+          other.cacheKey == this.cacheKey &&
+          other.stationId == this.stationId &&
+          other.dayBucket == this.dayBucket &&
+          other.predictionsJson == this.predictionsJson &&
+          other.fetchedAtUtc == this.fetchedAtUtc &&
+          other.validUntilUtc == this.validUntilUtc &&
+          other.sizeBytes == this.sizeBytes &&
+          other.lastAccessedUtc == this.lastAccessedUtc &&
+          other.pinned == this.pinned);
+}
+
+class TideCacheCompanion extends UpdateCompanion<TideCacheRow> {
+  final Value<String> cacheKey;
+  final Value<String> stationId;
+  final Value<String> dayBucket;
+  final Value<String> predictionsJson;
+  final Value<int> fetchedAtUtc;
+  final Value<int> validUntilUtc;
+  final Value<int> sizeBytes;
+  final Value<int> lastAccessedUtc;
+  final Value<bool> pinned;
+  final Value<int> rowid;
+  const TideCacheCompanion({
+    this.cacheKey = const Value.absent(),
+    this.stationId = const Value.absent(),
+    this.dayBucket = const Value.absent(),
+    this.predictionsJson = const Value.absent(),
+    this.fetchedAtUtc = const Value.absent(),
+    this.validUntilUtc = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.lastAccessedUtc = const Value.absent(),
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TideCacheCompanion.insert({
+    required String cacheKey,
+    required String stationId,
+    required String dayBucket,
+    required String predictionsJson,
+    required int fetchedAtUtc,
+    required int validUntilUtc,
+    required int sizeBytes,
+    required int lastAccessedUtc,
+    this.pinned = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : cacheKey = Value(cacheKey),
+        stationId = Value(stationId),
+        dayBucket = Value(dayBucket),
+        predictionsJson = Value(predictionsJson),
+        fetchedAtUtc = Value(fetchedAtUtc),
+        validUntilUtc = Value(validUntilUtc),
+        sizeBytes = Value(sizeBytes),
+        lastAccessedUtc = Value(lastAccessedUtc);
+  static Insertable<TideCacheRow> custom({
+    Expression<String>? cacheKey,
+    Expression<String>? stationId,
+    Expression<String>? dayBucket,
+    Expression<String>? predictionsJson,
+    Expression<int>? fetchedAtUtc,
+    Expression<int>? validUntilUtc,
+    Expression<int>? sizeBytes,
+    Expression<int>? lastAccessedUtc,
+    Expression<bool>? pinned,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (cacheKey != null) 'cache_key': cacheKey,
+      if (stationId != null) 'station_id': stationId,
+      if (dayBucket != null) 'day_bucket': dayBucket,
+      if (predictionsJson != null) 'predictions_json': predictionsJson,
+      if (fetchedAtUtc != null) 'fetched_at_utc': fetchedAtUtc,
+      if (validUntilUtc != null) 'valid_until_utc': validUntilUtc,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (lastAccessedUtc != null) 'last_accessed_utc': lastAccessedUtc,
+      if (pinned != null) 'pinned': pinned,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TideCacheCompanion copyWith(
+      {Value<String>? cacheKey,
+      Value<String>? stationId,
+      Value<String>? dayBucket,
+      Value<String>? predictionsJson,
+      Value<int>? fetchedAtUtc,
+      Value<int>? validUntilUtc,
+      Value<int>? sizeBytes,
+      Value<int>? lastAccessedUtc,
+      Value<bool>? pinned,
+      Value<int>? rowid}) {
+    return TideCacheCompanion(
+      cacheKey: cacheKey ?? this.cacheKey,
+      stationId: stationId ?? this.stationId,
+      dayBucket: dayBucket ?? this.dayBucket,
+      predictionsJson: predictionsJson ?? this.predictionsJson,
+      fetchedAtUtc: fetchedAtUtc ?? this.fetchedAtUtc,
+      validUntilUtc: validUntilUtc ?? this.validUntilUtc,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      lastAccessedUtc: lastAccessedUtc ?? this.lastAccessedUtc,
+      pinned: pinned ?? this.pinned,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (cacheKey.present) {
+      map['cache_key'] = Variable<String>(cacheKey.value);
+    }
+    if (stationId.present) {
+      map['station_id'] = Variable<String>(stationId.value);
+    }
+    if (dayBucket.present) {
+      map['day_bucket'] = Variable<String>(dayBucket.value);
+    }
+    if (predictionsJson.present) {
+      map['predictions_json'] = Variable<String>(predictionsJson.value);
+    }
+    if (fetchedAtUtc.present) {
+      map['fetched_at_utc'] = Variable<int>(fetchedAtUtc.value);
+    }
+    if (validUntilUtc.present) {
+      map['valid_until_utc'] = Variable<int>(validUntilUtc.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (lastAccessedUtc.present) {
+      map['last_accessed_utc'] = Variable<int>(lastAccessedUtc.value);
+    }
+    if (pinned.present) {
+      map['pinned'] = Variable<bool>(pinned.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TideCacheCompanion(')
+          ..write('cacheKey: $cacheKey, ')
+          ..write('stationId: $stationId, ')
+          ..write('dayBucket: $dayBucket, ')
+          ..write('predictionsJson: $predictionsJson, ')
+          ..write('fetchedAtUtc: $fetchedAtUtc, ')
+          ..write('validUntilUtc: $validUntilUtc, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('lastAccessedUtc: $lastAccessedUtc, ')
+          ..write('pinned: $pinned, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2605,17 +5085,40 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UserPreferencesTableTable userPreferencesTable =
       $UserPreferencesTableTable(this);
   late final $SyncQueueTable syncQueue = $SyncQueueTable(this);
+  late final $ConditionsCacheTable conditionsCache =
+      $ConditionsCacheTable(this);
+  late final $ScoreCacheTable scoreCache = $ScoreCacheTable(this);
+  late final $ChartTileCacheTable chartTileCache = $ChartTileCacheTable(this);
+  late final $ForecastCacheTable forecastCache = $ForecastCacheTable(this);
+  late final $TideCacheTable tideCache = $TideCacheTable(this);
   late final CatchesDao catchesDao = CatchesDao(this as AppDatabase);
   late final TripPlansDao tripPlansDao = TripPlansDao(this as AppDatabase);
   late final UserPreferencesDao userPreferencesDao =
       UserPreferencesDao(this as AppDatabase);
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
+  late final ConditionsCacheDao conditionsCacheDao =
+      ConditionsCacheDao(this as AppDatabase);
+  late final ScoreCacheDao scoreCacheDao = ScoreCacheDao(this as AppDatabase);
+  late final ChartTileCacheDao chartTileCacheDao =
+      ChartTileCacheDao(this as AppDatabase);
+  late final ForecastCacheDao forecastCacheDao =
+      ForecastCacheDao(this as AppDatabase);
+  late final TideCacheDao tideCacheDao = TideCacheDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [catches, tripPlans, userPreferencesTable, syncQueue];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        catches,
+        tripPlans,
+        userPreferencesTable,
+        syncQueue,
+        conditionsCache,
+        scoreCache,
+        chartTileCache,
+        forecastCache,
+        tideCache
+      ];
 }
 
 typedef $$CatchesTableCreateCompanionBuilder = CatchesCompanion Function({
@@ -3774,6 +6277,1210 @@ typedef $$SyncQueueTableProcessedTableManager = ProcessedTableManager<
     ),
     SyncQueueEntry,
     PrefetchHooks Function()>;
+typedef $$ConditionsCacheTableCreateCompanionBuilder = ConditionsCacheCompanion
+    Function({
+  required String cacheKey,
+  required String dataType,
+  required String source,
+  required String valueJson,
+  required int fetchedAtUtc,
+  required int validUntilUtc,
+  required int sizeBytes,
+  required int lastAccessedUtc,
+  Value<int> rowid,
+});
+typedef $$ConditionsCacheTableUpdateCompanionBuilder = ConditionsCacheCompanion
+    Function({
+  Value<String> cacheKey,
+  Value<String> dataType,
+  Value<String> source,
+  Value<String> valueJson,
+  Value<int> fetchedAtUtc,
+  Value<int> validUntilUtc,
+  Value<int> sizeBytes,
+  Value<int> lastAccessedUtc,
+  Value<int> rowid,
+});
+
+class $$ConditionsCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $ConditionsCacheTable> {
+  $$ConditionsCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get valueJson => $composableBuilder(
+      column: $table.valueJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$ConditionsCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $ConditionsCacheTable> {
+  $$ConditionsCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get valueJson => $composableBuilder(
+      column: $table.valueJson, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$ConditionsCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ConditionsCacheTable> {
+  $$ConditionsCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get dataType =>
+      $composableBuilder(column: $table.dataType, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get valueJson =>
+      $composableBuilder(column: $table.valueJson, builder: (column) => column);
+
+  GeneratedColumn<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc, builder: (column) => column);
+}
+
+class $$ConditionsCacheTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ConditionsCacheTable,
+    ConditionsCacheRow,
+    $$ConditionsCacheTableFilterComposer,
+    $$ConditionsCacheTableOrderingComposer,
+    $$ConditionsCacheTableAnnotationComposer,
+    $$ConditionsCacheTableCreateCompanionBuilder,
+    $$ConditionsCacheTableUpdateCompanionBuilder,
+    (
+      ConditionsCacheRow,
+      BaseReferences<_$AppDatabase, $ConditionsCacheTable, ConditionsCacheRow>
+    ),
+    ConditionsCacheRow,
+    PrefetchHooks Function()> {
+  $$ConditionsCacheTableTableManager(
+      _$AppDatabase db, $ConditionsCacheTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ConditionsCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ConditionsCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ConditionsCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> cacheKey = const Value.absent(),
+            Value<String> dataType = const Value.absent(),
+            Value<String> source = const Value.absent(),
+            Value<String> valueJson = const Value.absent(),
+            Value<int> fetchedAtUtc = const Value.absent(),
+            Value<int> validUntilUtc = const Value.absent(),
+            Value<int> sizeBytes = const Value.absent(),
+            Value<int> lastAccessedUtc = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ConditionsCacheCompanion(
+            cacheKey: cacheKey,
+            dataType: dataType,
+            source: source,
+            valueJson: valueJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String cacheKey,
+            required String dataType,
+            required String source,
+            required String valueJson,
+            required int fetchedAtUtc,
+            required int validUntilUtc,
+            required int sizeBytes,
+            required int lastAccessedUtc,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ConditionsCacheCompanion.insert(
+            cacheKey: cacheKey,
+            dataType: dataType,
+            source: source,
+            valueJson: valueJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ConditionsCacheTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ConditionsCacheTable,
+    ConditionsCacheRow,
+    $$ConditionsCacheTableFilterComposer,
+    $$ConditionsCacheTableOrderingComposer,
+    $$ConditionsCacheTableAnnotationComposer,
+    $$ConditionsCacheTableCreateCompanionBuilder,
+    $$ConditionsCacheTableUpdateCompanionBuilder,
+    (
+      ConditionsCacheRow,
+      BaseReferences<_$AppDatabase, $ConditionsCacheTable, ConditionsCacheRow>
+    ),
+    ConditionsCacheRow,
+    PrefetchHooks Function()>;
+typedef $$ScoreCacheTableCreateCompanionBuilder = ScoreCacheCompanion Function({
+  required String cacheKey,
+  required String speciesId,
+  required double cellLat,
+  required double cellLon,
+  required String conditionsHash,
+  required double score,
+  required String reasoningJson,
+  required int computedAtUtc,
+  required int validUntilUtc,
+  required int lastAccessedUtc,
+  Value<int> rowid,
+});
+typedef $$ScoreCacheTableUpdateCompanionBuilder = ScoreCacheCompanion Function({
+  Value<String> cacheKey,
+  Value<String> speciesId,
+  Value<double> cellLat,
+  Value<double> cellLon,
+  Value<String> conditionsHash,
+  Value<double> score,
+  Value<String> reasoningJson,
+  Value<int> computedAtUtc,
+  Value<int> validUntilUtc,
+  Value<int> lastAccessedUtc,
+  Value<int> rowid,
+});
+
+class $$ScoreCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $ScoreCacheTable> {
+  $$ScoreCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get speciesId => $composableBuilder(
+      column: $table.speciesId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get cellLat => $composableBuilder(
+      column: $table.cellLat, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get cellLon => $composableBuilder(
+      column: $table.cellLon, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get conditionsHash => $composableBuilder(
+      column: $table.conditionsHash,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get reasoningJson => $composableBuilder(
+      column: $table.reasoningJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get computedAtUtc => $composableBuilder(
+      column: $table.computedAtUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$ScoreCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $ScoreCacheTable> {
+  $$ScoreCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get speciesId => $composableBuilder(
+      column: $table.speciesId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get cellLat => $composableBuilder(
+      column: $table.cellLat, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get cellLon => $composableBuilder(
+      column: $table.cellLon, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get conditionsHash => $composableBuilder(
+      column: $table.conditionsHash,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get reasoningJson => $composableBuilder(
+      column: $table.reasoningJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get computedAtUtc => $composableBuilder(
+      column: $table.computedAtUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$ScoreCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ScoreCacheTable> {
+  $$ScoreCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get speciesId =>
+      $composableBuilder(column: $table.speciesId, builder: (column) => column);
+
+  GeneratedColumn<double> get cellLat =>
+      $composableBuilder(column: $table.cellLat, builder: (column) => column);
+
+  GeneratedColumn<double> get cellLon =>
+      $composableBuilder(column: $table.cellLon, builder: (column) => column);
+
+  GeneratedColumn<String> get conditionsHash => $composableBuilder(
+      column: $table.conditionsHash, builder: (column) => column);
+
+  GeneratedColumn<double> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<String> get reasoningJson => $composableBuilder(
+      column: $table.reasoningJson, builder: (column) => column);
+
+  GeneratedColumn<int> get computedAtUtc => $composableBuilder(
+      column: $table.computedAtUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc, builder: (column) => column);
+}
+
+class $$ScoreCacheTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ScoreCacheTable,
+    ScoreCacheRow,
+    $$ScoreCacheTableFilterComposer,
+    $$ScoreCacheTableOrderingComposer,
+    $$ScoreCacheTableAnnotationComposer,
+    $$ScoreCacheTableCreateCompanionBuilder,
+    $$ScoreCacheTableUpdateCompanionBuilder,
+    (
+      ScoreCacheRow,
+      BaseReferences<_$AppDatabase, $ScoreCacheTable, ScoreCacheRow>
+    ),
+    ScoreCacheRow,
+    PrefetchHooks Function()> {
+  $$ScoreCacheTableTableManager(_$AppDatabase db, $ScoreCacheTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScoreCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ScoreCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ScoreCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> cacheKey = const Value.absent(),
+            Value<String> speciesId = const Value.absent(),
+            Value<double> cellLat = const Value.absent(),
+            Value<double> cellLon = const Value.absent(),
+            Value<String> conditionsHash = const Value.absent(),
+            Value<double> score = const Value.absent(),
+            Value<String> reasoningJson = const Value.absent(),
+            Value<int> computedAtUtc = const Value.absent(),
+            Value<int> validUntilUtc = const Value.absent(),
+            Value<int> lastAccessedUtc = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ScoreCacheCompanion(
+            cacheKey: cacheKey,
+            speciesId: speciesId,
+            cellLat: cellLat,
+            cellLon: cellLon,
+            conditionsHash: conditionsHash,
+            score: score,
+            reasoningJson: reasoningJson,
+            computedAtUtc: computedAtUtc,
+            validUntilUtc: validUntilUtc,
+            lastAccessedUtc: lastAccessedUtc,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String cacheKey,
+            required String speciesId,
+            required double cellLat,
+            required double cellLon,
+            required String conditionsHash,
+            required double score,
+            required String reasoningJson,
+            required int computedAtUtc,
+            required int validUntilUtc,
+            required int lastAccessedUtc,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ScoreCacheCompanion.insert(
+            cacheKey: cacheKey,
+            speciesId: speciesId,
+            cellLat: cellLat,
+            cellLon: cellLon,
+            conditionsHash: conditionsHash,
+            score: score,
+            reasoningJson: reasoningJson,
+            computedAtUtc: computedAtUtc,
+            validUntilUtc: validUntilUtc,
+            lastAccessedUtc: lastAccessedUtc,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ScoreCacheTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ScoreCacheTable,
+    ScoreCacheRow,
+    $$ScoreCacheTableFilterComposer,
+    $$ScoreCacheTableOrderingComposer,
+    $$ScoreCacheTableAnnotationComposer,
+    $$ScoreCacheTableCreateCompanionBuilder,
+    $$ScoreCacheTableUpdateCompanionBuilder,
+    (
+      ScoreCacheRow,
+      BaseReferences<_$AppDatabase, $ScoreCacheTable, ScoreCacheRow>
+    ),
+    ScoreCacheRow,
+    PrefetchHooks Function()>;
+typedef $$ChartTileCacheTableCreateCompanionBuilder = ChartTileCacheCompanion
+    Function({
+  required String cacheKey,
+  required int zoom,
+  required int x,
+  required int y,
+  required String chartRevision,
+  required Uint8List tileBlob,
+  required int sizeBytes,
+  required int fetchedAtUtc,
+  required int lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+typedef $$ChartTileCacheTableUpdateCompanionBuilder = ChartTileCacheCompanion
+    Function({
+  Value<String> cacheKey,
+  Value<int> zoom,
+  Value<int> x,
+  Value<int> y,
+  Value<String> chartRevision,
+  Value<Uint8List> tileBlob,
+  Value<int> sizeBytes,
+  Value<int> fetchedAtUtc,
+  Value<int> lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+
+class $$ChartTileCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $ChartTileCacheTable> {
+  $$ChartTileCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get zoom => $composableBuilder(
+      column: $table.zoom, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get x => $composableBuilder(
+      column: $table.x, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get y => $composableBuilder(
+      column: $table.y, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get chartRevision => $composableBuilder(
+      column: $table.chartRevision, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get tileBlob => $composableBuilder(
+      column: $table.tileBlob, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnFilters(column));
+}
+
+class $$ChartTileCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChartTileCacheTable> {
+  $$ChartTileCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get zoom => $composableBuilder(
+      column: $table.zoom, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get x => $composableBuilder(
+      column: $table.x, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get y => $composableBuilder(
+      column: $table.y, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get chartRevision => $composableBuilder(
+      column: $table.chartRevision,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get tileBlob => $composableBuilder(
+      column: $table.tileBlob, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ChartTileCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChartTileCacheTable> {
+  $$ChartTileCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<int> get zoom =>
+      $composableBuilder(column: $table.zoom, builder: (column) => column);
+
+  GeneratedColumn<int> get x =>
+      $composableBuilder(column: $table.x, builder: (column) => column);
+
+  GeneratedColumn<int> get y =>
+      $composableBuilder(column: $table.y, builder: (column) => column);
+
+  GeneratedColumn<String> get chartRevision => $composableBuilder(
+      column: $table.chartRevision, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get tileBlob =>
+      $composableBuilder(column: $table.tileBlob, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc, builder: (column) => column);
+
+  GeneratedColumn<bool> get pinned =>
+      $composableBuilder(column: $table.pinned, builder: (column) => column);
+}
+
+class $$ChartTileCacheTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChartTileCacheTable,
+    ChartTileCacheRow,
+    $$ChartTileCacheTableFilterComposer,
+    $$ChartTileCacheTableOrderingComposer,
+    $$ChartTileCacheTableAnnotationComposer,
+    $$ChartTileCacheTableCreateCompanionBuilder,
+    $$ChartTileCacheTableUpdateCompanionBuilder,
+    (
+      ChartTileCacheRow,
+      BaseReferences<_$AppDatabase, $ChartTileCacheTable, ChartTileCacheRow>
+    ),
+    ChartTileCacheRow,
+    PrefetchHooks Function()> {
+  $$ChartTileCacheTableTableManager(
+      _$AppDatabase db, $ChartTileCacheTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChartTileCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChartTileCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChartTileCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> cacheKey = const Value.absent(),
+            Value<int> zoom = const Value.absent(),
+            Value<int> x = const Value.absent(),
+            Value<int> y = const Value.absent(),
+            Value<String> chartRevision = const Value.absent(),
+            Value<Uint8List> tileBlob = const Value.absent(),
+            Value<int> sizeBytes = const Value.absent(),
+            Value<int> fetchedAtUtc = const Value.absent(),
+            Value<int> lastAccessedUtc = const Value.absent(),
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChartTileCacheCompanion(
+            cacheKey: cacheKey,
+            zoom: zoom,
+            x: x,
+            y: y,
+            chartRevision: chartRevision,
+            tileBlob: tileBlob,
+            sizeBytes: sizeBytes,
+            fetchedAtUtc: fetchedAtUtc,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String cacheKey,
+            required int zoom,
+            required int x,
+            required int y,
+            required String chartRevision,
+            required Uint8List tileBlob,
+            required int sizeBytes,
+            required int fetchedAtUtc,
+            required int lastAccessedUtc,
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChartTileCacheCompanion.insert(
+            cacheKey: cacheKey,
+            zoom: zoom,
+            x: x,
+            y: y,
+            chartRevision: chartRevision,
+            tileBlob: tileBlob,
+            sizeBytes: sizeBytes,
+            fetchedAtUtc: fetchedAtUtc,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ChartTileCacheTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ChartTileCacheTable,
+    ChartTileCacheRow,
+    $$ChartTileCacheTableFilterComposer,
+    $$ChartTileCacheTableOrderingComposer,
+    $$ChartTileCacheTableAnnotationComposer,
+    $$ChartTileCacheTableCreateCompanionBuilder,
+    $$ChartTileCacheTableUpdateCompanionBuilder,
+    (
+      ChartTileCacheRow,
+      BaseReferences<_$AppDatabase, $ChartTileCacheTable, ChartTileCacheRow>
+    ),
+    ChartTileCacheRow,
+    PrefetchHooks Function()>;
+typedef $$ForecastCacheTableCreateCompanionBuilder = ForecastCacheCompanion
+    Function({
+  required String cacheKey,
+  required String zoneId,
+  required String dayBucket,
+  required String forecastJson,
+  required int fetchedAtUtc,
+  required int validUntilUtc,
+  required int sizeBytes,
+  required int lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+typedef $$ForecastCacheTableUpdateCompanionBuilder = ForecastCacheCompanion
+    Function({
+  Value<String> cacheKey,
+  Value<String> zoneId,
+  Value<String> dayBucket,
+  Value<String> forecastJson,
+  Value<int> fetchedAtUtc,
+  Value<int> validUntilUtc,
+  Value<int> sizeBytes,
+  Value<int> lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+
+class $$ForecastCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $ForecastCacheTable> {
+  $$ForecastCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get zoneId => $composableBuilder(
+      column: $table.zoneId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dayBucket => $composableBuilder(
+      column: $table.dayBucket, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get forecastJson => $composableBuilder(
+      column: $table.forecastJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnFilters(column));
+}
+
+class $$ForecastCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $ForecastCacheTable> {
+  $$ForecastCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get zoneId => $composableBuilder(
+      column: $table.zoneId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dayBucket => $composableBuilder(
+      column: $table.dayBucket, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get forecastJson => $composableBuilder(
+      column: $table.forecastJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ForecastCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ForecastCacheTable> {
+  $$ForecastCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get zoneId =>
+      $composableBuilder(column: $table.zoneId, builder: (column) => column);
+
+  GeneratedColumn<String> get dayBucket =>
+      $composableBuilder(column: $table.dayBucket, builder: (column) => column);
+
+  GeneratedColumn<String> get forecastJson => $composableBuilder(
+      column: $table.forecastJson, builder: (column) => column);
+
+  GeneratedColumn<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc, builder: (column) => column);
+
+  GeneratedColumn<bool> get pinned =>
+      $composableBuilder(column: $table.pinned, builder: (column) => column);
+}
+
+class $$ForecastCacheTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ForecastCacheTable,
+    ForecastCacheRow,
+    $$ForecastCacheTableFilterComposer,
+    $$ForecastCacheTableOrderingComposer,
+    $$ForecastCacheTableAnnotationComposer,
+    $$ForecastCacheTableCreateCompanionBuilder,
+    $$ForecastCacheTableUpdateCompanionBuilder,
+    (
+      ForecastCacheRow,
+      BaseReferences<_$AppDatabase, $ForecastCacheTable, ForecastCacheRow>
+    ),
+    ForecastCacheRow,
+    PrefetchHooks Function()> {
+  $$ForecastCacheTableTableManager(_$AppDatabase db, $ForecastCacheTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ForecastCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ForecastCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ForecastCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> cacheKey = const Value.absent(),
+            Value<String> zoneId = const Value.absent(),
+            Value<String> dayBucket = const Value.absent(),
+            Value<String> forecastJson = const Value.absent(),
+            Value<int> fetchedAtUtc = const Value.absent(),
+            Value<int> validUntilUtc = const Value.absent(),
+            Value<int> sizeBytes = const Value.absent(),
+            Value<int> lastAccessedUtc = const Value.absent(),
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ForecastCacheCompanion(
+            cacheKey: cacheKey,
+            zoneId: zoneId,
+            dayBucket: dayBucket,
+            forecastJson: forecastJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String cacheKey,
+            required String zoneId,
+            required String dayBucket,
+            required String forecastJson,
+            required int fetchedAtUtc,
+            required int validUntilUtc,
+            required int sizeBytes,
+            required int lastAccessedUtc,
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ForecastCacheCompanion.insert(
+            cacheKey: cacheKey,
+            zoneId: zoneId,
+            dayBucket: dayBucket,
+            forecastJson: forecastJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ForecastCacheTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ForecastCacheTable,
+    ForecastCacheRow,
+    $$ForecastCacheTableFilterComposer,
+    $$ForecastCacheTableOrderingComposer,
+    $$ForecastCacheTableAnnotationComposer,
+    $$ForecastCacheTableCreateCompanionBuilder,
+    $$ForecastCacheTableUpdateCompanionBuilder,
+    (
+      ForecastCacheRow,
+      BaseReferences<_$AppDatabase, $ForecastCacheTable, ForecastCacheRow>
+    ),
+    ForecastCacheRow,
+    PrefetchHooks Function()>;
+typedef $$TideCacheTableCreateCompanionBuilder = TideCacheCompanion Function({
+  required String cacheKey,
+  required String stationId,
+  required String dayBucket,
+  required String predictionsJson,
+  required int fetchedAtUtc,
+  required int validUntilUtc,
+  required int sizeBytes,
+  required int lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+typedef $$TideCacheTableUpdateCompanionBuilder = TideCacheCompanion Function({
+  Value<String> cacheKey,
+  Value<String> stationId,
+  Value<String> dayBucket,
+  Value<String> predictionsJson,
+  Value<int> fetchedAtUtc,
+  Value<int> validUntilUtc,
+  Value<int> sizeBytes,
+  Value<int> lastAccessedUtc,
+  Value<bool> pinned,
+  Value<int> rowid,
+});
+
+class $$TideCacheTableFilterComposer
+    extends Composer<_$AppDatabase, $TideCacheTable> {
+  $$TideCacheTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get stationId => $composableBuilder(
+      column: $table.stationId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dayBucket => $composableBuilder(
+      column: $table.dayBucket, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get predictionsJson => $composableBuilder(
+      column: $table.predictionsJson,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnFilters(column));
+}
+
+class $$TideCacheTableOrderingComposer
+    extends Composer<_$AppDatabase, $TideCacheTable> {
+  $$TideCacheTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cacheKey => $composableBuilder(
+      column: $table.cacheKey, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get stationId => $composableBuilder(
+      column: $table.stationId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dayBucket => $composableBuilder(
+      column: $table.dayBucket, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get predictionsJson => $composableBuilder(
+      column: $table.predictionsJson,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+      column: $table.sizeBytes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get pinned => $composableBuilder(
+      column: $table.pinned, builder: (column) => ColumnOrderings(column));
+}
+
+class $$TideCacheTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TideCacheTable> {
+  $$TideCacheTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cacheKey =>
+      $composableBuilder(column: $table.cacheKey, builder: (column) => column);
+
+  GeneratedColumn<String> get stationId =>
+      $composableBuilder(column: $table.stationId, builder: (column) => column);
+
+  GeneratedColumn<String> get dayBucket =>
+      $composableBuilder(column: $table.dayBucket, builder: (column) => column);
+
+  GeneratedColumn<String> get predictionsJson => $composableBuilder(
+      column: $table.predictionsJson, builder: (column) => column);
+
+  GeneratedColumn<int> get fetchedAtUtc => $composableBuilder(
+      column: $table.fetchedAtUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get validUntilUtc => $composableBuilder(
+      column: $table.validUntilUtc, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<int> get lastAccessedUtc => $composableBuilder(
+      column: $table.lastAccessedUtc, builder: (column) => column);
+
+  GeneratedColumn<bool> get pinned =>
+      $composableBuilder(column: $table.pinned, builder: (column) => column);
+}
+
+class $$TideCacheTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TideCacheTable,
+    TideCacheRow,
+    $$TideCacheTableFilterComposer,
+    $$TideCacheTableOrderingComposer,
+    $$TideCacheTableAnnotationComposer,
+    $$TideCacheTableCreateCompanionBuilder,
+    $$TideCacheTableUpdateCompanionBuilder,
+    (
+      TideCacheRow,
+      BaseReferences<_$AppDatabase, $TideCacheTable, TideCacheRow>
+    ),
+    TideCacheRow,
+    PrefetchHooks Function()> {
+  $$TideCacheTableTableManager(_$AppDatabase db, $TideCacheTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TideCacheTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TideCacheTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TideCacheTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> cacheKey = const Value.absent(),
+            Value<String> stationId = const Value.absent(),
+            Value<String> dayBucket = const Value.absent(),
+            Value<String> predictionsJson = const Value.absent(),
+            Value<int> fetchedAtUtc = const Value.absent(),
+            Value<int> validUntilUtc = const Value.absent(),
+            Value<int> sizeBytes = const Value.absent(),
+            Value<int> lastAccessedUtc = const Value.absent(),
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TideCacheCompanion(
+            cacheKey: cacheKey,
+            stationId: stationId,
+            dayBucket: dayBucket,
+            predictionsJson: predictionsJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String cacheKey,
+            required String stationId,
+            required String dayBucket,
+            required String predictionsJson,
+            required int fetchedAtUtc,
+            required int validUntilUtc,
+            required int sizeBytes,
+            required int lastAccessedUtc,
+            Value<bool> pinned = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TideCacheCompanion.insert(
+            cacheKey: cacheKey,
+            stationId: stationId,
+            dayBucket: dayBucket,
+            predictionsJson: predictionsJson,
+            fetchedAtUtc: fetchedAtUtc,
+            validUntilUtc: validUntilUtc,
+            sizeBytes: sizeBytes,
+            lastAccessedUtc: lastAccessedUtc,
+            pinned: pinned,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$TideCacheTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TideCacheTable,
+    TideCacheRow,
+    $$TideCacheTableFilterComposer,
+    $$TideCacheTableOrderingComposer,
+    $$TideCacheTableAnnotationComposer,
+    $$TideCacheTableCreateCompanionBuilder,
+    $$TideCacheTableUpdateCompanionBuilder,
+    (
+      TideCacheRow,
+      BaseReferences<_$AppDatabase, $TideCacheTable, TideCacheRow>
+    ),
+    TideCacheRow,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3786,4 +7493,14 @@ class $AppDatabaseManager {
       $$UserPreferencesTableTableTableManager(_db, _db.userPreferencesTable);
   $$SyncQueueTableTableManager get syncQueue =>
       $$SyncQueueTableTableManager(_db, _db.syncQueue);
+  $$ConditionsCacheTableTableManager get conditionsCache =>
+      $$ConditionsCacheTableTableManager(_db, _db.conditionsCache);
+  $$ScoreCacheTableTableManager get scoreCache =>
+      $$ScoreCacheTableTableManager(_db, _db.scoreCache);
+  $$ChartTileCacheTableTableManager get chartTileCache =>
+      $$ChartTileCacheTableTableManager(_db, _db.chartTileCache);
+  $$ForecastCacheTableTableManager get forecastCache =>
+      $$ForecastCacheTableTableManager(_db, _db.forecastCache);
+  $$TideCacheTableTableManager get tideCache =>
+      $$TideCacheTableTableManager(_db, _db.tideCache);
 }
