@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Required for freezed/json_serializable types that nest other
+          # freezed/json_serializable types (e.g. LatLngBounds containing
+          # two LatLng values). Without this, toJson() on the outer type
+          # returns a Map whose values are still Dart objects, and fromJson
+          # then tries to cast them to Map<String, dynamic> and throws.
+          explicit_to_json: true
