@@ -1,0 +1,11 @@
+# Test runner configuration.
+#
+# `live`-tagged tests hit real NOAA endpoints and require network access.
+# flutter_test blocks raw HTTP by default (the binding stubs every request
+# with status 400), so these only run when explicitly opted in via
+# `flutter test --tags=live`. CI runs the default suite (live skipped) on
+# every push; live tests can be enabled in a separate CI lane or run
+# manually to satisfy Phase 3 DoD §3.4 verification.
+tags:
+  live:
+    skip: 'live NOAA tests opted out by default; pass `--tags=live` to enable'
