@@ -14,6 +14,7 @@ import 'package:ai_marine_engine/data/sources/ndbc/buoy_station.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/ndbc_adapter.dart';
 import 'package:ai_marine_engine/data/sources/nws_forecast/nws_adapter.dart';
 import 'package:ai_marine_engine/data/sources/solunar/solunar_adapter.dart';
+import 'package:ai_marine_engine/data/sources/tides_currents/tide_station.dart';
 import 'package:ai_marine_engine/data/sources/tides_currents/tides_currents_adapter.dart';
 import 'package:ai_marine_engine/services/conditions/conditions_service_impl.dart';
 import 'package:dio/dio.dart';
@@ -68,6 +69,15 @@ const _bostonBuoy = BuoyStation(
   lat: 42.346,
   lon: -70.651,
 );
+const _bostonTideStation = TideStation(
+  id: '8443970',
+  name: 'Boston',
+  lat: 42.354,
+  lon: -71.052,
+);
+
+String _tidesFixture() =>
+    File('test/fixtures/http_responses/tides_8443970.json').readAsStringSync();
 
 String _ndbcFixture() =>
     File('test/fixtures/http_responses/ndbc_44013.txt').readAsStringSync();
@@ -259,6 +269,66 @@ void main() {
         expect(t.stub.callCounts['/realtime2/'], 1);
         expect(r2.value.pressureMillibars, r1.value.pressureMillibars);
         expect(r2.value.trend, r1.value.trend);
+      },
+      skip: skipReason,
+    );
+  });
+
+  group('ConditionsService — cache wiring on getTideState', () {
+    test(
+      'second call hits cold-tier predictions and skips datagetter; '
+      'phase still computed for each lookup time',
+      () async {
+        final stub = _CountingStub({'/datagetter': _tidesFixture()});
+        final dio = Dio()..httpClientAdapter = stub;
+        final tides = TidesAndCurrentsAdapter(http: dio)
+          ..seedStationsForTesting(const [_bostonTideStation]);
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
+        addTearDown(() => db.close());
+        final cache = CacheManager(
+          live: LiveSensorBuffer(),
+          hot: HotCache(),
+          warm: WarmCache(dao: db.conditionsCacheDao),
+          cold: ColdCache(
+            tideDao: db.tideCacheDao,
+            forecastDao: db.forecastCacheDao,
+          ),
+        );
+        final svc = ConditionsServiceImpl(
+          ndbc: NdbcAdapter(http: dio),
+          tides: tides,
+          nws: NwsAdapter(http: dio),
+          solunar: SolunarAdapter(),
+          cache: cache,
+        );
+
+        // First call at 08:30 UTC — fixture's bracketing extremes are
+        // 05:24 H and 11:49 L, so phase is `falling`.
+        final r1 = await svc.getTideState(
+          _bostonHarbor,
+          DateTime.utc(2026, 5, 4, 8, 30),
+        );
+        expect(r1.source, DataSource.noaaTidesAndCurrents);
+        expect(r1.value.phase, TidePhase.falling);
+        expect(stub.callCounts['/datagetter'], 1);
+
+        // Cold-tier row exists, keyed by station + UTC dayBucket.
+        final coldRow =
+            await db.tideCacheDao.getByKey('tide:8443970:2026-05-04');
+        expect(coldRow, isNotNull);
+
+        // Second call later in the same UTC day. Predictions are cached;
+        // the local phase computation re-runs against the cached list.
+        final r2 = await svc.getTideState(
+          _bostonHarbor,
+          DateTime.utc(2026, 5, 4, 14),
+        );
+        expect(
+          stub.callCounts['/datagetter'],
+          1,
+          reason: 'second call should reuse cached predictions',
+        );
+        expect(r2.source, DataSource.noaaTidesAndCurrents);
       },
       skip: skipReason,
     );

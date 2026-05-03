@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import '../../core/types/catch_record.dart';
 import '../../core/types/condition_result.dart';
 import '../../core/types/conditions.dart';
@@ -10,6 +12,8 @@ import '../../data/sources/ndbc/ndbc_adapter.dart';
 import '../../data/sources/nws_forecast/nws_adapter.dart';
 import '../../data/sources/solunar/solunar_adapter.dart';
 import '../../data/sources/source_adapter.dart';
+import '../../data/sources/tides_currents/tide_phase_computer.dart';
+import '../../data/sources/tides_currents/tide_prediction.dart';
 import '../../data/sources/tides_currents/tides_currents_adapter.dart';
 import 'conditions_service.dart';
 
@@ -49,6 +53,15 @@ class ConditionsServiceImpl implements ConditionsService {
   /// apart get their own entries.
   String _locKey(LatLng loc) => '${(loc.latitude * 10).round() / 10},'
       '${(loc.longitude * 10).round() / 10}';
+
+  /// `YYYY-MM-DD` for the UTC day of [time] — the cold-tier tide cache
+  /// key per (station, day).
+  String _dayBucket(DateTime time) {
+    final t = time.toUtc();
+    final m = t.month.toString().padLeft(2, '0');
+    final d = t.day.toString().padLeft(2, '0');
+    return '${t.year}-$m-$d';
+  }
 
   /// Bridges a typed adapter [fetch] through the four-tier cache when a
   /// manager is wired, or runs it bare when the service was constructed
@@ -110,26 +123,71 @@ class ConditionsServiceImpl implements ConditionsService {
     LatLng loc,
     DateTime time,
   ) async {
-    if (!tides.canServe(loc, time)) {
-      return ConditionResult<TideState>.unavailable(
-        value: const TideState(
-          phase: TidePhase.slackHigh,
-          toNextChange: Duration.zero,
-        ),
-        time: time,
-      );
+    final mgr = cache;
+    if (mgr == null) {
+      // Back-compat: existing tests construct without a cache; route
+      // through the all-in-one adapter.fetch() path.
+      if (!tides.canServe(loc, time)) return _unavailableTide(time);
+      try {
+        return await tides.fetch(loc, time);
+      } on SourceException {
+        return _unavailableTide(time);
+      }
     }
-    try {
-      return await tides.fetch(loc, time);
-    } on SourceException {
-      return ConditionResult<TideState>.unavailable(
-        value: const TideState(
-          phase: TidePhase.slackHigh,
-          toNextChange: Duration.zero,
-        ),
-        time: time,
-      );
-    }
+
+    final station = tides.findNearestStation(loc);
+    if (station == null) return _unavailableTide(time);
+
+    // The cold tier caches the *predictions list* (one row per
+    // station+day), not the computed TideState. The same predictions
+    // serve any time-of-day query within the 3-day window the adapter
+    // fetches, so a single cold-tier hit can serve hundreds of phase
+    // computations across a session. Phase compute is local and runs
+    // on every lookup.
+    final dayBucket = _dayBucket(time);
+    final predictionsJson = await mgr.getTide(
+      stationId: station.id,
+      dayBucket: dayBucket,
+      // 7-day TTL: NOAA tide predictions are stable for the full year,
+      // so the limiting factor is "do we trust week-old data?" rather
+      // than freshness. v1 picks 7 days — long enough for offline trip
+      // use, short enough that astronomical-anomaly corrections
+      // refresh within a fortnight.
+      coldTtl: const Duration(days: 7),
+      fetcher: () async {
+        try {
+          final preds = await tides.fetchPredictions(
+            station: station,
+            time: time,
+          );
+          return jsonEncode(preds.map((p) => p.toJson()).toList());
+        } on SourceException {
+          return null;
+        }
+      },
+    );
+    if (predictionsJson == null) return _unavailableTide(time);
+
+    final predictions = (jsonDecode(predictionsJson) as List)
+        .cast<Map<String, dynamic>>()
+        .map(TidePrediction.fromJson)
+        .toList();
+    if (predictions.isEmpty) return _unavailableTide(time);
+
+    final tide = computeTideStateAt(time.toUtc(), predictions);
+    final fetchedAt = DateTime.now().toUtc();
+    return ConditionResult<TideState>(
+      value: tide,
+      unit: 'phase',
+      source: DataSource.noaaTidesAndCurrents,
+      sourceDetails: SourceDetails(
+        stationId: station.id,
+        interpolationDistanceNm: station.distanceNmTo(loc),
+      ),
+      fetchedAt: fetchedAt,
+      validUntil: fetchedAt.add(const Duration(minutes: 15)),
+      confidence: confidenceFromDistance(station.distanceNmTo(loc)),
+    );
   }
 
   @override
@@ -335,6 +393,15 @@ ConditionResult<WindVector> _unavailableWind(DateTime time) =>
 ConditionResult<WaveState> _unavailableWaves(DateTime time) =>
     ConditionResult<WaveState>.unavailable(
       value: const WaveState(significantHeightFt: 0),
+      time: time,
+    );
+
+ConditionResult<TideState> _unavailableTide(DateTime time) =>
+    ConditionResult<TideState>.unavailable(
+      value: const TideState(
+        phase: TidePhase.slackHigh,
+        toNextChange: Duration.zero,
+      ),
       time: time,
     );
 

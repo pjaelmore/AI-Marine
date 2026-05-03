@@ -9,6 +9,7 @@ import '../../../core/types/conditions.dart';
 import '../../../core/types/lat_lng.dart';
 import '../source_adapter.dart';
 import 'tide_phase_computer.dart';
+import 'tide_prediction.dart';
 import 'tide_station.dart';
 import 'tides_currents_parser.dart';
 
@@ -57,7 +58,7 @@ class TidesAndCurrentsAdapter extends SourceAdapter<TideState> {
 
   @override
   bool canServe(LatLng location, DateTime time) {
-    return _findNearestStation(location) != null;
+    return findNearestStation(location) != null;
   }
 
   @override
@@ -65,13 +66,39 @@ class TidesAndCurrentsAdapter extends SourceAdapter<TideState> {
     LatLng location,
     DateTime time,
   ) async {
-    final station = _findNearestStation(location);
+    final station = findNearestStation(location);
     if (station == null) {
       throw const SourceException(
         'no Tides & Currents station within range',
         source: DataSource.noaaTidesAndCurrents,
       );
     }
+    final predictions = await fetchPredictions(station: station, time: time);
+    final tide = computeTideStateAt(time.toUtc(), predictions);
+    final fetchedAt = DateTime.now().toUtc();
+    return ConditionResult<TideState>(
+      value: tide,
+      unit: 'phase',
+      source: DataSource.noaaTidesAndCurrents,
+      sourceDetails: SourceDetails(
+        stationId: station.id,
+        interpolationDistanceNm: station.distanceNmTo(location),
+      ),
+      fetchedAt: fetchedAt,
+      validUntil: fetchedAt.add(defaultTtl),
+      confidence: confidenceFromDistance(station.distanceNmTo(location)),
+    );
+  }
+
+  /// Fetches the raw predictions list for [station] over a ±1 day
+  /// window around [time]. The list is what the cold tier caches
+  /// (one row per station+dayBucket); phase computation is local
+  /// and runs on every lookup. Throws [SourceException] on network
+  /// or parse failure so callers can match the existing pattern.
+  Future<List<TidePrediction>> fetchPredictions({
+    required TideStation station,
+    required DateTime time,
+  }) async {
     final timeUtc = time.toUtc();
     final beginDate = _yyyymmdd.format(
       timeUtc.subtract(const Duration(days: 1)),
@@ -109,20 +136,7 @@ class TidesAndCurrentsAdapter extends SourceAdapter<TideState> {
           source: DataSource.noaaTidesAndCurrents,
         );
       }
-      final tide = computeTideStateAt(timeUtc, predictions);
-      final fetchedAt = DateTime.now().toUtc();
-      return ConditionResult<TideState>(
-        value: tide,
-        unit: 'phase',
-        source: DataSource.noaaTidesAndCurrents,
-        sourceDetails: SourceDetails(
-          stationId: station.id,
-          interpolationDistanceNm: station.distanceNmTo(location),
-        ),
-        fetchedAt: fetchedAt,
-        validUntil: fetchedAt.add(defaultTtl),
-        confidence: _confidenceFromDistance(station.distanceNmTo(location)),
-      );
+      return predictions;
     } on DioException catch (e) {
       throw SourceException(
         'Tides & Currents request to ${station.id} failed',
@@ -138,7 +152,10 @@ class TidesAndCurrentsAdapter extends SourceAdapter<TideState> {
     }
   }
 
-  TideStation? _findNearestStation(LatLng location) {
+  /// Nearest seeded station within [_maxDistanceNm], or null. Public
+  /// so the cached path in ConditionsServiceImpl can resolve the
+  /// station before consulting the cold tier.
+  TideStation? findNearestStation(LatLng location) {
     TideStation? best;
     var bestDistance = _maxDistanceNm;
     for (final station in _stations) {
@@ -153,8 +170,10 @@ class TidesAndCurrentsAdapter extends SourceAdapter<TideState> {
 }
 
 /// Linear confidence falloff across the 60 nm threshold: 1.0 at the
-/// station, 0.5 at the edge.
-double _confidenceFromDistance(double distanceNm) {
+/// station, 0.5 at the edge. Top-level so the cached path in
+/// ConditionsServiceImpl uses the same formula as the all-in-one
+/// fetch().
+double confidenceFromDistance(double distanceNm) {
   const halfPoint = 60.0;
   final scaled = 1.0 - (distanceNm / (halfPoint * 2));
   return scaled.clamp(0.0, 1.0);
