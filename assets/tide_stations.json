@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "_comment": "Curated NOAA Tides & Currents stations covering the v1 striped-bass range (MA/RI/CT/NY/ME). Coordinates from https://tidesandcurrents.noaa.gov/. Expand with station-list updates per app release.",
+  "stations": [
+    {
+      "id": "8443970",
+      "name": "Boston, MA",
+      "lat": 42.354,
+      "lon": -71.052
+    },
+    {
+      "id": "8418150",
+      "name": "Portland, ME",
+      "lat": 43.658,
+      "lon": -70.244
+    },
+    {
+      "id": "8447930",
+      "name": "Woods Hole, MA",
+      "lat": 41.524,
+      "lon": -70.671
+    },
+    {
+      "id": "8452660",
+      "name": "Newport, RI",
+      "lat": 41.504,
+      "lon": -71.327
+    },
+    {
+      "id": "8510560",
+      "name": "Montauk, NY",
+      "lat": 41.048,
+      "lon": -71.959
+    },
+    {
+      "id": "8516945",
+      "name": "Kings Point, NY",
+      "lat": 40.811,
+      "lon": -73.764
+    }
+  ]
+}

@@ -9,3 +9,12 @@ targets:
           # returns a Map whose values are still Dart objects, and fromJson
           # then tries to cast them to Map<String, dynamic> and throws.
           explicit_to_json: true
+      # Scope drift_dev to the database tree. Drift's analyzer scans every
+      # Dart input by default and chokes on certain freezed-generated
+      # files in lib/data/sources with a `Null is not ClassElement` cast
+      # error (drift_dev 2.18 + Dart 3.4 interaction). Only files under
+      # lib/data/database/ carry @DriftDatabase / @DriftAccessor anyway.
+      drift_dev:
+        generate_for:
+          include:
+            - lib/data/database/**
