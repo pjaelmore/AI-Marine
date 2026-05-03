@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.0",
+  "_comment": "Curated subset of NDBC buoy stations covering the v1 striped-bass range (MA/RI/CT/NY). Coordinates from NOAA NDBC station pages. Expand with station-list updates per app release.",
+  "stations": [
+    {
+      "id": "44013",
+      "name": "Boston Approach (BG)",
+      "lat": 42.346,
+      "lon": -70.651
+    },
+    {
+      "id": "44029",
+      "name": "Massachusetts Bay (A01)",
+      "lat": 42.523,
+      "lon": -70.566
+    },
+    {
+      "id": "44017",
+      "name": "Montauk Point",
+      "lat": 40.694,
+      "lon": -72.048
+    },
+    {
+      "id": "44027",
+      "name": "Jonesport, ME",
+      "lat": 44.283,
+      "lon": -67.302
+    },
+    {
+      "id": "44097",
+      "name": "Block Island",
+      "lat": 40.967,
+      "lon": -71.130
+    },
+    {
+      "id": "44065",
+      "name": "New York Harbor Entrance",
+      "lat": 40.369,
+      "lon": -73.703
+    }
+  ]
+}
