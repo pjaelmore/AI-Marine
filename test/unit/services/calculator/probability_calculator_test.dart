@@ -21,6 +21,7 @@ class _FakeConditionsService implements ConditionsService {
     this.wind,
     this.baro,
     this.solunar,
+    this.depth,
   });
 
   ConditionResult<double>? waterTemp;
@@ -28,6 +29,7 @@ class _FakeConditionsService implements ConditionsService {
   ConditionResult<WindVector>? wind;
   ConditionResult<BarometricState>? baro;
   ConditionResult<SolunarState>? solunar;
+  ConditionResult<double>? depth;
   ConditionResult<StructureInfo>? structure;
   List<CatchRecord> catches = const [];
 
@@ -105,6 +107,9 @@ class _FakeConditionsService implements ConditionsService {
   Future<ConditionResult<StructureInfo>> getStructure(LatLng loc) async =>
       structure ?? _unavailableStructure(DateTime.now().toUtc());
   @override
+  Future<ConditionResult<double>> getDepth(LatLng loc) async =>
+      depth ?? _unavailableDouble(DateTime.now().toUtc());
+  @override
   Future<List<CatchRecord>> getRecentCatches(
     LatLng loc,
     double radiusNm, {
@@ -124,9 +129,6 @@ class _FakeConditionsService implements ConditionsService {
       throw UnimplementedError('not used by calculator');
   @override
   Future<ConditionResult<WaveState>> getWaves(LatLng loc, DateTime t) =>
-      throw UnimplementedError('not used by calculator');
-  @override
-  Future<ConditionResult<double>> getDepth(LatLng loc) =>
       throw UnimplementedError('not used by calculator');
 }
 
@@ -407,6 +409,43 @@ void main() {
         // final = 5.8
         expect(r.reasoning.additiveTotal, closeTo(0.8, 1e-9));
         expect(r.finalScore, closeTo(5.8, 1e-9));
+      },
+    );
+  });
+
+  group('ProbabilityCalculator — depth modifier wiring', () {
+    test(
+      'depth at species ideal surfaces a 2.0 modifier in the breakdown',
+      () async {
+        // Profile's depthPreference is 5–50 ft, ideal 20.
+        final svc = _FakeConditionsService(depth: _ok(20.0, _refTime));
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final depthMod =
+            r.reasoning.modifiers.where((m) => m.name == 'depth').toList();
+        expect(depthMod, hasLength(1));
+        expect(depthMod.first.value, 2.0);
+      },
+    );
+
+    test(
+      'unavailable depth → modifier is omitted from the breakdown',
+      () async {
+        // No depth set → fake returns unavailable. Modifier should
+        // be skipped entirely (transparency over silently neutral).
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final depthMod = r.reasoning.modifiers.where((m) => m.name == 'depth');
+        expect(depthMod, isEmpty);
       },
     );
   });

@@ -11,6 +11,7 @@ import 'contributors/time_of_day_contributor.dart';
 import 'migration_base_probability.dart';
 import 'migration_gate.dart';
 import 'modifiers/barometric_trend_modifier.dart';
+import 'modifiers/depth_modifier.dart';
 import 'modifiers/solunar_window_modifier.dart';
 import 'modifiers/tide_phase_modifier.dart';
 import 'modifiers/water_temp_modifier.dart';
@@ -116,6 +117,7 @@ class ProbabilityCalculator {
     final windF = conditions.getWind(location, time);
     final baroF = conditions.getBarometric(location, time);
     final solunarF = conditions.getSolunar(location, time);
+    final depthF = conditions.getDepth(location);
     final structureF = conditions.getStructure(location);
     final catchesF = conditions.getRecentCatches(
       location,
@@ -129,6 +131,7 @@ class ProbabilityCalculator {
     final wind = await windF;
     final baro = await baroF;
     final solunar = await solunarF;
+    final depth = await depthF;
     final structure = await structureF;
     final catches = await catchesF;
 
@@ -181,6 +184,16 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(solunar.confidence);
+    }
+
+    if (depth.source != DataSource.unavailable) {
+      modifiers.add(
+        evaluateDepthModifier(
+          depthFt: depth.value,
+          preference: species.conditionProfile.depthPreference,
+        ),
+      );
+      modifierConfidences.add(depth.confidence);
     }
 
     // Geometric mean of modifier values, scaled to the 0–10 envelope.
