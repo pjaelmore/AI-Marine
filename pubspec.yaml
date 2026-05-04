@@ -102,7 +102,7 @@ flutter:
     - assets/map_styles/
     - assets/ndbc_stations.json
     - assets/tide_stations.json
-  #   - assets/species/
+    - assets/species/
   #   - assets/species/_common/
   #   - assets/tide_stations.json
   #   - assets/nws_zones.json

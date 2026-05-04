@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "speciesIds": [
+    "mahi-mahi",
+    "king-mackerel",
+    "yellowtail-snapper",
+    "mangrove-snapper",
+    "red-grouper",
+    "gag-grouper",
+    "red-snapper",
+    "sailfish",
+    "wahoo",
+    "cobia"
+  ]
+}

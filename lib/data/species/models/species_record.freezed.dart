@@ -31,6 +31,15 @@ mixin _$SpeciesRecord {
   RegulatoryProfile get regulatoryProfile => throw _privateConstructorUsedError;
   ConfidenceLevel get confidence => throw _privateConstructorUsedError;
 
+  /// Per-field provenance citations. Maps a calculator variable name
+  /// (e.g. `optimalTemp`, `tidePreference`) to either a source URL
+  /// or the literal string `unverified` when no authoritative source
+  /// could be found. Captured per-species when authoring the JSON
+  /// data file; surfaces in the recommendation card's "data quality"
+  /// notes (Phase 6+) so users see which numbers are pinned vs
+  /// best-guess.
+  Map<String, String> get dataProvenance => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $SpeciesRecordCopyWith<SpeciesRecord> get copyWith =>
@@ -53,7 +62,8 @@ abstract class $SpeciesRecordCopyWith<$Res> {
       MigrationModel migrationModel,
       ConditionProfile conditionProfile,
       RegulatoryProfile regulatoryProfile,
-      ConfidenceLevel confidence});
+      ConfidenceLevel confidence,
+      Map<String, String> dataProvenance});
 
   $MigrationModelCopyWith<$Res> get migrationModel;
   $ConditionProfileCopyWith<$Res> get conditionProfile;
@@ -83,6 +93,7 @@ class _$SpeciesRecordCopyWithImpl<$Res, $Val extends SpeciesRecord>
     Object? conditionProfile = null,
     Object? regulatoryProfile = null,
     Object? confidence = null,
+    Object? dataProvenance = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -125,6 +136,10 @@ class _$SpeciesRecordCopyWithImpl<$Res, $Val extends SpeciesRecord>
           ? _value.confidence
           : confidence // ignore: cast_nullable_to_non_nullable
               as ConfidenceLevel,
+      dataProvenance: null == dataProvenance
+          ? _value.dataProvenance
+          : dataProvenance // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ) as $Val);
   }
 
@@ -171,7 +186,8 @@ abstract class _$$SpeciesRecordImplCopyWith<$Res>
       MigrationModel migrationModel,
       ConditionProfile conditionProfile,
       RegulatoryProfile regulatoryProfile,
-      ConfidenceLevel confidence});
+      ConfidenceLevel confidence,
+      Map<String, String> dataProvenance});
 
   @override
   $MigrationModelCopyWith<$Res> get migrationModel;
@@ -202,6 +218,7 @@ class __$$SpeciesRecordImplCopyWithImpl<$Res>
     Object? conditionProfile = null,
     Object? regulatoryProfile = null,
     Object? confidence = null,
+    Object? dataProvenance = null,
   }) {
     return _then(_$SpeciesRecordImpl(
       id: null == id
@@ -244,6 +261,10 @@ class __$$SpeciesRecordImplCopyWithImpl<$Res>
           ? _value.confidence
           : confidence // ignore: cast_nullable_to_non_nullable
               as ConfidenceLevel,
+      dataProvenance: null == dataProvenance
+          ? _value._dataProvenance
+          : dataProvenance // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ));
   }
 }
@@ -261,9 +282,11 @@ class _$SpeciesRecordImpl implements _SpeciesRecord {
       required this.migrationModel,
       required this.conditionProfile,
       required this.regulatoryProfile,
-      required this.confidence})
+      required this.confidence,
+      final Map<String, String> dataProvenance = const <String, String>{}})
       : _commonNames = commonNames,
-        _sizeClasses = sizeClasses;
+        _sizeClasses = sizeClasses,
+        _dataProvenance = dataProvenance;
 
   factory _$SpeciesRecordImpl.fromJson(Map<String, dynamic> json) =>
       _$$SpeciesRecordImplFromJson(json);
@@ -301,9 +324,33 @@ class _$SpeciesRecordImpl implements _SpeciesRecord {
   @override
   final ConfidenceLevel confidence;
 
+  /// Per-field provenance citations. Maps a calculator variable name
+  /// (e.g. `optimalTemp`, `tidePreference`) to either a source URL
+  /// or the literal string `unverified` when no authoritative source
+  /// could be found. Captured per-species when authoring the JSON
+  /// data file; surfaces in the recommendation card's "data quality"
+  /// notes (Phase 6+) so users see which numbers are pinned vs
+  /// best-guess.
+  final Map<String, String> _dataProvenance;
+
+  /// Per-field provenance citations. Maps a calculator variable name
+  /// (e.g. `optimalTemp`, `tidePreference`) to either a source URL
+  /// or the literal string `unverified` when no authoritative source
+  /// could be found. Captured per-species when authoring the JSON
+  /// data file; surfaces in the recommendation card's "data quality"
+  /// notes (Phase 6+) so users see which numbers are pinned vs
+  /// best-guess.
+  @override
+  @JsonKey()
+  Map<String, String> get dataProvenance {
+    if (_dataProvenance is EqualUnmodifiableMapView) return _dataProvenance;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_dataProvenance);
+  }
+
   @override
   String toString() {
-    return 'SpeciesRecord(id: $id, scientificName: $scientificName, commonNames: $commonNames, schemaVersion: $schemaVersion, curationVersion: $curationVersion, sizeClasses: $sizeClasses, migrationModel: $migrationModel, conditionProfile: $conditionProfile, regulatoryProfile: $regulatoryProfile, confidence: $confidence)';
+    return 'SpeciesRecord(id: $id, scientificName: $scientificName, commonNames: $commonNames, schemaVersion: $schemaVersion, curationVersion: $curationVersion, sizeClasses: $sizeClasses, migrationModel: $migrationModel, conditionProfile: $conditionProfile, regulatoryProfile: $regulatoryProfile, confidence: $confidence, dataProvenance: $dataProvenance)';
   }
 
   @override
@@ -329,7 +376,9 @@ class _$SpeciesRecordImpl implements _SpeciesRecord {
             (identical(other.regulatoryProfile, regulatoryProfile) ||
                 other.regulatoryProfile == regulatoryProfile) &&
             (identical(other.confidence, confidence) ||
-                other.confidence == confidence));
+                other.confidence == confidence) &&
+            const DeepCollectionEquality()
+                .equals(other._dataProvenance, _dataProvenance));
   }
 
   @JsonKey(ignore: true)
@@ -345,7 +394,8 @@ class _$SpeciesRecordImpl implements _SpeciesRecord {
       migrationModel,
       conditionProfile,
       regulatoryProfile,
-      confidence);
+      confidence,
+      const DeepCollectionEquality().hash(_dataProvenance));
 
   @JsonKey(ignore: true)
   @override
@@ -372,7 +422,8 @@ abstract class _SpeciesRecord implements SpeciesRecord {
       required final MigrationModel migrationModel,
       required final ConditionProfile conditionProfile,
       required final RegulatoryProfile regulatoryProfile,
-      required final ConfidenceLevel confidence}) = _$SpeciesRecordImpl;
+      required final ConfidenceLevel confidence,
+      final Map<String, String> dataProvenance}) = _$SpeciesRecordImpl;
 
   factory _SpeciesRecord.fromJson(Map<String, dynamic> json) =
       _$SpeciesRecordImpl.fromJson;
@@ -397,6 +448,16 @@ abstract class _SpeciesRecord implements SpeciesRecord {
   RegulatoryProfile get regulatoryProfile;
   @override
   ConfidenceLevel get confidence;
+  @override
+
+  /// Per-field provenance citations. Maps a calculator variable name
+  /// (e.g. `optimalTemp`, `tidePreference`) to either a source URL
+  /// or the literal string `unverified` when no authoritative source
+  /// could be found. Captured per-species when authoring the JSON
+  /// data file; surfaces in the recommendation card's "data quality"
+  /// notes (Phase 6+) so users see which numbers are pinned vs
+  /// best-guess.
+  Map<String, String> get dataProvenance;
   @override
   @JsonKey(ignore: true)
   _$$SpeciesRecordImplCopyWith<_$SpeciesRecordImpl> get copyWith =>

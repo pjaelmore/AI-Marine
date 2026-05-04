@@ -1,0 +1,82 @@
+{
+  "id": "red-grouper",
+  "scientificName": "Epinephelus morio",
+  "commonNames": ["red grouper", "brown grouper", "hamlet", "cherna americana"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.85,0.85,0.85,0.90,0.95,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,0.95,0.90,0.85,0.85,0.85,0.85]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 66.0, "maxF": 77.0, "idealF": 71.5},
+    "toleratedTemp": {"minF": 52.7, "maxF": 78.3, "idealF": 66.4},
+    "depthPreference": {"minFt": 16.0, "maxFt": 1083.0, "idealFt": 130.0},
+    "structurePreferences": [
+      {"type": "ledge", "weight": 1.0},
+      {"type": "reef", "weight": 0.9},
+      {"type": "dropOff", "weight": 0.7},
+      {"type": "flatBottom", "weight": 0.5},
+      {"type": "sandFlat", "weight": 0.3}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.9},
+      {"startHour": 7, "endHour": 10, "weight": 0.7},
+      {"startHour": 10, "endHour": 15, "weight": 0.4},
+      {"startHour": 15, "endHour": 18, "weight": 0.6},
+      {"startHour": 18, "endHour": 20, "weight": 0.9}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FWC species profile spawning/preferred 66–77°F: https://myfwc.com/wildlifehabitats/profiles/saltwater/grouper/red-grouper/",
+    "toleratedTemp": "FishBase modeled bottom-water 11.5–25.7°C: https://www.fishbase.se/summary/Epinephelus-morio.html",
+    "depthPreference": "FishBase + Florida Museum 5–330m: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/epinephelus-morio/",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified — congeneric groupers have lunar spawning, E. morio not directly attested",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Crepuscular pattern inferred from genus-level reef-predator literature: https://link.springer.com/article/10.1007/s10641-012-0006-5",
+    "structurePreferences": "NOAA: ledges, crevices, limestone reefs, live-bottom (hardBottom/liveBottom/limestoneReef → reef; hole/crevice → ledge; muddyBottom → flatBottom; seagrass → sandFlat): https://www.fisheries.noaa.gov/species/red-grouper",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "NOAA + Gulf Council: non-migratory year-round resident, modest dip Jan-Feb (derived): https://www.fisheries.noaa.gov/species/red-grouper"
+  }
+}

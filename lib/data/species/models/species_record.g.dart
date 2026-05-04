@@ -25,6 +25,10 @@ _$SpeciesRecordImpl _$$SpeciesRecordImplFromJson(Map<String, dynamic> json) =>
       regulatoryProfile: RegulatoryProfile.fromJson(
           json['regulatoryProfile'] as Map<String, dynamic>),
       confidence: $enumDecode(_$ConfidenceLevelEnumMap, json['confidence']),
+      dataProvenance: (json['dataProvenance'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as String),
+          ) ??
+          const <String, String>{},
     );
 
 Map<String, dynamic> _$$SpeciesRecordImplToJson(_$SpeciesRecordImpl instance) =>
@@ -39,6 +43,7 @@ Map<String, dynamic> _$$SpeciesRecordImplToJson(_$SpeciesRecordImpl instance) =>
       'conditionProfile': instance.conditionProfile.toJson(),
       'regulatoryProfile': instance.regulatoryProfile.toJson(),
       'confidence': _$ConfidenceLevelEnumMap[instance.confidence]!,
+      'dataProvenance': instance.dataProvenance,
     };
 
 const _$ConfidenceLevelEnumMap = {

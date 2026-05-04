@@ -1,0 +1,81 @@
+{
+  "id": "wahoo",
+  "scientificName": "Acanthocybium solandri",
+  "commonNames": ["wahoo", "ono", "peto", "guarapucu"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -83.5},
+        {"latitude": 31.0, "longitude": -83.5},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -83.5}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-offshore",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -83.5},
+          {"latitude": 31.0, "longitude": -83.5},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -83.5}
+        ]]
+      },
+      "weeklyValues": [0.70,0.72,0.75,0.78,0.80,0.82,0.82,0.80,0.75,0.70,0.68,0.68,0.70,0.72,0.72,0.70,0.65,0.55,0.45,0.38,0.32,0.28,0.25,0.25,0.25,0.25,0.28,0.32,0.35,0.40,0.45,0.48,0.52,0.58,0.65,0.72,0.78,0.82,0.85,0.85,0.82,0.78,0.78,0.80,0.82,0.85,0.88,0.88,0.85,0.80,0.75,0.72]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 71.6, "maxF": 81.5, "idealF": 76.5},
+    "toleratedTemp": {"minF": 63.5, "maxF": 86.0, "idealF": 76.5},
+    "depthPreference": {"minFt": 0.0, "maxFt": 656.0, "idealFt": 75.0},
+    "structurePreferences": [
+      {"type": "dropOff", "weight": 1.0},
+      {"type": "ledge", "weight": 0.9},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "weedLine", "weight": 0.8}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.85},
+      {"startHour": 7, "endHour": 10, "weight": 0.75},
+      {"startHour": 10, "endHour": 15, "weight": 0.55},
+      {"startHour": 15, "endHour": 18, "weight": 0.65},
+      {"startHour": 18, "endHour": 20, "weight": 0.85}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "Theisen et al. 2012 (N Atlantic PSAT, >90% in 17.5–27.5°C) + Sepulveda et al. 2011: https://link.springer.com/article/10.1007/s00227-012-2010-x",
+    "toleratedTemp": "Sepulveda et al. 2011 (Marine Biology) observed range 10–30°C: https://link.springer.com/article/10.1007/s00227-010-1618-y",
+    "depthPreference": "Theisen et al. 2012 (>90% of time above 200m, median 30m night / 51m day): https://link.springer.com/article/10.1007/s00227-012-2010-x",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified — captain wisdom of full-moon peak not supported by peer-reviewed CPUE",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Theisen et al. 2012 — diel vertical migration (interpolated weights): https://link.springer.com/article/10.1007/s00227-012-2010-x",
+    "structurePreferences": "NOAA + Florida Museum: drop-offs, ledges, pinnacles, banks, current edges, sargassum (pinnacles/banks → ledge, color/thermal/current edges → ripCurrent, sargassum/floating debris → weedLine): https://www.fisheries.noaa.gov/species/atlantic-wahoo",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "NOAA SAFMC FMP + Bermuda seasonality (Oxenford et al.) — Atlantic-coast-weighted, not peer-reviewed FL CPUE: https://www.fisheries.noaa.gov/species/atlantic-wahoo"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "id": "yellowtail-snapper",
+  "scientificName": "Ocyurus chrysurus",
+  "commonNames": ["yellowtail snapper", "yellowtail", "flag", "tail", "rabirubia"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -83.5},
+        {"latitude": 28.5, "longitude": -83.5},
+        {"latitude": 28.5, "longitude": -78.5},
+        {"latitude": 24.0, "longitude": -78.5},
+        {"latitude": 24.0, "longitude": -83.5}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-keys-southeast",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -83.5},
+          {"latitude": 28.5, "longitude": -83.5},
+          {"latitude": 28.5, "longitude": -78.5},
+          {"latitude": 24.0, "longitude": -78.5},
+          {"latitude": 24.0, "longitude": -83.5}
+        ]]
+      },
+      "weeklyValues": [0.85,0.85,0.85,0.85,0.85,0.90,0.90,0.90,0.95,0.95,0.95,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,0.95,0.95,0.95,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 72.0, "maxF": 82.2, "idealF": 78.6},
+    "toleratedTemp": {"minF": 64.4, "maxF": 91.4, "idealF": 78.6},
+    "depthPreference": {"minFt": 33.0, "maxFt": 230.0, "idealFt": 75.0},
+    "structurePreferences": [
+      {"type": "reef", "weight": 1.0},
+      {"type": "ledge", "weight": 0.9},
+      {"type": "dropOff", "weight": 0.85},
+      {"type": "wreck", "weight": 0.8},
+      {"type": "channelEdge", "weight": 0.5},
+      {"type": "sandFlat", "weight": 0.3}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 0, "endHour": 5, "weight": 0.85},
+      {"startHour": 5, "endHour": 8, "weight": 0.7},
+      {"startHour": 8, "endHour": 17, "weight": 0.35},
+      {"startHour": 17, "endHour": 20, "weight": 0.7},
+      {"startHour": 20, "endHour": 23, "weight": 0.85}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 21.7–27.9°C: https://fishbase.se/summary/Ocyurus-chrysurus.html",
+    "toleratedTemp": "Hoss & Peters 1977 (Bull. Mar. Sci.) thermal tolerance: https://www.ingentaconnect.com/content/umrsmas/bullmar/1977/00000027/00000002/art00007",
+    "depthPreference": "FishBase 0–180m, usually 10–70m: https://fishbase.se/summary/Ocyurus-chrysurus.html",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Florida Museum 'Adults are nocturnal predators': https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/",
+    "structurePreferences": "Florida Museum reef-and-ledge habitat: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Florida Museum year-round residency + summer spawning peak (derived): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/"
+  }
+}

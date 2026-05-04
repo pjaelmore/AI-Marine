@@ -1,0 +1,76 @@
+{
+  "id": "gag-grouper",
+  "scientificName": "Mycteroperca microlepis",
+  "commonNames": ["gag", "gag grouper", "copper belly", "charcoal belly"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 65.0, "maxF": 81.0, "idealF": 75.0},
+    "toleratedTemp": {"minF": 50.0, "maxF": 90.0, "idealF": 75.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 500.0, "idealFt": 130.0},
+    "structurePreferences": [
+      {"type": "ledge", "weight": 1.0},
+      {"type": "reef", "weight": 1.0},
+      {"type": "wreck", "weight": 0.95},
+      {"type": "dropOff", "weight": 0.85},
+      {"type": "sandFlat", "weight": 0.5}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [],
+    "lunarSensitivity": "low",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 18.3–27.1°C: https://www.fishbase.se/summary/1212",
+    "toleratedTemp": "unverified — no FishBase tolerance bounds; values are placeholder",
+    "depthPreference": "Florida Museum + FWC: 0–500ft (juvenile estuarine to adult shelf): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/mycteroperca-microlepis/",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Documented winter spawning aggregations (NOAA / SCRFA); per-lunar-phase feeding not directly attested: https://www.fisheries.noaa.gov/species/gag-grouper",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "unverified — no species-specific diel data",
+    "structurePreferences": "NOAA: hard bottom, reefs, wrecks, ledges, drop-offs (juvenile estuarine seagrass → sandFlat): https://www.fisheries.noaa.gov/species/gag-grouper",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "unverified — flat 0.7 baseline; NOAA notes year-round residency on FL shelf"
+  }
+}

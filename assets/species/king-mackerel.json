@@ -1,0 +1,83 @@
+{
+  "id": "king-mackerel",
+  "scientificName": "Scomberomorus cavalla",
+  "commonNames": ["king mackerel", "kingfish", "cavalla", "sierra"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.55,0.55,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95,0.95,0.95,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.90,0.95,0.95,0.95,0.95,0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.55,0.55,0.55]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 74.3, "maxF": 82.6, "idealF": 81.0},
+    "toleratedTemp": {"minF": 68.0, "maxF": 87.8, "idealF": 81.0},
+    "depthPreference": {"minFt": 16.0, "maxFt": 459.0, "idealFt": 49.0},
+    "structurePreferences": [
+      {"type": "reef", "weight": 1.0},
+      {"type": "wreck", "weight": 1.0},
+      {"type": "ledge", "weight": 0.85},
+      {"type": "dropOff", "weight": 0.80},
+      {"type": "channelEdge", "weight": 0.55},
+      {"type": "weedLine", "weight": 0.45},
+      {"type": "ripCurrent", "weight": 0.40},
+      {"type": "shoal", "weight": 0.40}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 9, "weight": 1.0},
+      {"startHour": 9, "endHour": 16, "weight": 0.6},
+      {"startHour": 16, "endHour": 20, "weight": 0.95}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 23.5–28.1°C: https://www.fishbase.se/summary/Scomberomorus-cavalla",
+    "toleratedTemp": "SAFMC '>68°F': https://safmc.net/species/mackerel-king/ + FishBase upper bound",
+    "depthPreference": "FishBase 5–140m, usually 5–15m: https://www.fishbase.se/summary/Scomberomorus-cavalla",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified — anecdotal only",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "FishBase trophic 4.4 visual predator (qualitative): https://www.fishbase.se/summary/Scomberomorus-cavalla",
+    "structurePreferences": "FishBase 'outer reef areas' + SAFMC shelf-edge reefs/wrecks: https://safmc.net/species/mackerel-king/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "NOAA Making Sense of Mackerel + FWC migration timing (derived): https://www.fisheries.noaa.gov/southeast/rules-and-regulations/making-sense-mackerel"
+  }
+}

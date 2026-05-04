@@ -25,6 +25,15 @@ class SpeciesRecord with _$SpeciesRecord {
     required ConditionProfile conditionProfile,
     required RegulatoryProfile regulatoryProfile,
     required ConfidenceLevel confidence,
+
+    /// Per-field provenance citations. Maps a calculator variable name
+    /// (e.g. `optimalTemp`, `tidePreference`) to either a source URL
+    /// or the literal string `unverified` when no authoritative source
+    /// could be found. Captured per-species when authoring the JSON
+    /// data file; surfaces in the recommendation card's "data quality"
+    /// notes (Phase 6+) so users see which numbers are pinned vs
+    /// best-guess.
+    @Default(<String, String>{}) Map<String, String> dataProvenance,
   }) = _SpeciesRecord;
 
   factory SpeciesRecord.fromJson(Map<String, dynamic> json) =>

@@ -1,0 +1,82 @@
+{
+  "id": "red-snapper",
+  "scientificName": "Lutjanus campechanus",
+  "commonNames": ["red snapper", "northern red snapper", "American red snapper", "sow snapper"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 67.5, "maxF": 81.5, "idealF": 75.9},
+    "toleratedTemp": {"minF": 50.0, "maxF": 90.0, "idealF": 75.9},
+    "depthPreference": {"minFt": 30.0, "maxFt": 620.0, "idealFt": 295.0},
+    "structurePreferences": [
+      {"type": "reef", "weight": 1.0},
+      {"type": "wreck", "weight": 1.0},
+      {"type": "ledge", "weight": 0.95},
+      {"type": "dropOff", "weight": 0.85},
+      {"type": "sandFlat", "weight": 0.4},
+      {"type": "flatBottom", "weight": 0.3}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.8},
+      {"startHour": 7, "endHour": 17, "weight": 1.0},
+      {"startHour": 17, "endHour": 20, "weight": 0.6},
+      {"startHour": 20, "endHour": 23, "weight": 0.8}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 19.7–27.5°C: https://www.fishbase.se/summary/Lutjanus-campechanus.html",
+    "toleratedTemp": "unverified — FishBase publishes only preferred range; values are conservative placeholder",
+    "depthPreference": "NOAA Fisheries 30–620ft: https://www.fisheries.noaa.gov/species/red-snapper",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Jackson et al. 2006 (J. Fish Biology): NO field lunar cycle for L. campechanus: https://onlinelibrary.wiley.com/doi/10.1111/j.0022-1112.2006.00951.x",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Ouzts & Szedlmayer 2003 (Trans. Am. Fish. Soc.): feed across all diel periods, dusk lull: https://onlinelibrary.wiley.com/doi/10.1577/T02-085",
+    "structurePreferences": "NOAA: reefs/wrecks/rocks/ledges (oilGasPlatforms → wreck, hardBottom → reef, shellBeds/sandMudBottom → sandFlat): https://www.fisheries.noaa.gov/species/red-snapper",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Year-round resident; aggregation bump weeks 22–39 for summer spawning (Florida Museum): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/northern-red-snapper/"
+  }
+}

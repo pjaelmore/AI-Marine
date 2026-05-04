@@ -1,0 +1,77 @@
+{
+  "id": "cobia",
+  "scientificName": "Rachycentron canadum",
+  "commonNames": ["cobia", "ling", "lemonfish", "crabeater", "sergeantfish", "black kingfish"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.25,0.25,0.25,0.25,0.25,0.25,0.30,0.35,0.45,0.60,0.75,0.90,1.00,1.00,1.00,0.95,0.90,0.85,0.80,0.75,0.70,0.70,0.70,0.70,0.70,0.65,0.65,0.60,0.60,0.55,0.55,0.55,0.55,0.50,0.50,0.45,0.40,0.35,0.30,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 68.0, "maxF": 86.0, "idealF": 72.0},
+    "toleratedTemp": {"minF": 62.2, "maxF": 89.6, "idealF": 80.6},
+    "depthPreference": {"minFt": 0.0, "maxFt": 165.0, "idealFt": 30.0},
+    "structurePreferences": [
+      {"type": "wreck", "weight": 1.0},
+      {"type": "ripCurrent", "weight": 0.8},
+      {"type": "dropOff", "weight": 0.6},
+      {"type": "shoal", "weight": 0.5}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 7, "endHour": 18, "weight": 1.0}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "Florida Museum 68–86°F: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/rachycentron-canadum/",
+    "toleratedTemp": "FishBase 16.8–32°C: https://fishbase.se/summary/Rachycentron-canadum.html",
+    "depthPreference": "FWC + Florida Museum nearshore 0–50m: https://fishbase.se/summary/Rachycentron-canadum.html",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Jensen et al. 2020 (Animal Biotelemetry) + FWC — diurnal sight feeder (crepuscular peaks unverified): https://link.springer.com/article/10.1186/s40317-020-00212-0",
+    "structurePreferences": "NOAA: buoys, debris, wrecks, artificial reefs, rays/turtles (buoyMarker → wreck, raysAndTurtles → ripCurrent): https://www.fisheries.noaa.gov/species/cobia",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "NOAA + Florida Museum — Atlantic spring run weeks 12-19 + Gulf summer presence: https://www.fisheries.noaa.gov/species/cobia"
+  }
+}

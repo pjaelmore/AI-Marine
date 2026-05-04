@@ -1,0 +1,79 @@
+{
+  "id": "sailfish",
+  "scientificName": "Istiophorus platypterus",
+  "commonNames": ["Atlantic sailfish", "sailfish", "Indo-Pacific sailfish", "pez vela", "Florida state saltwater fish"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -82.0},
+        {"latitude": 31.0, "longitude": -82.0},
+        {"latitude": 31.0, "longitude": -77.0},
+        {"latitude": 24.0, "longitude": -77.0},
+        {"latitude": 24.0, "longitude": -82.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-atlantic",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -82.0},
+          {"latitude": 31.0, "longitude": -82.0},
+          {"latitude": 31.0, "longitude": -77.0},
+          {"latitude": 24.0, "longitude": -77.0},
+          {"latitude": 24.0, "longitude": -82.0}
+        ]]
+      },
+      "weeklyValues": [0.95,0.95,0.95,0.90,0.85,0.75,0.65,0.55,0.45,0.40,0.35,0.35,0.35,0.40,0.45,0.50,0.50,0.50,0.50,0.50,0.50,0.50,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.78,0.80,0.82,0.85,0.88,0.90,0.92,0.93,0.94,0.95,0.95,0.95]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 77.0, "maxF": 84.2, "idealF": 80.6},
+    "toleratedTemp": {"minF": 70.0, "maxF": 83.0, "idealF": 78.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 656.0, "idealFt": 33.0},
+    "structurePreferences": [
+      {"type": "dropOff", "weight": 1.0},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "weedLine", "weight": 0.8}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.4},
+      {"startHour": 7, "endHour": 11, "weight": 0.9},
+      {"startHour": 11, "endHour": 17, "weight": 1.0},
+      {"startHour": 17, "endHour": 19, "weight": 0.4}
+    ],
+    "lunarSensitivity": "medium",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.4,
+      "frontalPassageFactor": 1.4,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "Kerstetter et al. 2011 (Marine and Coastal Fisheries) — FL Straits PSAT 25–29°C: https://bioone.org/journals/marine-and-coastal-fisheries/volume-3/issue-1/19425120.2011.623990/",
+    "toleratedTemp": "Florida Museum 70–83°F: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/sailfish/",
+    "depthPreference": "Kerstetter et al. 2011 (75.7% of daytime in top 20m): https://bioone.org/journals/marine-and-coastal-fisheries/volume-3/issue-1/19425120.2011.623990/",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Lopez et al. 2018 (ICES JMS) — increased nocturnal activity around full moon: https://academic.oup.com/icesjms/article/75/2/871/3845292",
+    "weatherSensitivity": "FWC + Mourato et al. 2016 — cold-front-driven SE FL run is qualitatively documented; numeric weights derived from this pattern: https://www.nature.com/articles/srep38163",
+    "timeOfDayPreferences": "Lopez et al. 2018 (ICES JMS) — peak 11–17h, low at twilight, residual at night: https://academic.oup.com/icesjms/article/75/2/871/3845292",
+    "structurePreferences": "Florida Museum + Mourato et al. 2016 — shelf-edge/Gulf-Stream/current-edge association (colorChange → ripCurrent): https://www.nature.com/articles/srep38163",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Kerstetter et al. + FWC + Florida Museum (winter peak Nov-Mar): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/sailfish/"
+  }
+}

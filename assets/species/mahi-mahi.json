@@ -1,0 +1,78 @@
+{
+  "id": "mahi-mahi",
+  "scientificName": "Coryphaena hippurus",
+  "commonNames": ["mahi-mahi", "dolphinfish", "dolphin", "dorado"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -83.5},
+        {"latitude": 31.0, "longitude": -83.5},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -83.5}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-offshore",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -83.5},
+          {"latitude": 31.0, "longitude": -83.5},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -83.5}
+        ]]
+      },
+      "weeklyValues": [0.15,0.15,0.15,0.20,0.20,0.25,0.30,0.35,0.45,0.55,0.65,0.75,0.85,0.90,0.95,1.00,1.00,1.00,1.00,0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.50,0.45,0.40,0.35,0.35,0.40,0.45,0.45,0.40,0.35,0.30,0.25,0.20,0.20,0.20,0.20,0.20,0.20,0.18,0.18,0.15,0.15,0.15,0.15]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 80.0, "maxF": 82.0, "idealF": 81.0},
+    "toleratedTemp": {"minF": 65.0, "maxF": 84.0, "idealF": 81.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 280.0, "idealFt": 3.0},
+    "structurePreferences": [
+      {"type": "weedLine", "weight": 1.0},
+      {"type": "ripCurrent", "weight": 0.8},
+      {"type": "dropOff", "weight": 0.4}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 6, "endHour": 10, "weight": 1.0},
+      {"startHour": 10, "endHour": 16, "weight": 0.8},
+      {"startHour": 16, "endHour": 19, "weight": 0.9}
+    ],
+    "lunarSensitivity": "low",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "NC Sea Grant (Merten et al. PSAT): https://ncseagrant.ncsu.edu/hooklinescience/what-depth-and-water-temperature-do-mahi-mahi-prefer/",
+    "toleratedTemp": "FishBase: https://www.fishbase.se/summary/Coryphaena-hippurus",
+    "depthPreference": "FishBase + NC Sea Grant tagging: https://www.fishbase.se/summary/Coryphaena-hippurus",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Lowry et al. 2007 (Fisheries Research): https://www.sciencedirect.com/science/article/abs/pii/S0165783607001634",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Sajeevan & Sanadi 2021 (Aquatic Living Resources): https://www.alr-journal.org/articles/alr/full_html/2021/01/alr210033/alr210033.html",
+    "structurePreferences": "SAFMC (Sargassum association): https://safmc.net/species/dolphin/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC + SAFMC + NOAA SPO Farrell et al. (derived): https://myfwc.com/wildlifehabitats/profiles/saltwater/dolphinfish/"
+  }
+}
