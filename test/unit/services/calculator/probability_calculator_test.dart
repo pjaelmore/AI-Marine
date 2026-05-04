@@ -2,6 +2,7 @@ import 'package:ai_marine_engine/core/types/catch_record.dart';
 import 'package:ai_marine_engine/core/types/condition_result.dart';
 import 'package:ai_marine_engine/core/types/conditions.dart';
 import 'package:ai_marine_engine/core/types/lat_lng.dart';
+import 'package:ai_marine_engine/core/types/score_result.dart';
 import 'package:ai_marine_engine/data/species/models/condition_profile.dart';
 import 'package:ai_marine_engine/data/species/models/migration_model.dart';
 import 'package:ai_marine_engine/data/species/models/regulatory_profile.dart';
@@ -430,5 +431,130 @@ void main() {
       expect(r.finalScore, lessThanOrEqualTo(10));
       expect(r.finalScore, greaterThanOrEqualTo(0));
     });
+  });
+
+  group('ProbabilityCalculator.scoreGrid', () {
+    test(
+      'small bbox at coarse resolution produces the expected cell count',
+      () async {
+        // 1° height × 1° width box (Boston box) ≈ 60 nm × ~44 nm at
+        // this latitude. At 30 nm resolution: rows = ceil(60/30) = 2,
+        // cols = ceil(~44/30) = 2 → 4 cells.
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final grid = await calc.scoreGrid(
+          species: _species(regionalCurve: _allOnes()),
+          bbox: const LatLngBounds(
+            southwest: LatLng(latitude: 42, longitude: -71),
+            northeast: LatLng(latitude: 43, longitude: -70),
+          ),
+          time: _refTime,
+          resolutionNm: 30,
+        );
+        expect(grid, hasLength(4));
+      },
+    );
+
+    test('every cell center sits inside the requested bbox', () async {
+      const bbox = LatLngBounds(
+        southwest: LatLng(latitude: 42, longitude: -71),
+        northeast: LatLng(latitude: 43, longitude: -70),
+      );
+      final svc = _FakeConditionsService();
+      final calc = ProbabilityCalculator(conditions: svc);
+      final grid = await calc.scoreGrid(
+        species: _species(regionalCurve: _allOnes()),
+        bbox: bbox,
+        time: _refTime,
+        resolutionNm: 15,
+      );
+      for (final r in grid) {
+        expect(
+          bbox.contains(r.location),
+          isTrue,
+          reason: 'cell ${r.location} should be inside the bbox',
+        );
+      }
+    });
+
+    test(
+      'cell centers are uniformly spaced — first cell offset half a step '
+      'inside the southwest corner',
+      () async {
+        const bbox = LatLngBounds(
+          southwest: LatLng(latitude: 42, longitude: -71),
+          northeast: LatLng(latitude: 43, longitude: -70),
+        );
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        // 60 nm height / 30 nm = 2 rows. Each row is 0.5°.
+        // First row center: 42 + 0.25 = 42.25.
+        final grid = await calc.scoreGrid(
+          species: _species(regionalCurve: _allOnes()),
+          bbox: bbox,
+          time: _refTime,
+          resolutionNm: 30,
+        );
+        final lats = grid.map((r) => r.location.latitude).toSet().toList()
+          ..sort();
+        expect(lats, hasLength(2));
+        expect(lats.first, closeTo(42.25, 1e-9));
+        expect(lats.last, closeTo(42.75, 1e-9));
+      },
+    );
+
+    test(
+      'cells outside the species spatial range still appear with finalScore 0',
+      () async {
+        // A bbox extending well outside the spatial range should
+        // produce some passing-gate cells and some failing-gate
+        // cells — both surface in the heatmap.
+        const bbox = LatLngBounds(
+          southwest: LatLng(latitude: 40, longitude: -75),
+          northeast: LatLng(latitude: 45, longitude: -68),
+        );
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final grid = await calc.scoreGrid(
+          species: _species(regionalCurve: _allOnes()),
+          bbox: bbox,
+          time: _refTime,
+          resolutionNm: 60,
+        );
+        final outOfRange = grid.where((r) => r.finalScore == 0).toList();
+        expect(
+          outOfRange,
+          isNotEmpty,
+          reason: 'cells outside the spatial range should score 0',
+        );
+        // And conversely, at least one cell should be in-range and
+        // produce a non-zero score.
+        final inRange = grid.where((r) => r.finalScore > 0).toList();
+        expect(inRange, isNotEmpty);
+      },
+    );
+
+    test(
+      'every grid cell carries species, time, and a reasoning breakdown',
+      () async {
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final species = _species(regionalCurve: _allOnes());
+        final grid = await calc.scoreGrid(
+          species: species,
+          bbox: const LatLngBounds(
+            southwest: LatLng(latitude: 42.3, longitude: -70.7),
+            northeast: LatLng(latitude: 42.4, longitude: -70.5),
+          ),
+          time: _refTime,
+          resolutionNm: 5,
+        );
+        for (final r in grid) {
+          expect(r.speciesId, species.id);
+          expect(r.time, _refTime);
+          expect(r.reasoning, isA<ReasoningBreakdown>());
+        }
+      },
+    );
   });
 }

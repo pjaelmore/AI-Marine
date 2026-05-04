@@ -248,6 +248,55 @@ class ProbabilityCalculator {
     );
   }
 
+  /// Scores a regular grid of locations across [bbox] at the given
+  /// [resolutionNm] resolution — TDD §6.7. Powers the heatmap layer
+  /// in Phase 6.
+  ///
+  /// The grid is laid out as cell centers spaced [resolutionNm]
+  /// apart along each axis, with the first cell centered half a
+  /// step inside the southwest corner. Cells outside the species's
+  /// spatial range still appear in the result with `finalScore = 0`
+  /// — that's useful "no fish here" data for the heatmap.
+  ///
+  /// **Sequential execution** in v1: the four-tier cache absorbs
+  /// duplicate condition fetches across cells (most cells in a
+  /// reasonable bbox resolve to the same NDBC station / NWS zone),
+  /// so the second cell onward is cache-warm. Parallel dispatch is
+  /// a Phase 6+ optimization once the heatmap UI exists and
+  /// measurable perf data exists to tune against.
+  ///
+  /// Caller is responsible for sane inputs. A bbox covering all of
+  /// Florida at 0.1 nm resolution would generate ~30M cells — the
+  /// function won't reject it but the UI will hang. Phase 6 will
+  /// pick sensible defaults (typical fishing-spot grid is 5–10 nm
+  /// at ~0.5 nm resolution → ~100–400 cells).
+  Future<List<ScoreResult>> scoreGrid({
+    required SpeciesRecord species,
+    required LatLngBounds bbox,
+    required DateTime time,
+    required double resolutionNm,
+  }) async {
+    assert(resolutionNm > 0, 'resolutionNm must be positive');
+    final rows = (bbox.heightNm / resolutionNm).ceil().clamp(1, 1000);
+    final cols = (bbox.widthNm / resolutionNm).ceil().clamp(1, 1000);
+    final latStep = (bbox.northeast.latitude - bbox.southwest.latitude) / rows;
+    final lngStep =
+        (bbox.northeast.longitude - bbox.southwest.longitude) / cols;
+
+    final results = <ScoreResult>[];
+    for (var i = 0; i < rows; i++) {
+      for (var j = 0; j < cols; j++) {
+        final lat = bbox.southwest.latitude + (i + 0.5) * latStep;
+        final lng = bbox.southwest.longitude + (j + 0.5) * lngStep;
+        final cell = LatLng(latitude: lat, longitude: lng);
+        results.add(
+          await scoreLocation(species: species, location: cell, time: time),
+        );
+      }
+    }
+    return results;
+  }
+
   String _weekHint(DateTime time) {
     final start = DateTime.utc(time.toUtc().year);
     final daysIn = time.toUtc().difference(start).inDays;
