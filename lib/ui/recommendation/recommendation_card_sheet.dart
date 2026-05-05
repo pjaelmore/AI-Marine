@@ -7,7 +7,9 @@ import '../design/spacing.dart';
 import '../design/typography.dart';
 import 'contributor_bar_tile.dart';
 import 'gate_row.dart';
+import 'math_block.dart';
 import 'modifier_bar_tile.dart';
+import 'suggested_approach_block.dart';
 
 /// Bottom-sheet recommendation card — the project's defensibility surface.
 ///
@@ -16,10 +18,10 @@ import 'modifier_bar_tile.dart';
 /// a spot, sees the score with reasoning, dismisses, taps another spot.
 /// Spatial context is preserved which the recommendation is *for*.
 ///
-/// **Scaffold scope (this slice):** layout structure + score header +
-/// placeholder body. Sibling slices fill in the modifier bars,
-/// contributor bars, gates row, math block, and suggested approach —
-/// each landing as its own focused commit.
+/// Body order: header → gates → modifiers (boosting / dampening /
+/// unverified) → contributors → math block → suggested approach. Loading
+/// / error / empty states are sibling widgets the chart shell swaps in,
+/// not modes of this card.
 class RecommendationCardSheet extends StatelessWidget {
   const RecommendationCardSheet({
     super.key,
@@ -110,7 +112,12 @@ class RecommendationCardSheet extends StatelessWidget {
                   contributors: result.reasoning.contributors,
                 ),
                 const SizedBox(height: MarineSpacing.lg),
-                const _RemainingSectionsPlaceholder(),
+                const _SectionLabel('The math'),
+                MathBlock(reasoning: result.reasoning),
+                const SizedBox(height: MarineSpacing.lg),
+                SuggestedApproachBlock(
+                  approach: result.reasoning.suggestedApproach,
+                ),
               ],
             ),
           ),
@@ -381,44 +388,6 @@ class _SectionLabel extends StatelessWidget {
           color: MarineColors.onDark.withAlpha(160),
           letterSpacing: 0.8,
         ),
-      ),
-    );
-  }
-}
-
-/// Stand-in for the remaining footer pieces — math block + suggested
-/// approach. Land alongside loading/error/empty states in slice 7.
-class _RemainingSectionsPlaceholder extends StatelessWidget {
-  const _RemainingSectionsPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(MarineSpacing.lg),
-      decoration: BoxDecoration(
-        color: MarineColors.deepMarine,
-        borderRadius: BorderRadius.circular(MarineSpacing.radiusMd),
-        border: Border.all(color: MarineColors.divider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'STILL TO COME',
-            style: MarineTypography.label.copyWith(
-              color: MarineColors.onDark.withAlpha(150),
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(height: MarineSpacing.sm),
-          Text(
-            'Math block + suggested approach land in slice 7 alongside '
-            'loading / error / empty states.',
-            style: MarineTypography.bodySmall.copyWith(
-              color: MarineColors.onDark.withAlpha(180),
-            ),
-          ),
-        ],
       ),
     );
   }

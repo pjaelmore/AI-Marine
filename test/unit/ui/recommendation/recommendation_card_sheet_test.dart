@@ -308,15 +308,30 @@ void main() {
     );
   });
 
-  group('RecommendationCardSheet — placeholder for remaining sections', () {
-    testWidgets('STILL TO COME stub names what is not yet built',
+  group('RecommendationCardSheet — math + approach footer', () {
+    testWidgets('math block renders under "THE MATH" with all three rows',
         (tester) async {
       await tester.pumpWidget(
         _harness(RecommendationCardSheet(result: _scoreFor())),
       );
-      expect(find.text('STILL TO COME'), findsOneWidget);
+      expect(find.text('THE MATH'), findsOneWidget);
+      expect(find.text('Base × modifiers'), findsOneWidget);
+      expect(find.text('+ Contributors'), findsOneWidget);
+      expect(find.text('Final'), findsOneWidget);
+      // Values from _scoreFor defaults.
+      expect(find.text('7.06'), findsOneWidget);
+      expect(find.text('1.75'), findsOneWidget);
+      expect(find.text('8.81'), findsOneWidget);
+    });
+
+    testWidgets('suggested approach renders with the labelled callout',
+        (tester) async {
+      await tester.pumpWidget(
+        _harness(RecommendationCardSheet(result: _scoreFor())),
+      );
+      expect(find.text('SUGGESTED APPROACH'), findsOneWidget);
       expect(
-        find.textContaining('Math block + suggested approach'),
+        find.text('Live pinfish on the channel edge.'),
         findsOneWidget,
       );
     });
