@@ -62,7 +62,14 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "crabs", "weight": 0.9},
+      {"baitfish": "small baitfish", "weight": 0.85},
+      {"baitfish": "squid", "weight": 0.7},
+      {"baitfish": "cigar minnows", "weight": 0.6}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -77,6 +84,7 @@
     "timeOfDayPreferences": "Ouzts & Szedlmayer 2003 (Trans. Am. Fish. Soc.): feed across all diel periods, dusk lull: https://onlinelibrary.wiley.com/doi/10.1577/T02-085",
     "structurePreferences": "NOAA: reefs/wrecks/rocks/ledges (oilGasPlatforms → wreck, hardBottom → reef, shellBeds/sandMudBottom → sandFlat): https://www.fisheries.noaa.gov/species/red-snapper",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "Year-round resident; aggregation bump weeks 22–39 for summer spawning (Florida Museum): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/northern-red-snapper/"
+    "weeklyPresenceCurve": "Year-round resident; aggregation bump weeks 22–39 for summer spawning (Florida Museum): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/northern-red-snapper/",
+    "baitAssociations": "FishBase + Gulf gut-analysis (SEDAR-74-RD79): stomatopods, portunid crabs, Sicyonia shrimp, squid, small fishes: https://aquila.usm.edu/goms/vol24/iss1/4/"
   }
 }

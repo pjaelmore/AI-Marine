@@ -56,7 +56,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "pinfish", "weight": 1.0},
+      {"baitfish": "Spanish sardines", "weight": 0.95},
+      {"baitfish": "scaled sardines", "weight": 0.85},
+      {"baitfish": "mullet", "weight": 0.75},
+      {"baitfish": "round scad", "weight": 0.7},
+      {"baitfish": "crabs", "weight": 0.5}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -71,6 +79,7 @@
     "timeOfDayPreferences": "unverified — no species-specific diel data",
     "structurePreferences": "NOAA: hard bottom, reefs, wrecks, ledges, drop-offs (juvenile estuarine seagrass → sandFlat): https://www.fisheries.noaa.gov/species/gag-grouper",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "unverified — flat 0.7 baseline; NOAA notes year-round residency on FL shelf"
+    "weeklyPresenceCurve": "unverified — flat 0.7 baseline; NOAA notes year-round residency on FL shelf",
+    "baitAssociations": "NOAA + SAFMC: 95-98% piscivorous adults (pinfish, sardines, mullet, scad dominant): https://safmc.net/species/grouper-gag/"
   }
 }

@@ -63,7 +63,14 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "crabs", "weight": 0.9},
+      {"baitfish": "small baitfish", "weight": 0.7},
+      {"baitfish": "squid", "weight": 0.55},
+      {"baitfish": "marine worms", "weight": 0.4}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -78,6 +85,7 @@
     "timeOfDayPreferences": "Florida Museum 'Adults are nocturnal predators': https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/",
     "structurePreferences": "Florida Museum reef-and-ledge habitat: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "Florida Museum year-round residency + summer spawning peak (derived): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/"
+    "weeklyPresenceCurve": "Florida Museum year-round residency + summer spawning peak (derived): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/yellowtail-snapper/",
+    "baitAssociations": "FishBase + UF/IFAS Collier County profile (~23% crab, 16% shrimp, 16% fish): https://blogs.ifas.ufl.edu/collierco/2021/06/29/fish-of-florida-yellowtail-snapper-ocyurus-chrysurus-species-profile/"
   }
 }

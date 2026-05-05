@@ -59,7 +59,15 @@
       "frontalPassageFactor": 1.4,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5},
+    "baitAssociations": [
+      {"baitfish": "sardines", "weight": 1.0},
+      {"baitfish": "ballyhoo", "weight": 0.9},
+      {"baitfish": "blue runners", "weight": 0.8},
+      {"baitfish": "squid", "weight": 0.7},
+      {"baitfish": "mullet", "weight": 0.65},
+      {"baitfish": "threadfin herring", "weight": 0.6}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -74,6 +82,7 @@
     "timeOfDayPreferences": "Lopez et al. 2018 (ICES JMS) — peak 11–17h, low at twilight, residual at night: https://academic.oup.com/icesjms/article/75/2/871/3845292",
     "structurePreferences": "Florida Museum + Mourato et al. 2016 — shelf-edge/Gulf-Stream/current-edge association (colorChange → ripCurrent): https://www.nature.com/articles/srep38163",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "Kerstetter et al. + FWC + Florida Museum (winter peak Nov-Mar): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/sailfish/"
+    "weeklyPresenceCurve": "Kerstetter et al. + FWC + Florida Museum (winter peak Nov-Mar): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/sailfish/",
+    "baitAssociations": "FishBase Food Items: sardines, mackerels, mullets, flying fish, jacks (Decapterus, Selar), squid: https://www.fishbase.se/TrophicEco/FoodItemsList.php?vstockcode=87&genusname=Istiophorus&speciesname=platypterus"
   }
 }

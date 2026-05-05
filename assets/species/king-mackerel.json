@@ -63,7 +63,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "Spanish sardines", "weight": 1.0},
+      {"baitfish": "threadfin herring", "weight": 0.9},
+      {"baitfish": "menhaden", "weight": 0.8},
+      {"baitfish": "blue runners", "weight": 0.75},
+      {"baitfish": "ballyhoo", "weight": 0.7},
+      {"baitfish": "squid", "weight": 0.45}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -78,6 +86,7 @@
     "timeOfDayPreferences": "FishBase trophic 4.4 visual predator (qualitative): https://www.fishbase.se/summary/Scomberomorus-cavalla",
     "structurePreferences": "FishBase 'outer reef areas' + SAFMC shelf-edge reefs/wrecks: https://safmc.net/species/mackerel-king/",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "NOAA Making Sense of Mackerel + FWC migration timing (derived): https://www.fisheries.noaa.gov/southeast/rules-and-regulations/making-sense-mackerel"
+    "weeklyPresenceCurve": "NOAA Making Sense of Mackerel + FWC migration timing (derived): https://www.fisheries.noaa.gov/southeast/rules-and-regulations/making-sense-mackerel",
+    "baitAssociations": "FishBase Food Items + NOAA Tech Report 'Food of king mackerel': https://repository.library.noaa.gov/view/noaa/5533"
   }
 }

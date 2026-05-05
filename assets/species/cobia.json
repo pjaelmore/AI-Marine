@@ -57,7 +57,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "crabs", "weight": 1.0},
+      {"baitfish": "eels", "weight": 0.7},
+      {"baitfish": "pinfish", "weight": 0.65},
+      {"baitfish": "mullet", "weight": 0.6},
+      {"baitfish": "squid", "weight": 0.5},
+      {"baitfish": "shrimp", "weight": 0.45}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -72,6 +80,7 @@
     "timeOfDayPreferences": "Jensen et al. 2020 (Animal Biotelemetry) + FWC — diurnal sight feeder (crepuscular peaks unverified): https://link.springer.com/article/10.1186/s40317-020-00212-0",
     "structurePreferences": "NOAA: buoys, debris, wrecks, artificial reefs, rays/turtles (buoyMarker → wreck, raysAndTurtles → ripCurrent): https://www.fisheries.noaa.gov/species/cobia",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "NOAA + Florida Museum — Atlantic spring run weeks 12-19 + Gulf summer presence: https://www.fisheries.noaa.gov/species/cobia"
+    "weeklyPresenceCurve": "NOAA + Florida Museum — Atlantic spring run weeks 12-19 + Gulf summer presence: https://www.fisheries.noaa.gov/species/cobia",
+    "baitAssociations": "Meyer & Franks 1996 (N. Gulf gut analysis): portunid crabs in 79.1% of stomachs, 77.6% by number — hence 'crabeater': https://aquila.usm.edu/gcr/vol9/iss3/2/"
   }
 }

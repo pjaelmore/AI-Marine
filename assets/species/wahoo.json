@@ -61,7 +61,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5},
+    "baitAssociations": [
+      {"baitfish": "small tunas", "weight": 1.0},
+      {"baitfish": "squid", "weight": 0.85},
+      {"baitfish": "ballyhoo", "weight": 0.8},
+      {"baitfish": "flying fish", "weight": 0.75},
+      {"baitfish": "blue runners", "weight": 0.65},
+      {"baitfish": "scad", "weight": 0.6}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -76,6 +84,7 @@
     "timeOfDayPreferences": "Theisen et al. 2012 — diel vertical migration (interpolated weights): https://link.springer.com/article/10.1007/s00227-012-2010-x",
     "structurePreferences": "NOAA + Florida Museum: drop-offs, ledges, pinnacles, banks, current edges, sargassum (pinnacles/banks → ledge, color/thermal/current edges → ripCurrent, sargassum/floating debris → weedLine): https://www.fisheries.noaa.gov/species/atlantic-wahoo",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "NOAA SAFMC FMP + Bermuda seasonality (Oxenford et al.) — Atlantic-coast-weighted, not peer-reviewed FL CPUE: https://www.fisheries.noaa.gov/species/atlantic-wahoo"
+    "weeklyPresenceCurve": "NOAA SAFMC FMP + Bermuda seasonality (Oxenford et al.) — Atlantic-coast-weighted, not peer-reviewed FL CPUE: https://www.fisheries.noaa.gov/species/atlantic-wahoo",
+    "baitAssociations": "Peer-reviewed gut analyses (fish ~85% by number / 96% by mass; Scombridae ~22%): https://www.researchgate.net/publication/258092809_Diet_of_Wahoo_Acanthocybium_solandri_from_the_Northcentral_Gulf_of_Mexico"
   }
 }

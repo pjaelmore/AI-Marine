@@ -62,7 +62,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "crabs", "weight": 1.0},
+      {"baitfish": "shrimp", "weight": 0.85},
+      {"baitfish": "octopus", "weight": 0.7},
+      {"baitfish": "squid", "weight": 0.6},
+      {"baitfish": "pinfish", "weight": 0.55},
+      {"baitfish": "lobster", "weight": 0.45}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -77,6 +85,7 @@
     "timeOfDayPreferences": "Crepuscular pattern inferred from genus-level reef-predator literature: https://link.springer.com/article/10.1007/s10641-012-0006-5",
     "structurePreferences": "NOAA: ledges, crevices, limestone reefs, live-bottom (hardBottom/liveBottom/limestoneReef → reef; hole/crevice → ledge; muddyBottom → flatBottom; seagrass → sandFlat): https://www.fisheries.noaa.gov/species/red-grouper",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "NOAA + Gulf Council: non-migratory year-round resident, modest dip Jan-Feb (derived): https://www.fisheries.noaa.gov/species/red-grouper"
+    "weeklyPresenceCurve": "NOAA + Gulf Council: non-migratory year-round resident, modest dip Jan-Feb (derived): https://www.fisheries.noaa.gov/species/red-grouper",
+    "baitAssociations": "FishBase Food Items (61 prey records — heavy crab dominance + penaeid shrimp + octopus): https://www.fishbase.se/TrophicEco/FoodItemsList.php?vstockcode=25&genus=Epinephelus&species=morio"
   }
 }

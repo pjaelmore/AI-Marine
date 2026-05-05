@@ -64,7 +64,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "pilchards", "weight": 0.85},
+      {"baitfish": "crabs", "weight": 0.8},
+      {"baitfish": "pinfish", "weight": 0.7},
+      {"baitfish": "squid", "weight": 0.55},
+      {"baitfish": "mojarra", "weight": 0.5}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -79,6 +87,7 @@
     "timeOfDayPreferences": "Florida Museum + FishBase: nocturnal foragers (adults): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/lutjanus-griseus/",
     "structurePreferences": "Florida Museum: mangroves, reefs, ledges, estuaries (mangrove → weedLine, seagrass → sandFlat, dock → wreck, hardBottom → reef): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/lutjanus-griseus/",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "Faletti et al. 2013 Estuaries & Coasts (year-round S. FL, peak Jul-Dec): https://link.springer.com/article/10.1007/s12237-013-9652-x"
+    "weeklyPresenceCurve": "Faletti et al. 2013 Estuaries & Coasts (year-round S. FL, peak Jul-Dec): https://link.springer.com/article/10.1007/s12237-013-9652-x",
+    "baitAssociations": "FishBase + Florida Museum (nocturnal forage on small fish, shrimp, crabs, gastropods, cephalopods): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/lutjanus-griseus/"
   }
 }

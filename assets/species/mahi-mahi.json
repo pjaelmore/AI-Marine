@@ -58,7 +58,15 @@
       "frontalPassageFactor": 1.0,
       "cloudCoverPreference": 0.5
     },
-    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5}
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5},
+    "baitAssociations": [
+      {"baitfish": "flying fish", "weight": 1.0},
+      {"baitfish": "ballyhoo", "weight": 0.9},
+      {"baitfish": "squid", "weight": 0.75},
+      {"baitfish": "small jacks", "weight": 0.6},
+      {"baitfish": "sardines", "weight": 0.55},
+      {"baitfish": "mullet", "weight": 0.5}
+    ]
   },
   "regulatoryProfile": {},
   "confidence": "exploratory",
@@ -73,6 +81,7 @@
     "timeOfDayPreferences": "Sajeevan & Sanadi 2021 (Aquatic Living Resources): https://www.alr-journal.org/articles/alr/full_html/2021/01/alr210033/alr210033.html",
     "structurePreferences": "SAFMC (Sargassum association): https://safmc.net/species/dolphin/",
     "currentPreference": "unverified",
-    "weeklyPresenceCurve": "FWC + SAFMC + NOAA SPO Farrell et al. (derived): https://myfwc.com/wildlifehabitats/profiles/saltwater/dolphinfish/"
+    "weeklyPresenceCurve": "FWC + SAFMC + NOAA SPO Farrell et al. (derived): https://myfwc.com/wildlifehabitats/profiles/saltwater/dolphinfish/",
+    "baitAssociations": "Florida Museum (flying fish ~25% of adult diet by weight) + FishBase: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/dolphinfish/"
   }
 }
