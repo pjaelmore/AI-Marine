@@ -5,6 +5,7 @@ import '../../core/types/score_result.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../design/typography.dart';
+import 'modifier_bar_tile.dart';
 
 /// Bottom-sheet recommendation card — the project's defensibility surface.
 ///
@@ -22,6 +23,7 @@ class RecommendationCardSheet extends StatelessWidget {
     super.key,
     required this.result,
     this.onClose,
+    this.unverifiedModifierNames = const <String>{},
   });
 
   /// Score to render. Null is the caller's responsibility to handle —
@@ -34,6 +36,14 @@ class RecommendationCardSheet extends StatelessWidget {
   /// the close button is omitted so the sheet stays purely a passive
   /// renderer (useful for previews and tests).
   final VoidCallback? onClose;
+
+  /// Modifier names whose underlying species data is marked
+  /// `unverified` in `dataProvenance`. Sourced by the chart shell
+  /// from `SpeciesRecord.dataProvenance` and passed in here so the
+  /// card itself stays decoupled from species data plumbing. The
+  /// modifier subsection routes these to a muted "UNVERIFIED" row
+  /// instead of the bar.
+  final Set<String> unverifiedModifierNames;
 
   /// Initial sheet position as a fraction of the screen. Matches the
   /// "peek" snap point — header + label visible, chart still readable
@@ -87,7 +97,12 @@ class RecommendationCardSheet extends StatelessWidget {
                 const SizedBox(height: MarineSpacing.md),
                 _Header(result: result, onClose: onClose),
                 const SizedBox(height: MarineSpacing.lg),
-                const _BreakdownPlaceholder(),
+                _ModifiersBlock(
+                  result: result,
+                  unverifiedNames: unverifiedModifierNames,
+                ),
+                const SizedBox(height: MarineSpacing.lg),
+                const _RemainingSectionsPlaceholder(),
               ],
             ),
           ),
@@ -236,10 +251,84 @@ class _ConfidenceChip extends StatelessWidget {
   }
 }
 
-/// Stand-in for the breakdown body. Replaced in the next slices with
-/// modifier bars, contributor bars, gates row, math block, and approach.
-class _BreakdownPlaceholder extends StatelessWidget {
-  const _BreakdownPlaceholder();
+/// Modifiers section — splits boosting / dampening / unverified into
+/// labelled subsections. Boosting (value > 1) appears first because
+/// it's what the user came to learn ("why is this spot good?"); the
+/// dampening section explains the ceiling; unverified rows surface
+/// last so the user sees what *isn't* peer-reviewed.
+class _ModifiersBlock extends StatelessWidget {
+  const _ModifiersBlock({
+    required this.result,
+    required this.unverifiedNames,
+  });
+
+  final ScoreResult result;
+  final Set<String> unverifiedNames;
+
+  @override
+  Widget build(BuildContext context) {
+    final boosting = <ModifierApplication>[];
+    final dampening = <ModifierApplication>[];
+    final unverified = <ModifierApplication>[];
+    for (final m in result.reasoning.modifiers) {
+      if (unverifiedNames.contains(m.name)) {
+        unverified.add(m);
+      } else if (m.value >= 1.0) {
+        boosting.add(m);
+      } else {
+        dampening.add(m);
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (boosting.isNotEmpty) ...[
+          const _SectionLabel("What's boosting"),
+          ...boosting.map((m) => ModifierBarTile(modifier: m)),
+        ],
+        if (dampening.isNotEmpty) ...[
+          const _SectionLabel("What's dampening"),
+          ...dampening.map((m) => ModifierBarTile(modifier: m)),
+        ],
+        if (unverified.isNotEmpty) ...[
+          const _SectionLabel('Tracked but unverified'),
+          ...unverified.map(
+            (m) => ModifierBarTile(modifier: m, unverified: true),
+          ),
+        ],
+        if (boosting.isEmpty && dampening.isEmpty && unverified.isEmpty)
+          const _SectionLabel('No modifiers fired (data unavailable)'),
+      ],
+    );
+  }
+}
+
+/// Small all-caps label that introduces each modifier subsection.
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: MarineSpacing.sm),
+      child: Text(
+        text.toUpperCase(),
+        style: MarineTypography.label.copyWith(
+          color: MarineColors.onDark.withAlpha(160),
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+/// Stand-in for sections still to come (gates row, contributors, math
+/// block, suggested approach). Replaced one block at a time in the
+/// next slices.
+class _RemainingSectionsPlaceholder extends StatelessWidget {
+  const _RemainingSectionsPlaceholder();
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +343,7 @@ class _BreakdownPlaceholder extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'BREAKDOWN',
+            'STILL TO COME',
             style: MarineTypography.label.copyWith(
               color: MarineColors.onDark.withAlpha(150),
               letterSpacing: 0.8,
@@ -262,8 +351,8 @@ class _BreakdownPlaceholder extends StatelessWidget {
           ),
           const SizedBox(height: MarineSpacing.sm),
           Text(
-            'Modifier bars, contributor bars, gates row, math block, and '
-            'suggested approach land in upcoming slices.',
+            'Gates row, contributor bars, math block, and suggested '
+            'approach land in upcoming slices.',
             style: MarineTypography.bodySmall.copyWith(
               color: MarineColors.onDark.withAlpha(180),
             ),

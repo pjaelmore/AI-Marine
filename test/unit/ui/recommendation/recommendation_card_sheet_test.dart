@@ -11,6 +11,7 @@ ScoreResult _scoreFor({
   double confidence = 0.85,
   LatLng location = const LatLng(latitude: 27.94, longitude: -82.45),
   DateTime? time,
+  List<ModifierApplication> modifiers = const [],
 }) {
   final t = time ?? DateTime.utc(2026, 5, 22, 23);
   return ScoreResult(
@@ -22,7 +23,7 @@ ScoreResult _scoreFor({
     reasoning: ReasoningBreakdown(
       baseProbability: 0.95,
       gates: const [GateResult(name: 'migration_presence', passed: true)],
-      modifiers: const [],
+      modifiers: modifiers,
       contributors: const [],
       rawScoreBeforeContributors: 7.06,
       additiveTotal: 1.75,
@@ -32,6 +33,21 @@ ScoreResult _scoreFor({
     ),
   );
 }
+
+ModifierApplication _mod({
+  required String name,
+  required double value,
+  String description = 'Test description',
+  double rangeMin = 0,
+  double rangeMax = 2,
+}) =>
+    ModifierApplication(
+      name: name,
+      value: value,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      description: description,
+    );
 
 Widget _harness(Widget sheet) {
   return MaterialApp(
@@ -116,27 +132,107 @@ void main() {
     });
   });
 
-  group('RecommendationCardSheet — body placeholder', () {
-    testWidgets('shows the BREAKDOWN section header', (tester) async {
-      await tester.pumpWidget(
-        _harness(RecommendationCardSheet(result: _scoreFor())),
-      );
-      // Sheet starts at peek size (~32%) — drag up to reveal the body.
-      // At default peek the placeholder may be partially below the fold,
-      // so widget-tree presence is the right assertion (not visibility).
-      expect(find.text('BREAKDOWN'), findsOneWidget);
-    });
+  group('RecommendationCardSheet — modifiers section', () {
+    testWidgets(
+      "boosting modifiers (value > 1) appear under \"What's boosting\"",
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            RecommendationCardSheet(
+              result: _scoreFor(
+                modifiers: [
+                  _mod(name: 'water_temperature', value: 2.0),
+                  _mod(name: 'tide_phase', value: 1.5),
+                ],
+              ),
+            ),
+          ),
+        );
+        expect(find.text("WHAT'S BOOSTING"), findsOneWidget);
+        expect(find.text('Water temperature'), findsOneWidget);
+        expect(find.text('Tide phase'), findsOneWidget);
+        expect(find.text('×2.00'), findsOneWidget);
+        expect(find.text('×1.50'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-      'placeholder names every section coming in later slices',
+      "dampening modifiers (value < 1) appear under \"What's dampening\"",
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            RecommendationCardSheet(
+              result: _scoreFor(
+                modifiers: [
+                  _mod(name: 'wind_speed', value: 0.4),
+                ],
+              ),
+            ),
+          ),
+        );
+        expect(find.text("WHAT'S DAMPENING"), findsOneWidget);
+        expect(find.text('Wind speed'), findsOneWidget);
+        expect(find.text('×0.40'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'unverified modifiers route to the muted UNVERIFIED row',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            RecommendationCardSheet(
+              result: _scoreFor(
+                modifiers: [
+                  _mod(name: 'water_temperature', value: 2.0),
+                  _mod(name: 'solunar_window', value: 1.6),
+                ],
+              ),
+              unverifiedModifierNames: const {'solunar_window'},
+            ),
+          ),
+        );
+        // verified modifier renders as a normal bar
+        expect(find.text("WHAT'S BOOSTING"), findsOneWidget);
+        expect(find.text('Water temperature'), findsOneWidget);
+        // unverified appears under its own subsection with the badge
+        expect(find.text('TRACKED BUT UNVERIFIED'), findsOneWidget);
+        expect(find.text('UNVERIFIED'), findsOneWidget);
+        expect(find.text('Solunar window'), findsOneWidget);
+        // and the unverified row deliberately does NOT show the
+        // multiplier number — that's the whole point of the muted row
+        expect(find.text('×1.60'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'empty modifiers list shows the no-data fallback label',
       (tester) async {
         await tester.pumpWidget(
           _harness(RecommendationCardSheet(result: _scoreFor())),
         );
-        final body = find.textContaining('Modifier bars, contributor bars');
-        expect(body, findsOneWidget);
+        expect(
+          find.text('NO MODIFIERS FIRED (DATA UNAVAILABLE)'),
+          findsOneWidget,
+        );
       },
     );
+  });
+
+  group('RecommendationCardSheet — placeholder for remaining sections', () {
+    testWidgets('STILL TO COME stub names what is not yet built',
+        (tester) async {
+      await tester.pumpWidget(
+        _harness(RecommendationCardSheet(result: _scoreFor())),
+      );
+      expect(find.text('STILL TO COME'), findsOneWidget);
+      expect(
+        find.textContaining(
+          'Gates row, contributor bars, math block',
+        ),
+        findsOneWidget,
+      );
+    });
   });
 
   group('RecommendationCardSheet — sheet behavior', () {
