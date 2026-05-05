@@ -12,6 +12,10 @@ ScoreResult _scoreFor({
   LatLng location = const LatLng(latitude: 27.94, longitude: -82.45),
   DateTime? time,
   List<ModifierApplication> modifiers = const [],
+  List<ContributorApplication> contributors = const [],
+  List<GateResult> gates = const [
+    GateResult(name: 'migration_presence', passed: true),
+  ],
 }) {
   final t = time ?? DateTime.utc(2026, 5, 22, 23);
   return ScoreResult(
@@ -22,9 +26,9 @@ ScoreResult _scoreFor({
     confidence: confidence,
     reasoning: ReasoningBreakdown(
       baseProbability: 0.95,
-      gates: const [GateResult(name: 'migration_presence', passed: true)],
+      gates: gates,
       modifiers: modifiers,
-      contributors: const [],
+      contributors: contributors,
       rawScoreBeforeContributors: 7.06,
       additiveTotal: 1.75,
       finalScore: finalScore,
@@ -33,6 +37,19 @@ ScoreResult _scoreFor({
     ),
   );
 }
+
+ContributorApplication _con({
+  required String name,
+  required double value,
+  String description = 'desc',
+  double rangeMax = 1.0,
+}) =>
+    ContributorApplication(
+      name: name,
+      value: value,
+      rangeMax: rangeMax,
+      description: description,
+    );
 
 ModifierApplication _mod({
   required String name,
@@ -219,6 +236,78 @@ void main() {
     );
   });
 
+  group('RecommendationCardSheet — gates section', () {
+    testWidgets('passing gate renders under "GATES" with a check icon',
+        (tester) async {
+      await tester.pumpWidget(
+        _harness(RecommendationCardSheet(result: _scoreFor())),
+      );
+      expect(find.text('GATES'), findsOneWidget);
+      expect(find.text('Migration presence'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+    });
+
+    testWidgets('failing gate surfaces the failure reason + error icon',
+        (tester) async {
+      await tester.pumpWidget(
+        _harness(
+          RecommendationCardSheet(
+            result: _scoreFor(
+              gates: const [
+                GateResult(
+                  name: 'migration_presence',
+                  passed: false,
+                  failureReason: 'Out of season window',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Migration presence'), findsOneWidget);
+      expect(find.text('Out of season window'), findsOneWidget);
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+    });
+  });
+
+  group('RecommendationCardSheet — contributors section', () {
+    testWidgets(
+      'non-zero contributors render under "WHAT\'S ADDING" with +N.NN',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            RecommendationCardSheet(
+              result: _scoreFor(
+                contributors: [
+                  _con(name: 'time_of_day', value: 0.85),
+                  _con(name: 'structure_proximity', value: 0.6),
+                ],
+              ),
+            ),
+          ),
+        );
+        expect(find.text("WHAT'S ADDING"), findsOneWidget);
+        expect(find.text('Time of day'), findsOneWidget);
+        expect(find.text('Structure proximity'), findsOneWidget);
+        expect(find.text('+0.85'), findsOneWidget);
+        expect(find.text('+0.60'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'empty contributors list shows the no-data fallback label',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(RecommendationCardSheet(result: _scoreFor())),
+        );
+        expect(
+          find.text('NO CONTRIBUTORS FIRED (DATA UNAVAILABLE)'),
+          findsOneWidget,
+        );
+      },
+    );
+  });
+
   group('RecommendationCardSheet — placeholder for remaining sections', () {
     testWidgets('STILL TO COME stub names what is not yet built',
         (tester) async {
@@ -227,9 +316,7 @@ void main() {
       );
       expect(find.text('STILL TO COME'), findsOneWidget);
       expect(
-        find.textContaining(
-          'Gates row, contributor bars, math block',
-        ),
+        find.textContaining('Math block + suggested approach'),
         findsOneWidget,
       );
     });

@@ -5,6 +5,8 @@ import '../../core/types/score_result.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../design/typography.dart';
+import 'contributor_bar_tile.dart';
+import 'gate_row.dart';
 import 'modifier_bar_tile.dart';
 
 /// Bottom-sheet recommendation card — the project's defensibility surface.
@@ -97,9 +99,15 @@ class RecommendationCardSheet extends StatelessWidget {
                 const SizedBox(height: MarineSpacing.md),
                 _Header(result: result, onClose: onClose),
                 const SizedBox(height: MarineSpacing.lg),
+                _GatesBlock(gates: result.reasoning.gates),
+                const SizedBox(height: MarineSpacing.lg),
                 _ModifiersBlock(
                   result: result,
                   unverifiedNames: unverifiedModifierNames,
+                ),
+                const SizedBox(height: MarineSpacing.lg),
+                _ContributorsBlock(
+                  contributors: result.reasoning.contributors,
                 ),
                 const SizedBox(height: MarineSpacing.lg),
                 const _RemainingSectionsPlaceholder(),
@@ -251,6 +259,60 @@ class _ConfidenceChip extends StatelessWidget {
   }
 }
 
+/// Gates section — at the top of the breakdown. Renders one [GateRow]
+/// per [GateResult]. When all gates pass this is a row of green pills;
+/// when one fails it surfaces the failure reason and (because a failed
+/// gate produces `finalScore = 0` with empty modifiers/contributors)
+/// becomes the *only* explanation the user gets.
+class _GatesBlock extends StatelessWidget {
+  const _GatesBlock({required this.gates});
+
+  final List<GateResult> gates;
+
+  @override
+  Widget build(BuildContext context) {
+    if (gates.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionLabel('Gates'),
+        ...gates.map((g) => GateRow(gate: g)),
+      ],
+    );
+  }
+}
+
+/// Contributors section — additive bonuses on top of the multiplied
+/// base × modifiers product. Section appears even when every
+/// contributor is zero so the user sees what *could* contribute (a
+/// gentle nudge to log catches feeds the recent-catches contributor;
+/// a structure bonus comes from species data + ENC bathymetry).
+class _ContributorsBlock extends StatelessWidget {
+  const _ContributorsBlock({required this.contributors});
+
+  final List<ContributorApplication> contributors;
+
+  @override
+  Widget build(BuildContext context) {
+    if (contributors.isEmpty) {
+      return const Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SectionLabel("What's adding"),
+          _SectionLabel('No contributors fired (data unavailable)'),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _SectionLabel("What's adding"),
+        ...contributors.map((c) => ContributorBarTile(contributor: c)),
+      ],
+    );
+  }
+}
+
 /// Modifiers section — splits boosting / dampening / unverified into
 /// labelled subsections. Boosting (value > 1) appears first because
 /// it's what the user came to learn ("why is this spot good?"); the
@@ -324,9 +386,8 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-/// Stand-in for sections still to come (gates row, contributors, math
-/// block, suggested approach). Replaced one block at a time in the
-/// next slices.
+/// Stand-in for the remaining footer pieces — math block + suggested
+/// approach. Land alongside loading/error/empty states in slice 7.
 class _RemainingSectionsPlaceholder extends StatelessWidget {
   const _RemainingSectionsPlaceholder();
 
@@ -351,8 +412,8 @@ class _RemainingSectionsPlaceholder extends StatelessWidget {
           ),
           const SizedBox(height: MarineSpacing.sm),
           Text(
-            'Gates row, contributor bars, math block, and suggested '
-            'approach land in upcoming slices.',
+            'Math block + suggested approach land in slice 7 alongside '
+            'loading / error / empty states.',
             style: MarineTypography.bodySmall.copyWith(
               color: MarineColors.onDark.withAlpha(180),
             ),
