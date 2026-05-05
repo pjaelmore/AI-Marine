@@ -75,3 +75,5 @@ ios/Flutter/Flutter.podspec
 
 # Claude Code workspace state — per-developer, not project-shared
 .claude/
+# Local UI mockups — planning artifacts, not project-shared
+mockups/
