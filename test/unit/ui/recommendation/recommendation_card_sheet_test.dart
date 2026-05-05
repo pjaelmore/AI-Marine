@@ -2,6 +2,7 @@ import 'package:ai_marine_engine/core/types/lat_lng.dart';
 import 'package:ai_marine_engine/core/types/score_result.dart';
 import 'package:ai_marine_engine/ui/design/theme.dart';
 import 'package:ai_marine_engine/ui/recommendation/recommendation_card_sheet.dart';
+import 'package:ai_marine_engine/ui/recommendation/sheet_chrome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -356,11 +357,7 @@ void main() {
       await tester.pumpWidget(
         _harness(RecommendationCardSheet(result: _scoreFor())),
       );
-      // The grabber is the small horizontal pill — find by its
-      // dimensions (44x4). Use byType + filter rather than a key
-      // because the grabber is private.
-      final containers = find.byType(Container);
-      expect(containers, findsWidgets);
+      expect(find.byType(SheetGrabber), findsOneWidget);
     });
   });
 }

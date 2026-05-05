@@ -9,6 +9,7 @@ import 'contributor_bar_tile.dart';
 import 'gate_row.dart';
 import 'math_block.dart';
 import 'modifier_bar_tile.dart';
+import 'sheet_chrome.dart';
 import 'suggested_approach_block.dart';
 
 /// Bottom-sheet recommendation card — the project's defensibility surface.
@@ -97,7 +98,7 @@ class RecommendationCardSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const _Grabber(),
+                const SheetGrabber(),
                 const SizedBox(height: MarineSpacing.md),
                 _Header(result: result, onClose: onClose),
                 const SizedBox(height: MarineSpacing.lg),
@@ -123,25 +124,6 @@ class RecommendationCardSheet extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-/// The horizontal pill at the top of the sheet that signals draggability.
-class _Grabber extends StatelessWidget {
-  const _Grabber();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 44,
-        height: 4,
-        decoration: const BoxDecoration(
-          color: MarineColors.divider,
-          borderRadius: BorderRadius.all(Radius.circular(2)),
-        ),
-      ),
     );
   }
 }
