@@ -1,0 +1,86 @@
+{
+  "id": "florida-pompano",
+  "scientificName": "Trachinotus carolinus",
+  "commonNames": ["Florida pompano", "common pompano", "Carolina pompano", "pompano"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.30,0.30,0.35,0.45,0.55,0.70,0.85,0.95,1.00,1.00,1.00,0.95,0.85,0.75,0.65,0.55,0.50,0.50,0.50,0.50,0.50,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.95,1.00,1.00,0.95,0.90,0.80,0.70,0.60,0.50,0.45,0.40,0.35,0.32,0.30]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 73.94, "maxF": 82.4, "idealF": 78.08},
+    "toleratedTemp": {"minF": 50.0, "maxF": 95.0, "idealF": 78.08},
+    "depthPreference": {"minFt": 1.0, "maxFt": 130.0, "idealFt": 6.0},
+    "structurePreferences": [
+      {"type": "sandFlat", "weight": 1.0},
+      {"type": "channel", "weight": 0.9},
+      {"type": "channelEdge", "weight": 0.8},
+      {"type": "shoal", "weight": 0.6}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 6, "endHour": 8, "weight": 1.0},
+      {"startHour": 8, "endHour": 17, "weight": 0.6},
+      {"startHour": 17, "endHour": 20, "weight": 0.4}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "sand fleas", "weight": 1.0},
+      {"baitfish": "coquina clams", "weight": 0.95},
+      {"baitfish": "shrimp", "weight": 0.55},
+      {"baitfish": "crabs", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 23.3-28°C: https://www.fishbase.se/summary/380",
+    "toleratedTemp": "TPWD pompano profile + aquaculture lit 10-35°C: https://tpwd.texas.gov/huntwild/wild/species/pompano/",
+    "depthPreference": "FishBase 1-70m + FWC nearshore typical: https://www.fishbase.se/summary/380",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Heilman & Spieler (Nova Southeastern) demand-feeder study — 99% feeding in light, peak 0600-0800 (21.5%), trough 1800-2000 (6.8%): https://nsuworks.nova.edu/occ_stuetd/332/",
+    "structurePreferences": "FWC + Armitage & Alevizon — sandy beaches (sandFlat), surf troughs/guts (channel): https://myfwc.com/wildlifehabitats/profiles/saltwater/jacks/florida-pompano/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC + UF/IFAS — bimodal Atlantic peaks Mar-May + Oct-Nov; Gulf year-round Panhandle: https://myfwc.com/wildlifehabitats/profiles/saltwater/jacks/florida-pompano/",
+    "baitAssociations": "Armitage & Alevizon (FIT, canonical pompano diet study, mole crabs Emerita talpoida + coquina clams Donax variabilis): https://repository.fit.edu/oems_faculty/112/"
+  }
+}

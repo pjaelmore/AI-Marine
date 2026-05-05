@@ -1,0 +1,93 @@
+{
+  "id": "common-snook",
+  "scientificName": "Centropomus undecimalis",
+  "commonNames": ["common snook", "snook", "linesider", "robalo", "sergeant fish"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -83.5},
+        {"latitude": 29.0, "longitude": -83.5},
+        {"latitude": 29.0, "longitude": -78.5},
+        {"latitude": 24.0, "longitude": -78.5},
+        {"latitude": 24.0, "longitude": -83.5}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-south-inshore",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -83.5},
+          {"latitude": 29.0, "longitude": -83.5},
+          {"latitude": 29.0, "longitude": -78.5},
+          {"latitude": 24.0, "longitude": -78.5},
+          {"latitude": 24.0, "longitude": -83.5}
+        ]]
+      },
+      "weeklyValues": [0.55,0.55,0.60,0.65,0.72,0.80,0.88,0.92,0.95,0.97,0.98,0.99,1.00,1.00,1.00,1.00,1.00,1.00,0.99,0.97,0.95,0.93,0.90,0.85,0.80,0.75,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 68.0, "maxF": 82.0, "idealF": 75.0},
+    "toleratedTemp": {"minF": 55.0, "maxF": 90.0, "idealF": 75.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 65.0, "idealFt": 8.0},
+    "structurePreferences": [
+      {"type": "wreck", "weight": 0.95},
+      {"type": "channelEdge", "weight": 0.9},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "weedLine", "weight": 0.85},
+      {"type": "dropOff", "weight": 0.7},
+      {"type": "ledge", "weight": 0.6},
+      {"type": "channel", "weight": 0.6},
+      {"type": "shoal", "weight": 0.5},
+      {"type": "sandFlat", "weight": 0.4}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.7, "falling": 0.75, "slackHigh": 0.5, "slackLow": 0.4},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 8, "weight": 0.95},
+      {"startHour": 18, "endHour": 22, "weight": 1.0},
+      {"startHour": 22, "endHour": 23, "weight": 0.85}
+    ],
+    "lunarSensitivity": "high",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 0.4,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "pinfish", "weight": 1.0},
+      {"baitfish": "anchovies", "weight": 0.9},
+      {"baitfish": "shrimp", "weight": 0.85},
+      {"baitfish": "mojarra", "weight": 0.6},
+      {"baitfish": "finger mullet", "weight": 0.55},
+      {"baitfish": "crabs", "weight": 0.4}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FWC 2020 Stock Assessment + FishBase preferred range: https://myfwc.com/media/26711/snook-assessment-2020.pdf",
+    "toleratedTemp": "Howells et al. — cold-stun lower lethal limits 9-14°C: https://aquila.usm.edu/goms/vol6/iss2/12/",
+    "depthPreference": "FishBase 0-22m: https://www.fishbase.se/summary/centropomus-undecimalis.html",
+    "tidePreference": "Lowerre-Barbieri et al. 2014 PLOS ONE — outgoing-tide spawning egress: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0101809",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Lowerre-Barbieri et al. 2014 — new + full moon spawning aggregation peaks: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0101809",
+    "weatherSensitivity": "frontalPassageFactor from FWC 2010 cold-front mass mortality (https://myfwc.com/research/saltwater/snook/cold-stun/); risingPressureFactor + fallingPressureFactor + cloudCoverPreference unverified",
+    "timeOfDayPreferences": "Blewett et al. (Charlotte Harbor) + acoustic telemetry — crepuscular + nocturnal: https://aquila.usm.edu/gcr/vol18/iss1/1/",
+    "structurePreferences": "Lowerre-Barbieri 2014 + FishBase habitat (mangrove → weedLine, dock pilings → wreck, pass → ripCurrent, channel-mouth → channelEdge): https://www.fishbase.se/summary/centropomus-undecimalis.html",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Lowerre-Barbieri 2014 spawning peak May-Sep + FWC 2020 stock assessment: https://myfwc.com/media/26711/snook-assessment-2020.pdf",
+    "baitAssociations": "Blewett et al. 2006 (Charlotte Harbor stomach analysis, fishes 71% by number / 90% by weight): https://aquila.usm.edu/gcr/vol18/iss1/1/"
+  }
+}

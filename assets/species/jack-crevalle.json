@@ -1,0 +1,90 @@
+{
+  "id": "jack-crevalle",
+  "scientificName": "Caranx hippos",
+  "commonNames": ["crevalle jack", "jack crevalle", "common jack", "horse crevalle", "toro", "jurel"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.55,0.55,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.92,0.95,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 70.0, "maxF": 85.0, "idealF": 77.0},
+    "toleratedTemp": {"minF": 50.0, "maxF": 92.5, "idealF": 77.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 50.0, "idealFt": 8.0},
+    "structurePreferences": [
+      {"type": "channelEdge", "weight": 0.95},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "sandFlat", "weight": 0.85},
+      {"type": "weedLine", "weight": 0.8},
+      {"type": "reef", "weight": 0.6}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.55, "falling": 0.55, "slackHigh": 0.55, "slackLow": 0.4},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.85},
+      {"startHour": 7, "endHour": 17, "weight": 1.0},
+      {"startHour": 17, "endHour": 20, "weight": 0.85}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5},
+    "baitAssociations": [
+      {"baitfish": "anchovies", "weight": 1.0},
+      {"baitfish": "scaled sardines", "weight": 0.9},
+      {"baitfish": "threadfin herring", "weight": 0.85},
+      {"baitfish": "menhaden", "weight": 0.8},
+      {"baitfish": "pinfish", "weight": 0.6},
+      {"baitfish": "shrimp", "weight": 0.45},
+      {"baitfish": "crabs", "weight": 0.35}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 16.5-27.9°C + Florida Museum adults 18-33.6°C: https://fishbase.se/summary/71",
+    "toleratedTemp": "Hoff 1971 NOAA — lower mortality at <9°C: https://spo.nmfs.noaa.gov/content/consequences-dispersal-subtropically-spawned-crevalle-jacks-caranx-hippos-temperate",
+    "depthPreference": "FishBase 1-200m typical + FWC inshore/nearshore: https://myfwc.com/wildlifehabitats/profiles/saltwater/jacks/crevalle-jack/",
+    "tidePreference": "unverified — FWC qualitative bait-cornering at moving water; weights engine-tuned",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Kwei 1978 (J. Nat. Hist. 12) — both adults + juveniles feed mostly during the day: https://www.tandfonline.com/doi/abs/10.1080/00222937800770081",
+    "structurePreferences": "FWC + Florida Museum + FishBase — passes/inlets → channelEdge + ripCurrent, beaches → sandFlat: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/crevalle-jack/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC: spawning Mar-Sep + year-round inshore both coasts: https://myfwc.com/wildlifehabitats/profiles/saltwater/jacks/crevalle-jack/",
+    "baitAssociations": "Saloman & Naughton NOAA (n=3,643): https://repository.library.noaa.gov/view/noaa/5561"
+  }
+}

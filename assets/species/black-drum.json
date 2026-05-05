@@ -1,0 +1,88 @@
+{
+  "id": "black-drum",
+  "scientificName": "Pogonias cromis",
+  "commonNames": ["black drum", "drum", "drummer", "sea drum", "big drum"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.85,0.75,0.65,0.6,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.9,0.95,1.0,1.0]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 64.0, "maxF": 72.0, "idealF": 68.0},
+    "toleratedTemp": {"minF": 53.0, "maxF": 91.0, "idealF": 68.0},
+    "depthPreference": {"minFt": 3.0, "maxFt": 50.0, "idealFt": 10.0},
+    "structurePreferences": [
+      {"type": "shoal", "weight": 0.95},
+      {"type": "flatBottom", "weight": 0.9},
+      {"type": "wreck", "weight": 0.85},
+      {"type": "channelEdge", "weight": 0.85}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 8, "endHour": 17, "weight": 0.6},
+      {"startHour": 17, "endHour": 22, "weight": 1.0},
+      {"startHour": 22, "endHour": 23, "weight": 0.65}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "blue crab", "weight": 1.0},
+      {"baitfish": "shrimp", "weight": 0.9},
+      {"baitfish": "clams", "weight": 0.85},
+      {"baitfish": "oysters", "weight": 0.75},
+      {"baitfish": "fiddler crab", "weight": 0.6},
+      {"baitfish": "polychaete worms", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "Locascio & Mann 2011 — peak spawning sound production at 18-22°C: https://spo.nmfs.noaa.gov/content/diel-and-seasonal-timing-sound-production-black-drum-pogonias-cromis",
+    "toleratedTemp": "FWC + SCDNR + FishBase 10.8-27.6°C: https://myfwc.com/wildlifehabitats/profiles/saltwater/drums/black-drum/",
+    "depthPreference": "FishBase 1-50m, usually shallow + FWC bays/lagoons/oyster beds: https://fishbase.ca/summary/Pogonias-cromis",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified — strong diel + seasonal patterns documented but no lunar-phase periodicity established",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Locascio & Mann 2011 — calling rises 1-2 hr before sunset, peaks 1800-2200h, persists 12 hr in peak season: https://spo.nmfs.noaa.gov/content/diel-and-seasonal-timing-sound-production-black-drum-pogonias-cromis",
+    "structurePreferences": "FWC: oyster bars (shoal), bays/river mouths/lagoons (flatBottom), bridges/dock pilings (wreck), channels (channelEdge): https://myfwc.com/wildlifehabitats/profiles/saltwater/drums/black-drum/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Locascio & Mann + FWC: Jan-Mar peak spawning + winter aggregations Indian River/Mosquito Lagoon: https://pubmed.ncbi.nlm.nih.gov/22957862/",
+    "baitAssociations": "Olsen et al. 2018 J Fish Biol Baffin Bay (n=264): https://pubmed.ncbi.nlm.nih.gov/29935002/"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "id": "spanish-mackerel",
+  "scientificName": "Scomberomorus maculatus",
+  "commonNames": ["Spanish mackerel", "Atlantic Spanish mackerel", "bay mackerel", "spotted mackerel", "spotted cybium"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.20,0.20,0.25,0.30,0.40,0.50,0.60,0.70,0.80,0.85,0.90,0.92,0.95,0.98,1.00,1.00,1.00,1.00,1.00,1.00,0.98,0.95,0.92,0.90,0.88,0.85,0.82,0.80,0.80,0.82,0.85,0.88,0.92,0.95,0.98,1.00,1.00,1.00,0.98,0.95,0.90,0.85,0.75,0.65,0.55,0.45,0.35,0.30,0.25,0.22,0.20,0.20]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 68.0, "maxF": 84.0, "idealF": 75.0},
+    "toleratedTemp": {"minF": 65.0, "maxF": 90.0, "idealF": 75.0},
+    "depthPreference": {"minFt": 5.0, "maxFt": 115.0, "idealFt": 25.0},
+    "structurePreferences": [
+      {"type": "sandFlat", "weight": 1.0},
+      {"type": "channelEdge", "weight": 1.0},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "reef", "weight": 0.8},
+      {"type": "weedLine", "weight": 0.7}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 8, "weight": 0.8},
+      {"startHour": 8, "endHour": 17, "weight": 1.0},
+      {"startHour": 17, "endHour": 20, "weight": 0.8}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "anchovies", "weight": 1.0},
+      {"baitfish": "scaled sardines", "weight": 0.85},
+      {"baitfish": "threadfin herring", "weight": 0.8},
+      {"baitfish": "menhaden", "weight": 0.7},
+      {"baitfish": "glass minnows", "weight": 0.65},
+      {"baitfish": "shrimp", "weight": 0.3}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "NOAA: prefers >68°F + FWC migration trigger at 70°F: https://www.fisheries.noaa.gov/species/spanish-mackerel",
+    "toleratedTemp": "FWC: south-migration triggered <70°F: https://myfwc.com/wildlifehabitats/profiles/saltwater/mackerel/spanish-mackerel/",
+    "depthPreference": "Florida Museum 33-115ft (10-35m) epipelagic: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/spanish-mackerel/",
+    "tidePreference": "unverified",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Day-active surface schoolers (NOAA + FWC); diel curve interpolated: https://www.fisheries.noaa.gov/species/spanish-mackerel",
+    "structurePreferences": "FWC + Florida Museum + NOAA — barrier islands/passes (channelEdge), beaches (sandFlat): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/spanish-mackerel/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "NOAA + FWC migration timing — Atlantic stock spring north / fall south, bimodal FL peaks: https://www.fisheries.noaa.gov/species/spanish-mackerel",
+    "baitAssociations": "Saloman & Naughton 1983 NOAA (n=6,933 stomachs): https://repository.library.noaa.gov/view/noaa/5552"
+  }
+}

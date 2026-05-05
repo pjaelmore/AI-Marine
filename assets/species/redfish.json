@@ -1,0 +1,89 @@
+{
+  "id": "redfish",
+  "scientificName": "Sciaenops ocellatus",
+  "commonNames": ["red drum", "redfish", "channel bass", "spottail bass", "puppy drum", "red bass", "reds"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.72,0.74,0.76,0.78,0.80,0.80,0.78,0.76,0.74,0.72,0.70,0.70,0.70,0.70,0.70,0.70,0.70,0.70,0.72,0.74,0.76,0.78,0.80,0.82,0.85,0.90,0.95,1.0,1.0,1.0,1.0,1.0,1.0,0.95,0.90,0.85,0.80,0.78,0.76,0.74,0.72,0.70,0.70,0.70]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 60.0, "maxF": 81.0, "idealF": 75.0},
+    "toleratedTemp": {"minF": 39.0, "maxF": 93.0, "idealF": 75.0},
+    "depthPreference": {"minFt": 1.0, "maxFt": 33.0, "idealFt": 4.0},
+    "structurePreferences": [
+      {"type": "sandFlat", "weight": 0.95},
+      {"type": "shoal", "weight": 0.95},
+      {"type": "weedLine", "weight": 0.9},
+      {"type": "channelEdge", "weight": 0.7},
+      {"type": "flatBottom", "weight": 0.5}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.5, "slackHigh": 0.5, "slackLow": 0.5},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 8, "weight": 0.9},
+      {"startHour": 8, "endHour": 17, "weight": 0.4},
+      {"startHour": 17, "endHour": 20, "weight": 0.9}
+    ],
+    "lunarSensitivity": "low",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "blue crab", "weight": 0.95},
+      {"baitfish": "menhaden", "weight": 0.8},
+      {"baitfish": "finger mullet", "weight": 0.7},
+      {"baitfish": "fiddler crab", "weight": 0.6},
+      {"baitfish": "pinfish", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 15.5-27.3°C: https://www.fishbase.se/summary/Sciaenops-ocellatus.html",
+    "toleratedTemp": "Florida Museum 4-34°C tolerance + Procarione & King 1993 juvenile cold mortality at ≤3°C: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/red-drum/",
+    "depthPreference": "FishBase to 10m + FWC tailing depths: https://myfwc.com/research/saltwater/fish/red-drum/quick-facts/",
+    "tidePreference": "unverified — FWC describes tide-driven flats movement qualitatively but no peer-reviewed phase weights",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Lowerre-Barbieri et al. (FWC) + Montie et al. — fall spawning egg presence peaks near full moon: https://pubmed.ncbi.nlm.nih.gov/27509742/",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Lowerre-Barbieri et al. — spawning vocalization peaks at dusk; FWC habitat description for dawn/dusk tailing: https://myfwc.com/research/saltwater/fish/red-drum/red-drum-spawning/",
+    "structurePreferences": "FWC + Florida Museum (seagrass beds → sandFlat, oyster bars → shoal, marshes/mangroves → weedLine, tidal inlets → channelEdge): https://myfwc.com/fishing/saltwater/recreational/red-drum/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC fall (Sep-Nov) bull-redfish nearshore spawning aggregations: https://myfwc.com/research/saltwater/fish/red-drum/red-drum-spawning/",
+    "baitAssociations": "Scharf & Schlicht 2000 Galveston Bay (n=598): https://people.uncw.edu/scharff/publications/Estuaries%202000.pdf"
+  }
+}

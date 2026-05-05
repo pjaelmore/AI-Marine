@@ -1,0 +1,90 @@
+{
+  "id": "sheepshead",
+  "scientificName": "Archosargus probatocephalus",
+  "commonNames": ["sheepshead", "convict fish", "sheephead"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.85,0.95,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.95,0.85,0.7,0.65,0.6,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.55,0.6,0.6,0.65,0.7,0.7,0.7,0.7,0.75,0.75,0.75,0.75,0.8,0.8,0.85]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 73.2, "maxF": 82.4, "idealF": 78.6},
+    "toleratedTemp": {"minF": 50.0, "maxF": 95.0, "idealF": 78.6},
+    "depthPreference": {"minFt": 3.0, "maxFt": 40.0, "idealFt": 15.0},
+    "structurePreferences": [
+      {"type": "wreck", "weight": 1.0},
+      {"type": "shoal", "weight": 0.9},
+      {"type": "reef", "weight": 0.85},
+      {"type": "weedLine", "weight": 0.7},
+      {"type": "channel", "weight": 0.5}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.6, "falling": 0.6, "slackHigh": 0.4, "slackLow": 0.4},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.85},
+      {"startHour": 7, "endHour": 17, "weight": 1.0},
+      {"startHour": 17, "endHour": 19, "weight": 0.85},
+      {"startHour": 19, "endHour": 22, "weight": 0.4}
+    ],
+    "lunarSensitivity": "none",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "fiddler crab", "weight": 1.0},
+      {"baitfish": "barnacles", "weight": 0.95},
+      {"baitfish": "shrimp", "weight": 0.7},
+      {"baitfish": "oysters", "weight": 0.65},
+      {"baitfish": "clams", "weight": 0.55},
+      {"baitfish": "blue crab", "weight": 0.5}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 22.9-28°C: https://www.fishbase.se/summary/archosargus-probatocephalus",
+    "toleratedTemp": "FishBase 10-35°C: https://www.fishbase.se/summary/archosargus-probatocephalus",
+    "depthPreference": "FishBase 1-12m + FWC inshore structure orientation: https://myfwc.com/wildlifehabitats/profiles/saltwater/porgy/sheepshead/",
+    "tidePreference": "Tidal-current activates structure-bound prey; magnitudes engine-tuned",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "unverified",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Diurnal visual structure-pickers; night substantially less productive: https://aquila.usm.edu/goms/vol9/iss1/3/",
+    "structurePreferences": "FWC + Florida Museum (pilings/jetties/bridges → wreck, jetties/oyster bars → shoal, mangrove roots → weedLine): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/sheepshead/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC peak Jan-Apr pre-spawn aggregation; FWC vessel limit increases Mar-Apr: https://myfwc.com/wildlifehabitats/profiles/saltwater/porgy/sheepshead/",
+    "baitAssociations": "Florida Museum + Sedberry 1987 + NW GoM regional study (n=multiple): https://www.mdpi.com/2410-3888/8/4/188"
+  }
+}

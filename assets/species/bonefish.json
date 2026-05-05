@@ -1,0 +1,89 @@
+{
+  "id": "bonefish",
+  "scientificName": "Albula vulpes",
+  "commonNames": ["bonefish", "gray ghost", "ghost of the flats", "macabi", "banana fish"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -82.0},
+        {"latitude": 26.0, "longitude": -82.0},
+        {"latitude": 26.0, "longitude": -79.5},
+        {"latitude": 24.0, "longitude": -79.5},
+        {"latitude": 24.0, "longitude": -82.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-keys-biscayne",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -82.0},
+          {"latitude": 26.0, "longitude": -82.0},
+          {"latitude": 26.0, "longitude": -79.5},
+          {"latitude": 24.0, "longitude": -79.5},
+          {"latitude": 24.0, "longitude": -82.0}
+        ]]
+      },
+      "weeklyValues": [0.65,0.65,0.7,0.75,0.85,0.9,0.95,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.95,0.9,0.85,0.8,0.75,0.7,0.7,0.7,0.7,0.7,0.65,0.65]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 68.7, "maxF": 83.1, "idealF": 80.6},
+    "toleratedTemp": {"minF": 56.5, "maxF": 100.2, "idealF": 80.6},
+    "depthPreference": {"minFt": 0.0, "maxFt": 276.0, "idealFt": 2.0},
+    "structurePreferences": [
+      {"type": "sandFlat", "weight": 1.0},
+      {"type": "channelEdge", "weight": 0.7},
+      {"type": "weedLine", "weight": 0.6},
+      {"type": "channel", "weight": 0.4}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.6, "falling": 0.4, "slackHigh": 0.3, "slackLow": 0.25},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 7, "weight": 0.7},
+      {"startHour": 7, "endHour": 12, "weight": 1.0},
+      {"startHour": 12, "endHour": 15, "weight": 0.6},
+      {"startHour": 15, "endHour": 18, "weight": 0.9},
+      {"startHour": 18, "endHour": 20, "weight": 0.7}
+    ],
+    "lunarSensitivity": "high",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 0.4,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 4.0, "idealKnots": 0.5},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "crabs", "weight": 0.95},
+      {"baitfish": "clams", "weight": 0.55},
+      {"baitfish": "polychaete worms", "weight": 0.5},
+      {"baitfish": "gulf toadfish", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "FishBase preferred 20.4-28.4°C: https://www.fishbase.se/summary/albula-vulpes",
+    "toleratedTemp": "Murchie et al. 2011 — lower lethal 13.6°C; Brownscombe et al. CTMax 37.9°C: https://www.sciencedirect.com/science/article/abs/pii/S0306456510001233",
+    "depthPreference": "FishBase 0-84m + flats feeding <1ft (Florida Museum) + Rezek 2025 juvenile 1.8-2.5m: https://academic.oup.com/mcf/article/17/3/vtaf003/8137700",
+    "tidePreference": "Ultrasonic telemetry (Bahamas) — rising-tide flats feeding documented: https://www.bonefishtarpontrust.org/blog/2017-07-27-bonefish-and-tides/",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "BTT acoustic-tagging — pre-spawn aggregations on full + new moons fall-spring: https://www.bonefishtarpontrust.org/bonefish-life-cycle/",
+    "weatherSensitivity": "Cold-front hazard documented (2010-2011 die-offs); frontalPassageFactor calibrated from population-mortality lit: https://academic.oup.com/mcf/article/17/3/vtaf003/8137700",
+    "timeOfDayPreferences": "Visual sight feeders requiring daylight (Florida Museum); midday avoidance qualitatively documented: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/bonefish/",
+    "structurePreferences": "FWC + Florida Museum: intertidal sand/grass flats → sandFlat, mangrove zones → weedLine: https://myfwc.com/fishing/saltwater/recreational/bonefish/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC peak Mar-Oct + Boucek/Santos 2018 post-2010 cold-event population data: https://link.springer.com/article/10.1007/s10641-018-0820-5",
+    "baitAssociations": "Crabtree et al. NOAA SPO Florida Keys feeding-habits study: https://spo.nmfs.noaa.gov/content/feeding-habits-bonefish-albula-vulpes-waters-florida-keys"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "id": "spotted-seatrout",
+  "scientificName": "Cynoscion nebulosus",
+  "commonNames": ["spotted seatrout", "speckled seatrout", "speckled trout", "speck", "spotted weakfish", "seatrout"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.7,0.7,0.7,0.7,0.75,0.8,0.85,0.9,0.92,0.95,0.97,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.97,0.95,0.92,0.9,0.85,0.8,0.78,0.75,0.72,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7,0.7]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 69.0, "maxF": 80.0, "idealF": 75.0},
+    "toleratedTemp": {"minF": 39.2, "maxF": 102.4, "idealF": 75.0},
+    "depthPreference": {"minFt": 1.0, "maxFt": 33.0, "idealFt": 4.0},
+    "structurePreferences": [
+      {"type": "sandFlat", "weight": 1.0},
+      {"type": "channelEdge", "weight": 0.7},
+      {"type": "dropOff", "weight": 0.6},
+      {"type": "shoal", "weight": 0.6}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.6, "falling": 0.55, "slackHigh": 0.5, "slackLow": 0.4},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 8, "weight": 0.9},
+      {"startHour": 8, "endHour": 17, "weight": 0.5},
+      {"startHour": 17, "endHour": 22, "weight": 1.0}
+    ],
+    "lunarSensitivity": "medium",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 0.7,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.0},
+    "baitAssociations": [
+      {"baitfish": "shrimp", "weight": 1.0},
+      {"baitfish": "anchovies", "weight": 0.9},
+      {"baitfish": "pinfish", "weight": 0.85},
+      {"baitfish": "menhaden", "weight": 0.75},
+      {"baitfish": "finger mullet", "weight": 0.7},
+      {"baitfish": "silversides", "weight": 0.6},
+      {"baitfish": "blue crab", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "Bumguardner & Tucker SEAFWA growth study: https://seafwa.org/sites/default/files/journal-articles/BUMGUARDNER-80-89.pdf",
+    "toleratedTemp": "Anweiler et al. 2014 + Ellis et al. 2017 thermal tolerance — equilibrium loss at ≤4°C, CTMax 38.8-39.4°C: https://www.sciencedirect.com/science/article/abs/pii/S002209811730045X",
+    "depthPreference": "FishBase + Florida Museum 0-10m: https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/cynoscion-nebulosus/",
+    "tidePreference": "FWC + Florida Museum directional pattern (slack low least active); magnitudes engine-tuned",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "Montie et al. 2017 PeerJ — drumming choruses elevated on 2nd + 4th lunar quarters: https://peerj.com/articles/2944/",
+    "weatherSensitivity": "Cold-front population impact peer-reviewed (Ellis 2017); fine-grained feeding response unverified — frontalPassageFactor engine-tuned: https://www.sciencedirect.com/science/article/abs/pii/S002209811730045X",
+    "timeOfDayPreferences": "Florida Museum + FWC: spawning calls 1-2 hr before sunset, dusk-night peak: https://myfwc.com/research/saltwater/fish/spotted-seatrout/mapping/",
+    "structurePreferences": "Florida Museum + FishBase (seagrass beds + sandy bottoms → sandFlat): https://www.floridamuseum.ufl.edu/discover-fish/species-profiles/cynoscion-nebulosus/",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "Year-round; Mar-Nov spawning season Atlantic + mid-Mar to mid-Sep Gulf: https://myfwc.com/research/saltwater/fish/spotted-seatrout/research-overview-tampa-bay/",
+    "baitAssociations": "Lorio & Perret SEAFWA + GovInfo seatrout life history: https://seafwa.org/sites/default/files/journal-articles/LORIO-289.pdf"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "tarpon",
+  "scientificName": "Megalops atlanticus",
+  "commonNames": ["Atlantic tarpon", "tarpon", "silver king", "sabalo"],
+  "schemaVersion": "1.0",
+  "curationVersion": "0.1.0-research",
+  "sizeClasses": [],
+  "migrationModel": {
+    "spatialRange": {
+      "rings": [[
+        {"latitude": 24.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -88.0},
+        {"latitude": 31.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -78.0},
+        {"latitude": 24.0, "longitude": -88.0}
+      ]]
+    },
+    "populations": [],
+    "regionalCurves": [{
+      "regionId": "florida-coastal",
+      "regionPolygon": {
+        "rings": [[
+          {"latitude": 24.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -88.0},
+          {"latitude": 31.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -78.0},
+          {"latitude": 24.0, "longitude": -88.0}
+        ]]
+      },
+      "weeklyValues": [0.30,0.30,0.30,0.32,0.35,0.40,0.45,0.50,0.55,0.62,0.70,0.78,0.85,0.90,0.93,0.95,0.97,1.00,1.00,1.00,1.00,0.98,0.95,0.92,0.90,0.92,0.95,0.95,0.92,0.88,0.82,0.75,0.68,0.60,0.55,0.50,0.45,0.42,0.40,0.38,0.36,0.35,0.34,0.33,0.32,0.32,0.31,0.30,0.30,0.30,0.30,0.30]
+    }],
+    "corridors": [],
+    "triggers": []
+  },
+  "conditionProfile": {
+    "optimalTemp": {"minF": 75.0, "maxF": 90.0, "idealF": 79.0},
+    "toleratedTemp": {"minF": 49.0, "maxF": 104.0, "idealF": 79.0},
+    "depthPreference": {"minFt": 0.0, "maxFt": 50.0, "idealFt": 10.0},
+    "structurePreferences": [
+      {"type": "channelEdge", "weight": 0.95},
+      {"type": "ripCurrent", "weight": 0.9},
+      {"type": "channel", "weight": 0.85},
+      {"type": "wreck", "weight": 0.8},
+      {"type": "sandFlat", "weight": 0.65},
+      {"type": "weedLine", "weight": 0.6}
+    ],
+    "tidePreference": {
+      "phaseWeights": {"rising": 0.5, "falling": 0.65, "slackHigh": 0.4, "slackLow": 0.4},
+      "prefersSpringTides": false
+    },
+    "solunarSensitivity": "none",
+    "timeOfDayPreferences": [
+      {"startHour": 5, "endHour": 8, "weight": 0.95},
+      {"startHour": 8, "endHour": 17, "weight": 0.7},
+      {"startHour": 17, "endHour": 21, "weight": 0.95}
+    ],
+    "lunarSensitivity": "high",
+    "weatherSensitivity": {
+      "risingPressureFactor": 1.0,
+      "fallingPressureFactor": 1.0,
+      "frontalPassageFactor": 1.0,
+      "cloudCoverPreference": 0.5
+    },
+    "currentPreference": {"minKnots": 0.0, "maxKnots": 5.0, "idealKnots": 1.5},
+    "baitAssociations": [
+      {"baitfish": "mullet", "weight": 1.0},
+      {"baitfish": "pinfish", "weight": 0.85},
+      {"baitfish": "shrimp", "weight": 0.75},
+      {"baitfish": "crabs", "weight": 0.7},
+      {"baitfish": "sardines", "weight": 0.55},
+      {"baitfish": "ladyfish", "weight": 0.45}
+    ]
+  },
+  "regulatoryProfile": {},
+  "confidence": "exploratory",
+  "dataProvenance": {
+    "optimalTemp": "BTT life-cycle 75-90°F + FishBase: https://www.bonefishtarpontrust.org/tarpon-life-cycle/",
+    "toleratedTemp": "Howson et al. 2017 (Environ Biol Fish) — lower lethal 9.2°C: https://link.springer.com/article/10.1007/s10641-017-0619-9",
+    "depthPreference": "FishBase 0-40m, usually 0-15m + BTT pre-spawn dives: https://www.fishbase.se/summary/Megalops-atlanticus.html",
+    "tidePreference": "BTT 'Hill tides' (Boca Grande) outgoing-pass feeding qualitative; weights engine-tuned",
+    "solunarSensitivity": "unverified",
+    "lunarSensitivity": "BTT — spawning aggregations + ~400ft dives on full + new moons: https://www.bonefishtarpontrust.org/tarpon-life-cycle/",
+    "weatherSensitivity": "unverified",
+    "timeOfDayPreferences": "Crepuscular pattern qualitatively documented (BTT, FWC); magnitudes engine-tuned: https://www.bonefishtarpontrust.org/tarpon-life-cycle/",
+    "structurePreferences": "FishBase + BTT (passes/inlets → channelEdge + ripCurrent, bridges → wreck, beach guts → sandFlat, backcountry channels → channel): https://www.fishbase.se/summary/Megalops-atlanticus.html",
+    "currentPreference": "unverified",
+    "weeklyPresenceCurve": "FWC + BTT seasonal narrative — Boca Grande peak May-Jul + Atlantic beach migration Jun-Jul + Keys winter refuge: https://myfwc.com/research/saltwater/tarpon/",
+    "baitAssociations": "Llopiz et al. (Indian River Lagoon) + Florida Museum: https://link.springer.com/article/10.1007/s10641-010-9734-6"
+  }
+}
