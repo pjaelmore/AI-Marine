@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' show Point;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,7 @@ class MarineChartView extends StatefulWidget {
     super.key,
     required this.initialCameraPosition,
     this.vesselPosition,
+    this.onTap,
     this.styleAssetPath = _defaultStyleAsset,
   });
 
@@ -30,6 +32,11 @@ class MarineChartView extends StatefulWidget {
   /// Current vessel position. When non-null, a teal dot is drawn at this
   /// location and the camera follows on subsequent updates.
   final LatLng? vesselPosition;
+
+  /// Invoked when the user taps a spot on the chart. The chart shell
+  /// uses this to drive the recommendation overlay — the tapped LatLng
+  /// becomes the score query's location.
+  final void Function(LatLng location)? onTap;
 
   final String styleAssetPath;
 
@@ -128,6 +135,11 @@ class _MarineChartViewState extends State<MarineChartView> {
       initialCameraPosition: widget.initialCameraPosition,
       onMapCreated: _onMapCreated,
       onStyleLoadedCallback: _onStyleLoaded,
+      onMapClick: _handleTap,
     );
+  }
+
+  void _handleTap(Point<double> _, LatLng location) {
+    widget.onTap?.call(location);
   }
 }
