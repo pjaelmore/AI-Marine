@@ -7,14 +7,14 @@ import '../../state/vessel_providers.dart';
 import '../recommendation/recommendation_overlay.dart';
 import 'marine_chart_view.dart';
 
-/// Default initial camera target — Boston Harbor.
+/// Default initial camera target — Tampa Bay, FL.
 ///
-/// Matches the TDD §6.8 worked-example coordinate so the Phase 1 deliverable
-/// (Implementation Guide §2.2.3, "shows your boat ramp on a NOAA chart") has
-/// a sensible starting view that sits inside the v1 striper range. Replaced
-/// by user_preferences home-waters when that lands in Phase 2.
-const _defaultCenter = ml.LatLng(42.36, -70.55);
-const _defaultZoom = 10.0;
+/// The v1 species coverage is Florida inshore + offshore (snook, redfish,
+/// tarpon, snapper, etc.) so the chart opens over the central west coast
+/// where the calibration tuple was tuned. Replaced by user_preferences
+/// home-waters once that lands in a later phase.
+const _defaultCenter = ml.LatLng(27.94, -82.45);
+const _defaultZoom = 9.0;
 
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});

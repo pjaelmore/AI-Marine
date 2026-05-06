@@ -40,7 +40,7 @@ class SheetChrome extends StatelessWidget {
           const SizedBox(height: MarineSpacing.md),
           const SheetGrabber(),
           const SizedBox(height: MarineSpacing.md),
-          Flexible(child: child),
+          child,
         ],
       ),
     );

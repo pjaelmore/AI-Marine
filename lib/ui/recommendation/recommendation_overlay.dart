@@ -37,10 +37,7 @@ class RecommendationOverlay extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tap = tappedLocation;
     if (tap == null) {
-      return const Align(
-        alignment: Alignment.bottomCenter,
-        child: RecommendationEmptySheet(),
-      );
+      return const _BottomAligned(child: RecommendationEmptySheet());
     }
 
     final speciesId = ref.watch(selectedSpeciesIdProvider);
@@ -53,20 +50,41 @@ class RecommendationOverlay extends ConsumerWidget {
     final scoreAsync = ref.watch(scoreAtLocationProvider(query));
 
     return scoreAsync.when(
-      loading: () => const Align(
-        alignment: Alignment.bottomCenter,
-        child: RecommendationLoadingSheet(),
-      ),
-      error: (e, _) => Align(
-        alignment: Alignment.bottomCenter,
+      loading: () => const _BottomAligned(child: RecommendationLoadingSheet()),
+      error: (e, _) => _BottomAligned(
         child: RecommendationErrorSheet(
           message: _userFacingMessage(e),
           onRetry: () => ref.invalidate(scoreAtLocationProvider(query)),
         ),
       ),
+      // The card sheet uses DraggableScrollableSheet which positions
+      // itself; SafeArea would clip its peek/expanded heights, so it
+      // gets the raw Stack child slot.
       data: (result) => RecommendationCardSheet(
         result: result,
         onClose: onDismiss,
+      ),
+    );
+  }
+}
+
+/// Bottom-aligned + bottom-safe-area wrapper for the static state
+/// sheets (loading / error / empty). Keeps them above the Android
+/// gesture nav pill / iOS home indicator. Skip for the real
+/// [RecommendationCardSheet] which manages its own positioning via
+/// [DraggableScrollableSheet].
+class _BottomAligned extends StatelessWidget {
+  const _BottomAligned({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: child,
       ),
     );
   }

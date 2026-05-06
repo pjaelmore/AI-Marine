@@ -57,6 +57,12 @@ class _MarineChartViewState extends State<MarineChartView> {
   bool _styleLoaded = false;
   Circle? _vesselCircle;
 
+  /// Tracks whether the camera has already centered on the user's
+  /// first GPS fix. Set once the initial vessel position lands so
+  /// subsequent fixes (the user moves) don't keep yanking the camera
+  /// back — after the first follow, the user controls the view.
+  bool _hasFollowedFirstFix = false;
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +84,18 @@ class _MarineChartViewState extends State<MarineChartView> {
 
   void _onStyleLoaded() {
     _styleLoaded = true;
+    // Defend against the maplibre quirk where the loaded style's own
+    // default center can override `initialCameraPosition` on first
+    // paint. Re-issue the move once the style is up so the user lands
+    // on the configured target every time.
+    final controller = _controller;
+    if (controller != null) {
+      unawaited(
+        controller.moveCamera(
+          CameraUpdate.newCameraPosition(widget.initialCameraPosition),
+        ),
+      );
+    }
     unawaited(_syncVesselMarker());
   }
 
@@ -99,6 +117,12 @@ class _MarineChartViewState extends State<MarineChartView> {
         _vesselCircle = null;
       }
       return;
+    }
+    if (!_hasFollowedFirstFix) {
+      _hasFollowedFirstFix = true;
+      unawaited(
+        controller.animateCamera(CameraUpdate.newLatLng(pos)),
+      );
     }
     if (_vesselCircle == null) {
       _vesselCircle = await controller.addCircle(
