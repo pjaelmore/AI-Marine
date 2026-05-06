@@ -4,6 +4,8 @@ import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 
 import '../../core/types/lat_lng.dart';
 import '../../state/vessel_providers.dart';
+import '../design/spacing.dart';
+import '../picker/species_chip.dart';
 import '../recommendation/recommendation_overlay.dart';
 import 'marine_chart_view.dart';
 
@@ -47,6 +49,21 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             ),
             vesselPosition: vesselPosition,
             onTap: _onChartTap,
+          ),
+          const SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                MarineSpacing.md + 2,
+                MarineSpacing.md + 2,
+                MarineSpacing.md + 2,
+                0,
+              ),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SpeciesChip(),
+              ),
+            ),
           ),
           RecommendationOverlay(
             tappedLocation: _tap,
