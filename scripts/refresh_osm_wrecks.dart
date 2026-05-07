@@ -30,11 +30,19 @@ const _overpassUrl = 'https://overpass-api.de/api/interpreter';
 const _outputPath = 'assets/osm_wrecks.json';
 
 Future<void> main() async {
+  // Filter at the Overpass level to require either
+  // `seamark:wreck:category` OR `seamark:wreck:depth` to be set —
+  // bare `seamark:type=wreck` taggings often land on dry land
+  // (beached/preserved wrecks, museum ships, marina decorations) or
+  // on inland features. Real underwater chart wrecks almost always
+  // have at least one of category or depth populated.
   const query = '''
 [out:json][timeout:60];
 (
-  node["seamark:type"="wreck"]($_minLat,$_minLon,$_maxLat,$_maxLon);
-  way["seamark:type"="wreck"]($_minLat,$_minLon,$_maxLat,$_maxLon);
+  node["seamark:type"="wreck"]["seamark:wreck:category"]($_minLat,$_minLon,$_maxLat,$_maxLon);
+  node["seamark:type"="wreck"]["seamark:wreck:depth"]($_minLat,$_minLon,$_maxLat,$_maxLon);
+  way["seamark:type"="wreck"]["seamark:wreck:category"]($_minLat,$_minLon,$_maxLat,$_maxLon);
+  way["seamark:type"="wreck"]["seamark:wreck:depth"]($_minLat,$_minLon,$_maxLat,$_maxLon);
 );
 out center;
 ''';
