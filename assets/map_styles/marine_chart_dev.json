@@ -2,15 +2,15 @@
   "version": 8,
   "name": "Marine (Dev)",
   "sources": {
-    "osm": {
+    "esri-ocean": {
       "type": "raster",
       "tiles": [
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        "https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"
       ],
       "tileSize": 256,
       "minzoom": 0,
-      "maxzoom": 19,
-      "attribution": "© OpenStreetMap contributors"
+      "maxzoom": 13,
+      "attribution": "Tiles © Esri — Sources: GEBCO, NOAA, National Geographic, DeLorme, HERE, Geonames.org, and other contributors"
     },
     "openseamap": {
       "type": "raster",
@@ -32,9 +32,9 @@
       }
     },
     {
-      "id": "osm-base",
+      "id": "esri-ocean-base",
       "type": "raster",
-      "source": "osm"
+      "source": "esri-ocean"
     },
     {
       "id": "openseamap-overlay",

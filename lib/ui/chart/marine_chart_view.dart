@@ -6,16 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 /// Renders the active marine chart style inside a [MapLibreMap], plus an
-/// optional vessel-position dot.
+/// optional vessel-position dot and station markers.
 ///
-/// The TDD §5.5.2 NOAA ENC tile endpoint was retired by NOAA in October 2021
-/// (see docs/adr/0002-chart-tile-source.md); for Phase 1–3 the dev style
-/// uses OpenStreetMap + OpenSeaMap to render a real nautical chart while
-/// MBTiles support is built into the cache layer in Phase 4.
-///
-/// Phase 1 scope: chart tiles + vessel dot. The heatmap, recommendation pins,
-/// and overlay chrome (species picker, time / mode indicators, log-catch FAB)
-/// are added in subsequent phases per Implementation Guide §1.2.
+/// The TDD §5.5.2 NOAA ENC tile endpoint was retired (see
+/// docs/adr/0002-chart-tile-source.md) and NOAA's public RNC tile service
+/// followed in Jan 2025. Phase 6 swapped to **Esri World Ocean Base** as
+/// the basemap with **OpenSeaMap** overlaid for channel markers + lights —
+/// gives an ocean-styled map with bathymetry shading without depending on
+/// NOAA infrastructure that's been intermittently unreachable. NOAA
+/// MBTiles bundling for true chartplotter-equivalent offline charts is
+/// scoped for v1.5+.
 class MarineChartView extends StatefulWidget {
   const MarineChartView({
     super.key,
