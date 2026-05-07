@@ -22,16 +22,6 @@
       "maxzoom": 13,
       "attribution": "Reference labels © Esri"
     },
-    "openseamap-depth": {
-      "type": "raster",
-      "tiles": [
-        "https://t1.openseamap.org/depth/{z}/{x}/{y}.png"
-      ],
-      "tileSize": 256,
-      "minzoom": 0,
-      "maxzoom": 17,
-      "attribution": "Depth contours © OpenSeaMap contributors"
-    },
     "openseamap": {
       "type": "raster",
       "tiles": [
@@ -60,11 +50,6 @@
       "id": "esri-ocean-reference-overlay",
       "type": "raster",
       "source": "esri-ocean-reference"
-    },
-    {
-      "id": "openseamap-depth-overlay",
-      "type": "raster",
-      "source": "openseamap-depth"
     },
     {
       "id": "openseamap-overlay",

@@ -59,21 +59,6 @@ void main() {
       expect(src['attribution'], contains('Esri'));
     });
 
-    test('exposes the OpenSeaMap depth contour overlay raster source', () {
-      // OSM-based depth contour LINES (community-maintained, patchier
-      // coverage than NOAA but real isobaths where available). Sits
-      // between the Esri reference labels and the seamark overlay.
-      final src = sources['openseamap-depth'] as Map<String, dynamic>;
-      expect(src['type'], 'raster');
-      expect(src['tileSize'], 256);
-      final tiles = (src['tiles'] as List).cast<String>();
-      expect(
-        tiles.first,
-        'https://t1.openseamap.org/depth/{z}/{x}/{y}.png',
-      );
-      expect(src['attribution'], contains('Depth contours'));
-    });
-
     test('exposes the OpenSeaMap nautical overlay raster source', () {
       final src = sources['openseamap'] as Map<String, dynamic>;
       expect(src['type'], 'raster');
@@ -94,23 +79,21 @@ void main() {
     });
 
     test(
-      'layers stack background → ocean base → reference → depth → seamarks',
+      'layers stack background → ocean base → ocean reference → seamarks',
       () {
-        // Order: shading → depth labels → contour lines → seamarks.
-        // Seamarks (channel markers, lights) stay on top so navigational
-        // symbols don't get covered by either label or contour overlay.
+        // Order matters: depth labels + feature names paint above the
+        // bathymetry shading; seamarks (channel markers, lights) paint
+        // above the labels so navigational symbols stay legible.
         final ids = layers.map((l) => l['id']).toList();
         expect(ids, [
           'background',
           'esri-ocean-base',
           'esri-ocean-reference-overlay',
-          'openseamap-depth-overlay',
           'openseamap-overlay',
         ]);
         expect(layers[1]['source'], 'esri-ocean');
         expect(layers[2]['source'], 'esri-ocean-reference');
-        expect(layers[3]['source'], 'openseamap-depth');
-        expect(layers[4]['source'], 'openseamap');
+        expect(layers[3]['source'], 'openseamap');
       },
     );
   });
