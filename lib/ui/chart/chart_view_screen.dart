@@ -37,6 +37,15 @@ const _defaultZoom = 9.0;
 /// apart).
 const _markerTapRadiusNm = 0.5;
 
+/// Cap on the number of ramp markers rendered on the chart at once.
+/// The bundled snapshot ships ~2150 ramps; rendering all of them as
+/// maplibre Circle annotations is several minutes of native calls
+/// (each `addCircle` is ~30-50 ms on Android emulator) and chokes
+/// the app at startup. We pass the closest N to the user's vessel
+/// (or chart centre when no GPS); the trip-planner picker keeps the
+/// full list available for ramp selection.
+const _maxRampMarkers = 150;
+
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});
 
@@ -91,10 +100,23 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     );
 
     final rampsAsync = ref.watch(osmRampsProvider);
+    // Cap the rendered marker layer at the closest [_maxRampMarkers]
+    // ramps to the user. Falls back to the chart's default centre
+    // when no GPS fix is available.
+    final rampOrigin = vesselCorePosition ??
+        const LatLng(latitude: 27.94, longitude: -82.45);
     final rampPositions = rampsAsync.maybeWhen(
-      data: (ramps) => [
-        for (final r in ramps) ml.LatLng(r.lat, r.lon),
-      ],
+      data: (ramps) {
+        final sorted = [...ramps]
+          ..sort(
+            (a, b) =>
+                a.distanceNmTo(rampOrigin).compareTo(b.distanceNmTo(rampOrigin)),
+          );
+        return [
+          for (final r in sorted.take(_maxRampMarkers))
+            ml.LatLng(r.lat, r.lon),
+        ];
+      },
       orElse: () => const <ml.LatLng>[],
     );
 
