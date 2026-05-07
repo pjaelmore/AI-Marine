@@ -103,18 +103,17 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     // Cap the rendered marker layer at the closest [_maxRampMarkers]
     // ramps to the user. Falls back to the chart's default centre
     // when no GPS fix is available.
-    final rampOrigin = vesselCorePosition ??
-        const LatLng(latitude: 27.94, longitude: -82.45);
+    final rampOrigin =
+        vesselCorePosition ?? const LatLng(latitude: 27.94, longitude: -82.45);
     final rampPositions = rampsAsync.maybeWhen(
       data: (ramps) {
-        final sorted = [...ramps]
-          ..sort(
-            (a, b) =>
-                a.distanceNmTo(rampOrigin).compareTo(b.distanceNmTo(rampOrigin)),
+        final sorted = [...ramps]..sort(
+            (a, b) => a
+                .distanceNmTo(rampOrigin)
+                .compareTo(b.distanceNmTo(rampOrigin)),
           );
         return [
-          for (final r in sorted.take(_maxRampMarkers))
-            ml.LatLng(r.lat, r.lon),
+          for (final r in sorted.take(_maxRampMarkers)) ml.LatLng(r.lat, r.lon),
         ];
       },
       orElse: () => const <ml.LatLng>[],
