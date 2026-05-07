@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 
 import '../../core/types/lat_lng.dart';
+import '../../state/component_providers.dart';
 import '../../state/vessel_providers.dart';
 import '../design/spacing.dart';
 import '../picker/species_chip.dart';
@@ -39,6 +40,14 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => null,
     );
 
+    final stationsAsync = ref.watch(ndbcStationsProvider);
+    final stationPositions = stationsAsync.maybeWhen(
+      data: (stations) => [
+        for (final s in stations) ml.LatLng(s.lat, s.lon),
+      ],
+      orElse: () => const <ml.LatLng>[],
+    );
+
     return Scaffold(
       body: Stack(
         children: [
@@ -48,6 +57,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
               zoom: _defaultZoom,
             ),
             vesselPosition: vesselPosition,
+            stationPositions: stationPositions,
             onTap: _onChartTap,
           ),
           const SafeArea(

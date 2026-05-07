@@ -6,6 +6,7 @@ import '../data/cache/eviction_service.dart';
 import '../data/cache/hot_cache.dart';
 import '../data/cache/live_sensor_buffer.dart';
 import '../data/cache/warm_cache.dart';
+import '../data/sources/ndbc/buoy_station.dart';
 import '../data/sources/ndbc/ndbc_adapter.dart';
 import '../data/sources/nws_forecast/nws_adapter.dart';
 import '../data/sources/solunar/solunar_adapter.dart';
@@ -19,6 +20,15 @@ final ndbcAdapterProvider = FutureProvider<NdbcAdapter>((ref) async {
   final adapter = NdbcAdapter(http: ref.watch(dioProvider));
   await adapter.loadStations();
   return adapter;
+});
+
+/// Loaded NDBC stations from the bundled asset, surfaced as a
+/// list for the chart marker layer. Composes
+/// [ndbcAdapterProvider] so the adapter only loads once even when
+/// both the scoring path and the marker layer watch stations.
+final ndbcStationsProvider = FutureProvider<List<BuoyStation>>((ref) async {
+  final adapter = await ref.watch(ndbcAdapterProvider.future);
+  return adapter.stations;
 });
 
 /// Tides & Currents adapter with its bundled station list pre-loaded.

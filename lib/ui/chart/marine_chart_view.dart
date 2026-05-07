@@ -21,6 +21,7 @@ class MarineChartView extends StatefulWidget {
     super.key,
     required this.initialCameraPosition,
     this.vesselPosition,
+    this.stationPositions = const <LatLng>[],
     this.onTap,
     this.styleAssetPath = _defaultStyleAsset,
   });
@@ -32,6 +33,13 @@ class MarineChartView extends StatefulWidget {
   /// Current vessel position. When non-null, a teal dot is drawn at this
   /// location and the camera follows on subsequent updates.
   final LatLng? vesselPosition;
+
+  /// NDBC buoy / coastal-station positions to render as small chart-
+  /// style markers (white pip with a deep-marine outline). Empty by
+  /// default; the chart shell passes the loaded list once
+  /// [ndbcStationsProvider] resolves. Distinct from the vessel dot so
+  /// the user can tell their boat from a buoy at a glance.
+  final List<LatLng> stationPositions;
 
   /// Invoked when the user taps a spot on the chart. The chart shell
   /// uses this to drive the recommendation overlay — the tapped LatLng
@@ -51,11 +59,21 @@ class _MarineChartViewState extends State<MarineChartView> {
   static const _vesselRadiusPx = 10.0;
   static const _vesselStrokeWidthPx = 2.0;
 
+  // Station-marker styling — small white pip with deep-marine outline,
+  // visually quiet so dozens of buoys don't compete with the vessel
+  // dot or the chart features beneath them.
+  static const _stationFillHex = '#FFFFFF';
+  static const _stationStrokeHex = '#0F2A47';
+  static const _stationRadiusPx = 5.0;
+  static const _stationStrokeWidthPx = 1.5;
+
   String? _styleJson;
   Object? _loadError;
   MapLibreMapController? _controller;
   bool _styleLoaded = false;
   Circle? _vesselCircle;
+  final List<Circle> _stationCircles = [];
+  List<LatLng> _renderedStationPositions = const [];
 
   /// Tracks whether the camera has already centered on the user's
   /// first GPS fix. Set once the initial vessel position lands so
@@ -97,6 +115,7 @@ class _MarineChartViewState extends State<MarineChartView> {
       );
     }
     unawaited(_syncVesselMarker());
+    unawaited(_syncStationMarkers());
   }
 
   @override
@@ -105,6 +124,18 @@ class _MarineChartViewState extends State<MarineChartView> {
     if (widget.vesselPosition != oldWidget.vesselPosition) {
       unawaited(_syncVesselMarker());
     }
+    if (!_listEquals(widget.stationPositions, oldWidget.stationPositions)) {
+      unawaited(_syncStationMarkers());
+    }
+  }
+
+  bool _listEquals(List<LatLng> a, List<LatLng> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   Future<void> _syncVesselMarker() async {
@@ -139,6 +170,33 @@ class _MarineChartViewState extends State<MarineChartView> {
         CircleOptions(geometry: pos),
       );
     }
+  }
+
+  /// Replaces the existing station-marker layer with one circle per
+  /// position in [MarineChartView.stationPositions]. Doing a full
+  /// remove-and-add on each change keeps the diff trivial; the list
+  /// only updates on app start (when the bundled snapshot loads) so
+  /// the cost is negligible.
+  Future<void> _syncStationMarkers() async {
+    final controller = _controller;
+    if (controller == null || !_styleLoaded) return;
+    if (_listEquals(widget.stationPositions, _renderedStationPositions)) return;
+    for (final c in _stationCircles) {
+      await controller.removeCircle(c);
+    }
+    _stationCircles.clear();
+    for (final pos in widget.stationPositions) {
+      final circle = await controller.addCircle(
+        const CircleOptions(
+          circleColor: _stationFillHex,
+          circleRadius: _stationRadiusPx,
+          circleStrokeColor: _stationStrokeHex,
+          circleStrokeWidth: _stationStrokeWidthPx,
+        ).copyWith(CircleOptions(geometry: pos)),
+      );
+      _stationCircles.add(circle);
+    }
+    _renderedStationPositions = List.unmodifiable(widget.stationPositions);
   }
 
   @override

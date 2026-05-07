@@ -33,14 +33,22 @@ class NdbcAdapter extends SourceAdapter<BuoyObservation> {
   final double _maxDistanceNm;
 
   /// Loads the station list from the bundled asset — call once at startup
-  /// before [canServe] is queried. v1 ships ~6 stations covering MA/RI/CT/NY
-  /// waters; updates land via app releases.
+  /// before [canServe] is queried. The bundled snapshot is regenerated
+  /// from the live NOAA `activestations.xml` feed by
+  /// `scripts/refresh_ndbc_stations.dart`; v1 covers a Florida bbox and
+  /// rebundles each release.
   Future<void> loadStations() async {
     final raw = await rootBundle.loadString(stationsAssetPath);
     final json = jsonDecode(raw) as Map<String, dynamic>;
     final list = (json['stations'] as List).cast<Map<String, dynamic>>();
     _stations = list.map(BuoyStation.fromJson).toList();
   }
+
+  /// All loaded stations, exposed read-only for callers that want to
+  /// render the full set on a map (rather than just the nearest, which
+  /// the scoring path uses internally). Returned as an unmodifiable
+  /// view so consumers can't mutate the adapter's state.
+  List<BuoyStation> get stations => List.unmodifiable(_stations);
 
   /// Test seam — bypasses the asset bundle.
   void seedStationsForTesting(List<BuoyStation> stations) {

@@ -207,11 +207,26 @@ void main() {
       final dio = Dio()..httpClientAdapter = _StubAdapter();
       final adapter = NdbcAdapter(http: dio);
       await adapter.loadStations();
+      // Cape Canaveral Nearshore (station 41113) sits at this coord —
+      // the bundled FL snapshot must include at least one station that
+      // can serve the central FL Atlantic coast.
+      const capeCanaveral = LatLng(latitude: 28.4, longitude: -80.533);
       expect(
-        adapter.canServe(_bostonHarbor, DateTime.now()),
+        adapter.canServe(capeCanaveral, DateTime.now()),
         isTrue,
-        reason: 'station 44013 should be found within 30 nm of Boston Harbor',
+        reason: 'a FL station should be within 30 nm of Cape Canaveral',
       );
+    });
+
+    test('stations getter returns an unmodifiable view of the seeded list', () {
+      final dio = Dio()..httpClientAdapter = _StubAdapter();
+      final adapter = NdbcAdapter(http: dio)
+        ..seedStationsForTesting([_bostonStation, _montaukStation]);
+      expect(adapter.stations, hasLength(2));
+      expect(adapter.stations.map((s) => s.id), ['44013', '44017']);
+      // Mutating the returned view throws — callers can render the
+      // list but can't mess with the adapter's state.
+      expect(() => adapter.stations.clear(), throwsUnsupportedError);
     });
   });
 }
