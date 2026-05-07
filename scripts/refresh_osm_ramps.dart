@@ -28,10 +28,42 @@ const _maxLon = -76.0;
 const _overpassUrl = 'https://overpass-api.de/api/interpreter';
 const _outputPath = 'assets/osm_ramps.json';
 
+/// Inland-water exclusion bboxes. OSM `leisure=slipway` covers every
+/// boat ramp — including freshwater lake / river / pond ramps that
+/// are irrelevant to a saltwater fishing app. The Overpass
+/// coastline-proximity filter (`around.coast:N`) is the elegant fix
+/// but Overpass rate-limits and times out across the full FL bbox.
+/// We instead drop ramps that fall inside any of the major FL
+/// inland-water rectangles below — gets ~90% of the bad ramps for
+/// near-zero cost. Tightenable per release as users surface more
+/// inland clusters.
+const _inlandExclusions = <List<double>>[
+  // [minLat, minLon, maxLat, maxLon]
+  [26.65, -81.15, 27.25, -80.55], // Lake Okeechobee
+  [27.65, -81.50, 28.30, -80.95], // Kissimmee Chain (Toho, Kissimmee, etc.)
+  [28.85, -81.85, 29.55, -81.45], // Lake George + Crescent Lake
+  [28.95, -82.10, 29.40, -81.65], // Ocala / Lake Weir / Lake Eaton
+  [27.40, -81.85, 27.80, -81.30], // Lake Istokpoga + central Highlands lakes
+  [29.10, -82.20, 29.50, -81.85], // Lochloosa / Orange Lake / Newnans Lake
+  [30.40, -82.50, 30.80, -81.90], // Lake City / Suwannee inland
+  [28.40, -81.80, 28.80, -81.20], // Conway / Tibet-Butler / Apopka outflow
+  [28.50, -82.00, 28.90, -81.65], // Lake Apopka
+  [29.30, -82.30, 29.55, -81.95], // Lake Lochloosa west
+];
+
+bool _insideInlandExclusion(double lat, double lon) {
+  for (final box in _inlandExclusions) {
+    if (lat >= box[0] && lat <= box[2] && lon >= box[1] && lon <= box[3]) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Future<void> main() async {
   // Pull both common ramp taggings (slipways and the rarer
-  // amenity=boat_ramp). Use `out center` so way-shaped ramps still get
-  // a single representative coordinate for the marker layer.
+  // amenity=boat_ramp). Use `out center` so way-shaped ramps still
+  // get a single representative coordinate for the marker layer.
   const query = '''
 [out:json][timeout:60];
 (
@@ -50,18 +82,19 @@ out center;
 
   final ramps = <_Ramp>[];
   var droppedPrivate = 0;
+  var droppedInland = 0;
   for (final e in elements) {
     final lat = _coordOf(e, 'lat');
     final lon = _coordOf(e, 'lon');
     if (lat == null || lon == null) continue;
     final tags =
         (e['tags'] as Map<String, dynamic>? ?? {}).cast<String, String>();
-    // Drop explicitly-private ramps — trip planning is for public
-    // launches. Untagged ramps stay in (vast majority of OSM ramps
-    // simply lack an `access` tag — we trust the OSM bias toward
-    // public features).
     if (tags['access'] == 'private') {
       droppedPrivate++;
+      continue;
+    }
+    if (_insideInlandExclusion(lat, lon)) {
+      droppedInland++;
       continue;
     }
     ramps.add(
@@ -80,7 +113,7 @@ out center;
 
   stdout.writeln(
     'Got ${ramps.length} ramps inside ($_minLat..$_maxLat, $_minLon..$_maxLon) '
-    '(dropped $droppedPrivate private).',
+    '(dropped $droppedPrivate private, $droppedInland inland-water).',
   );
 
   final out = const JsonEncoder.withIndent('  ').convert({
