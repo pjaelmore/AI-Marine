@@ -23,6 +23,7 @@ class MarineChartView extends StatefulWidget {
     this.vesselPosition,
     this.stationPositions = const <LatLng>[],
     this.wreckPositions = const <LatLng>[],
+    this.rampPositions = const <LatLng>[],
     this.onTap,
     this.styleAssetPath = _defaultStyleAsset,
   });
@@ -47,6 +48,13 @@ class MarineChartView extends StatefulWidget {
   /// data station at a glance. Empty by default; the chart shell
   /// passes the loaded list once [osmWrecksProvider] resolves.
   final List<LatLng> wreckPositions;
+
+  /// OSM-derived public boat-ramp positions to render as bright-teal
+  /// markers — launch-point semantics, visually distinct from the
+  /// hazard-amber wrecks, white buoy pips, and teal vessel dot.
+  /// Empty by default; the chart shell passes the loaded list once
+  /// [osmRampsProvider] resolves.
+  final List<LatLng> rampPositions;
 
   /// Invoked when the user taps a spot on the chart. The chart shell
   /// uses this to drive the recommendation overlay — the tapped LatLng
@@ -83,6 +91,16 @@ class _MarineChartViewState extends State<MarineChartView> {
   static const _wreckRadiusPx = 6.0;
   static const _wreckStrokeWidthPx = 1.5;
 
+  // Ramp-marker styling — brighter teal than the vessel dot, smaller
+  // radius. Anglers see hundreds of these along the FL coast at low
+  // zoom (~2k ramps in the bbox) so the visual is intentionally
+  // muted: small enough to dissolve into a continuous coastline at
+  // zoom <10 and resolve into individual markers at zoom 11+.
+  static const _rampFillHex = '#1FA37F';
+  static const _rampStrokeHex = '#FFFFFF';
+  static const _rampRadiusPx = 4.0;
+  static const _rampStrokeWidthPx = 1.0;
+
   String? _styleJson;
   Object? _loadError;
   MapLibreMapController? _controller;
@@ -92,6 +110,8 @@ class _MarineChartViewState extends State<MarineChartView> {
   List<LatLng> _renderedStationPositions = const [];
   final List<Circle> _wreckCircles = [];
   List<LatLng> _renderedWreckPositions = const [];
+  final List<Circle> _rampCircles = [];
+  List<LatLng> _renderedRampPositions = const [];
 
   /// Tracks whether the camera has already centered on the user's
   /// first GPS fix. Set once the initial vessel position lands so
@@ -140,6 +160,7 @@ class _MarineChartViewState extends State<MarineChartView> {
     unawaited(_syncVesselMarker());
     unawaited(_syncStationMarkers());
     unawaited(_syncWreckMarkers());
+    unawaited(_syncRampMarkers());
   }
 
   @override
@@ -153,6 +174,9 @@ class _MarineChartViewState extends State<MarineChartView> {
     }
     if (!_listEquals(widget.wreckPositions, oldWidget.wreckPositions)) {
       unawaited(_syncWreckMarkers());
+    }
+    if (!_listEquals(widget.rampPositions, oldWidget.rampPositions)) {
+      unawaited(_syncRampMarkers());
     }
   }
 
@@ -250,6 +274,32 @@ class _MarineChartViewState extends State<MarineChartView> {
       _wreckCircles.add(circle);
     }
     _renderedWreckPositions = List.unmodifiable(widget.wreckPositions);
+  }
+
+  /// Same shape as the station + wreck syncs for the ramp layer.
+  /// Ramp coverage is dense (~2k along the FL coast) so the
+  /// remove-and-add does more work, but ramps load once at startup
+  /// and the cost is amortised.
+  Future<void> _syncRampMarkers() async {
+    final controller = _controller;
+    if (controller == null || !_styleLoaded) return;
+    if (_listEquals(widget.rampPositions, _renderedRampPositions)) return;
+    for (final c in _rampCircles) {
+      await controller.removeCircle(c);
+    }
+    _rampCircles.clear();
+    for (final pos in widget.rampPositions) {
+      final circle = await controller.addCircle(
+        const CircleOptions(
+          circleColor: _rampFillHex,
+          circleRadius: _rampRadiusPx,
+          circleStrokeColor: _rampStrokeHex,
+          circleStrokeWidth: _rampStrokeWidthPx,
+        ).copyWith(CircleOptions(geometry: pos)),
+      );
+      _rampCircles.add(circle);
+    }
+    _renderedRampPositions = List.unmodifiable(widget.rampPositions);
   }
 
   @override

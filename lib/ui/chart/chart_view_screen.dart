@@ -4,12 +4,15 @@ import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 
 import '../../core/types/lat_lng.dart';
 import '../../data/sources/ndbc/buoy_station.dart';
+import '../../data/sources/osm/boat_ramp_record.dart';
 import '../../data/sources/osm/wreck_record.dart';
 import '../../state/component_providers.dart';
+import '../../state/osm_ramps_provider.dart';
 import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
 import '../design/spacing.dart';
 import '../picker/species_chip.dart';
+import '../recommendation/boat_ramp_info_sheet.dart';
 import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
 import '../recommendation/wreck_info_sheet.dart';
@@ -41,7 +44,8 @@ class ChartViewScreen extends ConsumerStatefulWidget {
 
 class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
   /// Open-water tap that should drive the recommendation overlay.
-  /// Mutually exclusive with [_selectedStation] and [_selectedWreck].
+  /// Mutually exclusive with [_selectedStation], [_selectedWreck],
+  /// and [_selectedRamp].
   LatLng? _tap;
 
   /// Buoy the user tapped that should drive the station info overlay.
@@ -49,6 +53,10 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
 
   /// Wreck the user tapped that should drive the wreck info overlay.
   WreckRecord? _selectedWreck;
+
+  /// Boat ramp the user tapped that should drive the ramp info
+  /// overlay.
+  BoatRampRecord? _selectedRamp;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +88,14 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => const <ml.LatLng>[],
     );
 
+    final rampsAsync = ref.watch(osmRampsProvider);
+    final rampPositions = rampsAsync.maybeWhen(
+      data: (ramps) => [
+        for (final r in ramps) ml.LatLng(r.lat, r.lon),
+      ],
+      orElse: () => const <ml.LatLng>[],
+    );
+
     return Scaffold(
       body: Stack(
         children: [
@@ -91,6 +107,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             vesselPosition: vesselMlPosition,
             stationPositions: stationPositions,
             wreckPositions: wreckPositions,
+            rampPositions: rampPositions,
             onTap: _onChartTap,
           ),
           const SafeArea(
@@ -114,9 +131,23 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     );
   }
 
-  /// Mutually-exclusive overlay selector — wreck > station > tap >
-  /// empty hint. Only one card surface is on screen at a time.
+  /// Mutually-exclusive overlay selector — ramp > wreck > station >
+  /// tap > empty hint. Only one card surface is on screen at a time.
   Widget _activeOverlay(LatLng? vesselCorePosition) {
+    final ramp = _selectedRamp;
+    if (ramp != null) {
+      return SafeArea(
+        top: false,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: BoatRampInfoSheet(
+            ramp: ramp,
+            vesselPosition: vesselCorePosition,
+            onClose: () => setState(() => _selectedRamp = null),
+          ),
+        ),
+      );
+    }
     final wreck = _selectedWreck;
     if (wreck != null) {
       return SafeArea(
@@ -149,13 +180,25 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       latitude: location.latitude,
       longitude: location.longitude,
     );
-    // Resolution priority: wreck → buoy → open water. Both marker
-    // layers use the same tap radius so a tie favours the wreck (rarer
-    // / structure usually beats a data station for the angler's
-    // intent), but in practice they sit at distinct lat/lons.
+    // Resolution priority: ramp → wreck → buoy → open water. Ramps
+    // win ties because they're the rarest tap intent (user wants to
+    // plan a trip from THIS ramp specifically). All marker layers
+    // use the same tap radius; in practice they sit at distinct
+    // lat/lons so ties are vanishingly rare.
+    final ramp = _rampAt(tap);
+    if (ramp != null) {
+      setState(() {
+        _selectedRamp = ramp;
+        _selectedWreck = null;
+        _selectedStation = null;
+        _tap = null;
+      });
+      return;
+    }
     final wreck = _wreckAt(tap);
     if (wreck != null) {
       setState(() {
+        _selectedRamp = null;
         _selectedWreck = wreck;
         _selectedStation = null;
         _tap = null;
@@ -164,6 +207,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     }
     final station = _stationAt(tap);
     setState(() {
+      _selectedRamp = null;
       if (station != null) {
         _selectedStation = station;
         _selectedWreck = null;
@@ -205,6 +249,22 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       final d = w.distanceNmTo(tap);
       if (d < bestNm) {
         best = w;
+        bestNm = d;
+      }
+    }
+    return best;
+  }
+
+  /// Mirror of [_stationAt] for the boat-ramp layer.
+  BoatRampRecord? _rampAt(LatLng tap) {
+    final ramps = ref.read(osmRampsProvider).valueOrNull;
+    if (ramps == null || ramps.isEmpty) return null;
+    BoatRampRecord? best;
+    var bestNm = _markerTapRadiusNm;
+    for (final r in ramps) {
+      final d = r.distanceNmTo(tap);
+      if (d < bestNm) {
+        best = r;
         bestNm = d;
       }
     }
