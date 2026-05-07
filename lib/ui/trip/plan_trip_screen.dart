@@ -266,9 +266,18 @@ class _BottomBar extends StatelessWidget {
                 child: const Text('Back'),
               ),
             const Spacer(),
+            // The marine theme sets ElevatedButton.minimumSize to
+            // Size.fromHeight(48) — a full-width button. That works
+            // in a Column but blows up inside a Row (button demands
+            // infinite width while the Row passes unbounded
+            // constraints). Override to a finite-width minimum so
+            // these inline buttons size to their intrinsic content.
             if (isLast)
               ElevatedButton(
                 onPressed: canSave ? onSave : null,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(120, 44),
+                ),
                 child: saving
                     ? const SizedBox(
                         width: 18,
@@ -280,6 +289,9 @@ class _BottomBar extends StatelessWidget {
             else
               ElevatedButton(
                 onPressed: canContinue ? onContinue : null,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(120, 44),
+                ),
                 child: const Text('Continue'),
               ),
           ],
