@@ -57,6 +57,7 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
         title: const Text('Plan a trip'),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _StepHeader(
             step: _step,
@@ -64,32 +65,12 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
             titles: _stepTitles,
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(MarineSpacing.lg),
-              child: switch (_step) {
-                0 => _RampStep(
-                    selected: draft.ramp,
-                    onPick: (r) {
-                      ref.read(planTripDraftProvider.notifier).setRamp(r);
-                      setState(() => _step = 1);
-                    },
-                  ),
-                1 => _TimeStep(
-                    start: draft.plannedStart,
-                    end: draft.plannedEnd,
-                    onChange: (s, e) {
-                      ref
-                          .read(planTripDraftProvider.notifier)
-                          .setTimeWindow(s, e);
-                    },
-                  ),
-                2 => _SpeciesStep(
-                    selectedId: draft.targetSpeciesId,
-                    onPick: (id) =>
-                        ref.read(planTripDraftProvider.notifier).setSpecies(id),
-                  ),
-                _ => _ReviewStep(draft: draft),
-              },
+            child: ColoredBox(
+              color: MarineColors.deepMarine,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(MarineSpacing.lg),
+                child: _stepBody(draft),
+              ),
             ),
           ),
           _BottomBar(
@@ -105,6 +86,35 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
         ],
       ),
     );
+  }
+
+  Widget _stepBody(PlanTripDraft draft) {
+    switch (_step) {
+      case 0:
+        return _RampStep(
+          selected: draft.ramp,
+          onPick: (r) {
+            ref.read(planTripDraftProvider.notifier).setRamp(r);
+            setState(() => _step = 1);
+          },
+        );
+      case 1:
+        return _TimeStep(
+          start: draft.plannedStart,
+          end: draft.plannedEnd,
+          onChange: (s, e) {
+            ref.read(planTripDraftProvider.notifier).setTimeWindow(s, e);
+          },
+        );
+      case 2:
+        return _SpeciesStep(
+          selectedId: draft.targetSpeciesId,
+          onPick: (id) =>
+              ref.read(planTripDraftProvider.notifier).setSpecies(id),
+        );
+      default:
+        return _ReviewStep(draft: draft);
+    }
   }
 
   bool _canAdvanceTo(int target, PlanTripDraft draft) {
