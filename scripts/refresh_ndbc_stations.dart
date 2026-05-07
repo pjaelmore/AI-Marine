@@ -98,8 +98,14 @@ Future<String> _fetch(String url) async {
 /// double-quoted attributes. The feed is large (~1300 stations) but
 /// regular and well-formed so a regex pull avoids dragging in an XML
 /// parser dependency for a one-off script.
+///
+/// The non-greedy `[^>]+?` is load-bearing: NDBC sets `pgm` to values
+/// like "NDBC Meteorological/Ocean" with a literal slash inside the
+/// attribute, and an `[^/>]+` would refuse to cross that slash and
+/// silently drop the station (this exact bug missed 41008/41009/etc
+/// before the fix).
 Iterable<_Station> _parseStations(String xml) sync* {
-  final stationPattern = RegExp(r'<station\s([^/>]+)/>');
+  final stationPattern = RegExp(r'<station\s+([^>]+?)/>');
   final attrPattern = RegExp(r'(\w+)="([^"]*)"');
   for (final match in stationPattern.allMatches(xml)) {
     final attrs = <String, String>{};
