@@ -12,6 +12,16 @@
       "maxzoom": 13,
       "attribution": "Tiles © Esri — Sources: GEBCO, NOAA, National Geographic, DeLorme, HERE, Geonames.org, and other contributors"
     },
+    "esri-ocean-reference": {
+      "type": "raster",
+      "tiles": [
+        "https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}"
+      ],
+      "tileSize": 256,
+      "minzoom": 0,
+      "maxzoom": 13,
+      "attribution": "Reference labels © Esri"
+    },
     "openseamap": {
       "type": "raster",
       "tiles": [
@@ -35,6 +45,11 @@
       "id": "esri-ocean-base",
       "type": "raster",
       "source": "esri-ocean"
+    },
+    {
+      "id": "esri-ocean-reference-overlay",
+      "type": "raster",
+      "source": "esri-ocean-reference"
     },
     {
       "id": "openseamap-overlay",

@@ -43,6 +43,22 @@ void main() {
       expect(src['attribution'], contains('Esri'));
     });
 
+    test('exposes Esri World Ocean Reference as a labelled overlay source',
+        () {
+      // Reference layer adds depth labels + sea-floor feature names on
+      // top of the bathymetry shading from World_Ocean_Base. Same
+      // ArcGIS {z}/{y}/{x} order as the base layer.
+      final src = sources['esri-ocean-reference'] as Map<String, dynamic>;
+      expect(src['type'], 'raster');
+      expect(src['tileSize'], 256);
+      final tiles = (src['tiles'] as List).cast<String>();
+      expect(
+        tiles.first,
+        'https://services.arcgisonline.com/arcgis/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}',
+      );
+      expect(src['attribution'], contains('Esri'));
+    });
+
     test('exposes the OpenSeaMap nautical overlay raster source', () {
       final src = sources['openseamap'] as Map<String, dynamic>;
       expect(src['type'], 'raster');
@@ -62,12 +78,23 @@ void main() {
       expect((paint['background-color'] as String).toUpperCase(), '#0F2A47');
     });
 
-    test('layers stack background → Esri ocean base → OpenSeaMap overlay', () {
-      // Order matters: nautical seamarks must paint *over* the basemap.
-      final ids = layers.map((l) => l['id']).toList();
-      expect(ids, ['background', 'esri-ocean-base', 'openseamap-overlay']);
-      expect(layers[1]['source'], 'esri-ocean');
-      expect(layers[2]['source'], 'openseamap');
-    });
+    test(
+      'layers stack background → ocean base → ocean reference → seamarks',
+      () {
+        // Order matters: depth labels + feature names paint above the
+        // bathymetry shading; seamarks (channel markers, lights) paint
+        // above the labels so navigational symbols stay legible.
+        final ids = layers.map((l) => l['id']).toList();
+        expect(ids, [
+          'background',
+          'esri-ocean-base',
+          'esri-ocean-reference-overlay',
+          'openseamap-overlay',
+        ]);
+        expect(layers[1]['source'], 'esri-ocean');
+        expect(layers[2]['source'], 'esri-ocean-reference');
+        expect(layers[3]['source'], 'openseamap');
+      },
+    );
   });
 }
