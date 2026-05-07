@@ -19,9 +19,12 @@ import '../design/typography.dart';
 /// dragging to expand for offshore runs lands in 13a.3.
 const _defaultTripRadiusNm = 15.0;
 
-/// Multi-step "Plan a trip" wizard. Walks the user through ramp →
-/// time window → species → review, persists a [TripPlan] on save,
-/// and sets it as the active trip.
+/// 4-step "Plan a trip" wizard. Custom layout instead of Material's
+/// Stepper because the latter renders invisibly on the marine dark
+/// theme — the controls + circles use light-mode colours that get
+/// lost against `surface = deepMarine`. We render a header strip
+/// showing step n/4 + title, the current step body, and a fixed
+/// bottom bar with Back / Continue (or Save) buttons.
 class PlanTripScreen extends ConsumerStatefulWidget {
   const PlanTripScreen({super.key});
 
@@ -33,76 +36,71 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
   int _step = 0;
   bool _saving = false;
 
+  static const _stepTitles = [
+    'Boat ramp',
+    'Time window',
+    'Target species',
+    'Review',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final draft = ref.watch(planTripDraftProvider);
+    final isLast = _step == _stepTitles.length - 1;
     return Scaffold(
+      backgroundColor: MarineColors.deepMarine,
       appBar: AppBar(
+        // Slightly elevated so the AppBar is visible against the
+        // deepMarine scaffold background.
+        backgroundColor: MarineColors.surfaceElevated,
+        foregroundColor: MarineColors.onDark,
         title: const Text('Plan a trip'),
       ),
-      body: Stepper(
-        currentStep: _step,
-        onStepTapped: (i) {
-          // Allow jumping back to earlier steps freely; jumping
-          // forward only when the prior steps are complete.
-          if (i <= _step || _canAdvanceTo(i, draft)) {
-            setState(() => _step = i);
-          }
-        },
-        controlsBuilder: (ctx, details) => _Controls(
-          step: _step,
-          isLastStep: _step == 3,
-          canContinue: _canAdvanceTo(_step + 1, draft),
-          canSave: draft.isComplete && !_saving,
-          saving: _saving,
-          onContinue: () => setState(() => _step = (_step + 1).clamp(0, 3)),
-          onBack: () => setState(() => _step = (_step - 1).clamp(0, 3)),
-          onSave: _save,
-        ),
-        steps: [
-          Step(
-            title: const Text('Boat ramp'),
-            isActive: _step >= 0,
-            state: draft.ramp != null ? StepState.complete : StepState.indexed,
-            content: _RampStep(
-              selected: draft.ramp,
-              onPick: (r) {
-                ref.read(planTripDraftProvider.notifier).setRamp(r);
-                setState(() => _step = 1);
+      body: Column(
+        children: [
+          _StepHeader(
+            step: _step,
+            total: _stepTitles.length,
+            titles: _stepTitles,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(MarineSpacing.lg),
+              child: switch (_step) {
+                0 => _RampStep(
+                    selected: draft.ramp,
+                    onPick: (r) {
+                      ref.read(planTripDraftProvider.notifier).setRamp(r);
+                      setState(() => _step = 1);
+                    },
+                  ),
+                1 => _TimeStep(
+                    start: draft.plannedStart,
+                    end: draft.plannedEnd,
+                    onChange: (s, e) {
+                      ref
+                          .read(planTripDraftProvider.notifier)
+                          .setTimeWindow(s, e);
+                    },
+                  ),
+                2 => _SpeciesStep(
+                    selectedId: draft.targetSpeciesId,
+                    onPick: (id) =>
+                        ref.read(planTripDraftProvider.notifier).setSpecies(id),
+                  ),
+                _ => _ReviewStep(draft: draft),
               },
             ),
           ),
-          Step(
-            title: const Text('Time window'),
-            isActive: _step >= 1,
-            state: (draft.plannedStart != null && draft.plannedEnd != null)
-                ? StepState.complete
-                : StepState.indexed,
-            content: _TimeStep(
-              start: draft.plannedStart,
-              end: draft.plannedEnd,
-              onChange: (s, e) {
-                ref.read(planTripDraftProvider.notifier).setTimeWindow(s, e);
-              },
-            ),
-          ),
-          Step(
-            title: const Text('Target species'),
-            isActive: _step >= 2,
-            state: (draft.targetSpeciesId?.isNotEmpty ?? false)
-                ? StepState.complete
-                : StepState.indexed,
-            content: _SpeciesStep(
-              selectedId: draft.targetSpeciesId,
-              onPick: (id) =>
-                  ref.read(planTripDraftProvider.notifier).setSpecies(id),
-            ),
-          ),
-          Step(
-            title: const Text('Review'),
-            isActive: _step >= 3,
-            state: StepState.indexed,
-            content: _ReviewStep(draft: draft),
+          _BottomBar(
+            isLast: isLast,
+            canContinue: _canAdvanceTo(_step + 1, draft),
+            canSave: draft.isComplete && !_saving,
+            saving: _saving,
+            showBack: _step > 0,
+            onBack: () => setState(() => _step = (_step - 1).clamp(0, 3)),
+            onContinue: () => setState(() => _step = (_step + 1).clamp(0, 3)),
+            onSave: _save,
           ),
         ],
       ),
@@ -164,54 +162,118 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
   }
 }
 
-class _Controls extends StatelessWidget {
-  const _Controls({
+class _StepHeader extends StatelessWidget {
+  const _StepHeader({
     required this.step,
-    required this.isLastStep,
-    required this.canContinue,
-    required this.canSave,
-    required this.saving,
-    required this.onContinue,
-    required this.onBack,
-    required this.onSave,
+    required this.total,
+    required this.titles,
   });
 
   final int step;
-  final bool isLastStep;
+  final int total;
+  final List<String> titles;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: MarineColors.surfaceElevated,
+      padding: const EdgeInsets.fromLTRB(
+        MarineSpacing.lg,
+        MarineSpacing.md,
+        MarineSpacing.lg,
+        MarineSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'STEP ${step + 1} OF $total',
+            style: MarineTypography.label.copyWith(
+              color: MarineColors.actionTeal,
+              letterSpacing: 0.8,
+              fontWeight: FontWeight.w700,
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(height: MarineSpacing.xs),
+          Text(
+            titles[step],
+            style: MarineTypography.headingMedium.copyWith(
+              color: MarineColors.onDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomBar extends StatelessWidget {
+  const _BottomBar({
+    required this.isLast,
+    required this.canContinue,
+    required this.canSave,
+    required this.saving,
+    required this.showBack,
+    required this.onBack,
+    required this.onContinue,
+    required this.onSave,
+  });
+
+  final bool isLast;
   final bool canContinue;
   final bool canSave;
   final bool saving;
-  final VoidCallback onContinue;
+  final bool showBack;
   final VoidCallback onBack;
+  final VoidCallback onContinue;
   final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: MarineSpacing.md),
-      child: Row(
-        children: [
-          if (isLastStep)
-            ElevatedButton(
-              onPressed: canSave ? onSave : null,
-              child: saving
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2.5),
-                    )
-                  : const Text('Save trip'),
-            )
-          else
-            ElevatedButton(
-              onPressed: canContinue ? onContinue : null,
-              child: const Text('Continue'),
-            ),
-          if (step > 0) ...[
-            const SizedBox(width: MarineSpacing.md),
-            TextButton(onPressed: onBack, child: const Text('Back')),
+    return SafeArea(
+      top: false,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(
+          MarineSpacing.lg,
+          MarineSpacing.md,
+          MarineSpacing.lg,
+          MarineSpacing.md,
+        ),
+        decoration: const BoxDecoration(
+          color: MarineColors.surfaceElevated,
+          border: Border(
+            top: BorderSide(color: MarineColors.divider),
+          ),
+        ),
+        child: Row(
+          children: [
+            if (showBack)
+              TextButton(
+                onPressed: onBack,
+                child: const Text('Back'),
+              ),
+            const Spacer(),
+            if (isLast)
+              ElevatedButton(
+                onPressed: canSave ? onSave : null,
+                child: saving
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      )
+                    : const Text('Save trip'),
+              )
+            else
+              ElevatedButton(
+                onPressed: canContinue ? onContinue : null,
+                child: const Text('Continue'),
+              ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -239,11 +301,16 @@ class _RampStepState extends ConsumerState<_RampStep> {
       orElse: () => const LatLng(latitude: 27.94, longitude: -82.45),
     );
     return rampsAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: MarineSpacing.lg),
-        child: Center(child: CircularProgressIndicator()),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: MarineSpacing.xxl),
+          child: CircularProgressIndicator(),
+        ),
       ),
-      error: (e, _) => Text('Could not load ramps: $e'),
+      error: (e, _) => Text(
+        'Could not load ramps: $e',
+        style: const TextStyle(color: MarineColors.onDark),
+      ),
       data: (ramps) {
         final filtered = _filterAndSort(ramps, _query, origin);
         return Column(
@@ -253,37 +320,22 @@ class _RampStepState extends ConsumerState<_RampStep> {
               decoration: const InputDecoration(
                 hintText: 'Search ramps by name…',
                 prefixIcon: Icon(Icons.search),
+                filled: true,
+                fillColor: MarineColors.surfaceElevated,
+                border: OutlineInputBorder(),
               ),
+              style: const TextStyle(color: MarineColors.onDark),
               onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: MarineSpacing.sm),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.4,
+            for (final r in filtered)
+              _RampTile(
+                ramp: r,
+                origin: origin,
+                hasGps: positionAsync.hasValue,
+                isSelected: widget.selected?.id == r.id,
+                onTap: () => widget.onPick(r),
               ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: filtered.length,
-                itemBuilder: (_, i) {
-                  final r = filtered[i];
-                  final isSelected = widget.selected?.id == r.id;
-                  return ListTile(
-                    title: Text(r.name ?? 'Unnamed ramp'),
-                    subtitle: Text(
-                      '${r.distanceNmTo(origin).toStringAsFixed(1)} nm '
-                      'from ${positionAsync.hasValue ? "vessel" : "default"}',
-                    ),
-                    trailing: isSelected
-                        ? const Icon(
-                            Icons.check,
-                            color: MarineColors.actionTeal,
-                          )
-                        : null,
-                    onTap: () => widget.onPick(r),
-                  );
-                },
-              ),
-            ),
           ],
         );
       },
@@ -305,10 +357,79 @@ class _RampStepState extends ConsumerState<_RampStep> {
     final sorted = [...filtered]..sort((a, b) {
         return a.distanceNmTo(origin).compareTo(b.distanceNmTo(origin));
       });
-    // Cap the rendered list — 2k+ items is too many for a Stepper
-    // section. Distance-sorted, so the closest 50 are the relevant
-    // ones for the user.
     return sorted.take(50).toList();
+  }
+}
+
+class _RampTile extends StatelessWidget {
+  const _RampTile({
+    required this.ramp,
+    required this.origin,
+    required this.hasGps,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final BoatRampRecord ramp;
+  final LatLng origin;
+  final bool hasGps;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: MarineSpacing.md,
+            vertical: MarineSpacing.sm + 2,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: MarineColors.onDark.withAlpha(20),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ramp.name ?? 'Unnamed ramp',
+                      style: MarineTypography.bodyMedium.copyWith(
+                        color: MarineColors.onDark,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${ramp.distanceNmTo(origin).toStringAsFixed(1)} nm '
+                      'from ${hasGps ? "vessel" : "default"}',
+                      style: MarineTypography.bodySmall.copyWith(
+                        color: MarineColors.onDark.withAlpha(150),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isSelected)
+                const Icon(
+                  Icons.check_circle,
+                  color: MarineColors.actionTeal,
+                  size: 22,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -327,32 +448,43 @@ class _TimeStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final startLabel = start == null ? 'Start time' : _fmt.format(start!);
-    final endLabel = end == null ? 'End time' : _fmt.format(end!);
+    final startLabel = start == null ? 'Pick start time' : _fmt.format(start!);
+    final endLabel = end == null ? 'Pick end time' : _fmt.format(end!);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Text(
+          'When does the trip run? Defaults to today 6 AM – 6 PM.',
+          style: MarineTypography.bodyMedium.copyWith(
+            color: MarineColors.onDark.withAlpha(200),
+          ),
+        ),
+        const SizedBox(height: MarineSpacing.lg),
         OutlinedButton.icon(
           icon: const Icon(Icons.schedule),
           label: Text(startLabel),
           onPressed: () => _pick(context, isStart: true),
+          style: _outlinedStyle,
         ),
         const SizedBox(height: MarineSpacing.sm),
         OutlinedButton.icon(
           icon: const Icon(Icons.schedule),
           label: Text(endLabel),
           onPressed: () => _pick(context, isStart: false),
-        ),
-        const SizedBox(height: MarineSpacing.sm),
-        Text(
-          'Default is today 6 AM – 6 PM. Adjust to match your trip.',
-          style: MarineTypography.bodySmall.copyWith(
-            color: MarineColors.onDark.withAlpha(170),
-          ),
+          style: _outlinedStyle,
         ),
       ],
     );
   }
+
+  static final _outlinedStyle = OutlinedButton.styleFrom(
+    foregroundColor: MarineColors.onDark,
+    side: const BorderSide(color: MarineColors.divider),
+    padding: const EdgeInsets.symmetric(
+      horizontal: MarineSpacing.md,
+      vertical: MarineSpacing.md,
+    ),
+  );
 
   Future<void> _pick(BuildContext context, {required bool isStart}) async {
     final initial = isStart ? (start ?? _todayAt(6)) : (end ?? _todayAt(18));
@@ -399,27 +531,62 @@ class _SpeciesStep extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final speciesAsync = ref.watch(availableSpeciesProvider);
     return speciesAsync.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.symmetric(vertical: MarineSpacing.lg),
-        child: Center(child: CircularProgressIndicator()),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: MarineSpacing.xxl),
+          child: CircularProgressIndicator(),
+        ),
       ),
-      error: (e, _) => Text('Could not load species: $e'),
+      error: (e, _) => Text(
+        'Could not load species: $e',
+        style: const TextStyle(color: MarineColors.onDark),
+      ),
       data: (records) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (final r in records)
-              ListTile(
-                title: Text(
-                  r.commonNames.isNotEmpty ? r.commonNames.first : r.id,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => onPick(r.id),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: MarineSpacing.md,
+                      vertical: MarineSpacing.md,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: MarineColors.onDark.withAlpha(20),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            r.commonNames.isNotEmpty
+                                ? r.commonNames.first
+                                : r.id,
+                            style: MarineTypography.bodyLarge.copyWith(
+                              color: MarineColors.onDark,
+                              fontWeight: r.id == selectedId
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (r.id == selectedId)
+                          const Icon(
+                            Icons.check_circle,
+                            color: MarineColors.actionTeal,
+                            size: 22,
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
-                trailing: r.id == selectedId
-                    ? const Icon(
-                        Icons.check,
-                        color: MarineColors.actionTeal,
-                      )
-                    : null,
-                onTap: () => onPick(r.id),
               ),
           ],
         );
@@ -439,7 +606,10 @@ class _ReviewStep extends StatelessWidget {
     final start = draft.plannedStart;
     final end = draft.plannedEnd;
     if (ramp == null || start == null || end == null) {
-      return const Text('Complete the previous steps first.');
+      return const Text(
+        'Complete the previous steps first.',
+        style: TextStyle(color: MarineColors.onDark),
+      );
     }
     final fmt = DateFormat('EEE MMM d, h:mm a');
     final bounds = LatLngBounds.fromCenter(
@@ -449,17 +619,17 @@ class _ReviewStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Row(label: 'Ramp', value: ramp.name ?? 'Unnamed (${ramp.id})'),
-        _Row(
+        _ReviewRow(label: 'Ramp', value: ramp.name ?? 'Unnamed (${ramp.id})'),
+        _ReviewRow(
           label: 'Trip area',
           value: '${_defaultTripRadiusNm.toInt()} nm '
               'around ramp · ${bounds.heightNm.toStringAsFixed(0)}×'
               '${bounds.widthNm.toStringAsFixed(0)} nm',
         ),
-        _Row(label: 'Start', value: fmt.format(start)),
-        _Row(label: 'End', value: fmt.format(end)),
-        _Row(label: 'Species', value: draft.targetSpeciesId ?? '—'),
-        const SizedBox(height: MarineSpacing.sm),
+        _ReviewRow(label: 'Start', value: fmt.format(start)),
+        _ReviewRow(label: 'End', value: fmt.format(end)),
+        _ReviewRow(label: 'Species', value: draft.targetSpeciesId ?? '—'),
+        const SizedBox(height: MarineSpacing.lg),
         Text(
           'Saving creates the trip and sets it as your active trip. '
           'Tile + score-grid pre-fetch lands in later slices.',
@@ -473,8 +643,8 @@ class _ReviewStep extends StatelessWidget {
   }
 }
 
-class _Row extends StatelessWidget {
-  const _Row({required this.label, required this.value});
+class _ReviewRow extends StatelessWidget {
+  const _ReviewRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -482,7 +652,7 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: MarineSpacing.xs),
+      padding: const EdgeInsets.symmetric(vertical: MarineSpacing.sm),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
