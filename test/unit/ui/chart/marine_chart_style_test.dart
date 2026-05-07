@@ -43,8 +43,7 @@ void main() {
       expect(src['attribution'], contains('Esri'));
     });
 
-    test('exposes Esri World Ocean Reference as a labelled overlay source',
-        () {
+    test('exposes Esri World Ocean Reference as a labelled overlay source', () {
       // Reference layer adds depth labels + sea-floor feature names on
       // top of the bathymetry shading from World_Ocean_Base. Same
       // ArcGIS {z}/{y}/{x} order as the base layer.

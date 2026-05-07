@@ -22,6 +22,7 @@ class MarineChartView extends StatefulWidget {
     required this.initialCameraPosition,
     this.vesselPosition,
     this.stationPositions = const <LatLng>[],
+    this.wreckPositions = const <LatLng>[],
     this.onTap,
     this.styleAssetPath = _defaultStyleAsset,
   });
@@ -40,6 +41,12 @@ class MarineChartView extends StatefulWidget {
   /// [ndbcStationsProvider] resolves. Distinct from the vessel dot so
   /// the user can tell their boat from a buoy at a glance.
   final List<LatLng> stationPositions;
+
+  /// OSM-derived wreck positions to render as warn-amber markers,
+  /// visually distinct from buoys so the user can tell structure from
+  /// data station at a glance. Empty by default; the chart shell
+  /// passes the loaded list once [osmWrecksProvider] resolves.
+  final List<LatLng> wreckPositions;
 
   /// Invoked when the user taps a spot on the chart. The chart shell
   /// uses this to drive the recommendation overlay — the tapped LatLng
@@ -67,6 +74,15 @@ class _MarineChartViewState extends State<MarineChartView> {
   static const _stationRadiusPx = 5.0;
   static const _stationStrokeWidthPx = 1.5;
 
+  // Wreck-marker styling — warn-amber fill (MarineColors.warnAmber
+  // #E89F3C) with a dark outline. Amber distinguishes structure from
+  // the white buoy pips and from the teal vessel dot, and matches the
+  // chart-symbology convention of warm colours for hazards.
+  static const _wreckFillHex = '#E89F3C';
+  static const _wreckStrokeHex = '#0F2A47';
+  static const _wreckRadiusPx = 6.0;
+  static const _wreckStrokeWidthPx = 1.5;
+
   String? _styleJson;
   Object? _loadError;
   MapLibreMapController? _controller;
@@ -74,6 +90,8 @@ class _MarineChartViewState extends State<MarineChartView> {
   Circle? _vesselCircle;
   final List<Circle> _stationCircles = [];
   List<LatLng> _renderedStationPositions = const [];
+  final List<Circle> _wreckCircles = [];
+  List<LatLng> _renderedWreckPositions = const [];
 
   /// Tracks whether the camera has already centered on the user's
   /// first GPS fix. Set once the initial vessel position lands so
@@ -121,6 +139,7 @@ class _MarineChartViewState extends State<MarineChartView> {
     }
     unawaited(_syncVesselMarker());
     unawaited(_syncStationMarkers());
+    unawaited(_syncWreckMarkers());
   }
 
   @override
@@ -131,6 +150,9 @@ class _MarineChartViewState extends State<MarineChartView> {
     }
     if (!_listEquals(widget.stationPositions, oldWidget.stationPositions)) {
       unawaited(_syncStationMarkers());
+    }
+    if (!_listEquals(widget.wreckPositions, oldWidget.wreckPositions)) {
+      unawaited(_syncWreckMarkers());
     }
   }
 
@@ -202,6 +224,32 @@ class _MarineChartViewState extends State<MarineChartView> {
       _stationCircles.add(circle);
     }
     _renderedStationPositions = List.unmodifiable(widget.stationPositions);
+  }
+
+  /// Same shape as [_syncStationMarkers] for the wreck layer — full
+  /// remove-and-add when the input list changes. The wreck snapshot
+  /// only loads once at startup so the cost is negligible; if we ever
+  /// switch to live trip-area filtering, swap to a diff.
+  Future<void> _syncWreckMarkers() async {
+    final controller = _controller;
+    if (controller == null || !_styleLoaded) return;
+    if (_listEquals(widget.wreckPositions, _renderedWreckPositions)) return;
+    for (final c in _wreckCircles) {
+      await controller.removeCircle(c);
+    }
+    _wreckCircles.clear();
+    for (final pos in widget.wreckPositions) {
+      final circle = await controller.addCircle(
+        const CircleOptions(
+          circleColor: _wreckFillHex,
+          circleRadius: _wreckRadiusPx,
+          circleStrokeColor: _wreckStrokeHex,
+          circleStrokeWidth: _wreckStrokeWidthPx,
+        ).copyWith(CircleOptions(geometry: pos)),
+      );
+      _wreckCircles.add(circle);
+    }
+    _renderedWreckPositions = List.unmodifiable(widget.wreckPositions);
   }
 
   @override

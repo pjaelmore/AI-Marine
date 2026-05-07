@@ -4,12 +4,15 @@ import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 
 import '../../core/types/lat_lng.dart';
 import '../../data/sources/ndbc/buoy_station.dart';
+import '../../data/sources/osm/wreck_record.dart';
 import '../../state/component_providers.dart';
+import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
 import '../design/spacing.dart';
 import '../picker/species_chip.dart';
 import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
+import '../recommendation/wreck_info_sheet.dart';
 import 'marine_chart_view.dart';
 
 /// Default initial camera target — Tampa Bay, FL.
@@ -21,12 +24,13 @@ import 'marine_chart_view.dart';
 const _defaultCenter = ml.LatLng(27.94, -82.45);
 const _defaultZoom = 9.0;
 
-/// A tap within this many nautical miles of a station marker is
-/// interpreted as a buoy tap (show station info), rather than an open-
-/// water tap (show recommendation). 0.5 nm covers the marker footprint
-/// at Phase-6 zooms plus typical fingertip slop without bleeding into
-/// adjacent buoys (real FL stations are 5–30 nm apart).
-const _buoyTapRadiusNm = 0.5;
+/// A tap within this many nautical miles of a buoy or wreck marker is
+/// interpreted as a marker tap (show its info card), rather than an
+/// open-water tap (show recommendation). 0.5 nm covers the marker
+/// footprint at Phase-6 zooms plus typical fingertip slop without
+/// bleeding into adjacent markers (real FL features are spaced miles
+/// apart).
+const _markerTapRadiusNm = 0.5;
 
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});
@@ -37,12 +41,14 @@ class ChartViewScreen extends ConsumerStatefulWidget {
 
 class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
   /// Open-water tap that should drive the recommendation overlay.
-  /// Mutually exclusive with [_selectedStation].
+  /// Mutually exclusive with [_selectedStation] and [_selectedWreck].
   LatLng? _tap;
 
   /// Buoy the user tapped that should drive the station info overlay.
-  /// Mutually exclusive with [_tap].
   BuoyStation? _selectedStation;
+
+  /// Wreck the user tapped that should drive the wreck info overlay.
+  WreckRecord? _selectedWreck;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +72,14 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => const <ml.LatLng>[],
     );
 
+    final wrecksAsync = ref.watch(osmWrecksProvider);
+    final wreckPositions = wrecksAsync.maybeWhen(
+      data: (wrecks) => [
+        for (final w in wrecks) ml.LatLng(w.lat, w.lon),
+      ],
+      orElse: () => const <ml.LatLng>[],
+    );
+
     return Scaffold(
       body: Stack(
         children: [
@@ -76,6 +90,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             ),
             vesselPosition: vesselMlPosition,
             stationPositions: stationPositions,
+            wreckPositions: wreckPositions,
             onTap: _onChartTap,
           ),
           const SafeArea(
@@ -93,19 +108,39 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
               ),
             ),
           ),
-          if (_selectedStation != null)
-            StationOverlay(
-              station: _selectedStation,
-              vesselPosition: vesselCorePosition,
-              onDismiss: () => setState(() => _selectedStation = null),
-            )
-          else
-            RecommendationOverlay(
-              tappedLocation: _tap,
-              onDismiss: () => setState(() => _tap = null),
-            ),
+          _activeOverlay(vesselCorePosition),
         ],
       ),
+    );
+  }
+
+  /// Mutually-exclusive overlay selector — wreck > station > tap >
+  /// empty hint. Only one card surface is on screen at a time.
+  Widget _activeOverlay(LatLng? vesselCorePosition) {
+    final wreck = _selectedWreck;
+    if (wreck != null) {
+      return SafeArea(
+        top: false,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: WreckInfoSheet(
+            wreck: wreck,
+            vesselPosition: vesselCorePosition,
+            onClose: () => setState(() => _selectedWreck = null),
+          ),
+        ),
+      );
+    }
+    if (_selectedStation != null) {
+      return StationOverlay(
+        station: _selectedStation,
+        vesselPosition: vesselCorePosition,
+        onDismiss: () => setState(() => _selectedStation = null),
+      );
+    }
+    return RecommendationOverlay(
+      tappedLocation: _tap,
+      onDismiss: () => setState(() => _tap = null),
     );
   }
 
@@ -114,31 +149,62 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       latitude: location.latitude,
       longitude: location.longitude,
     );
+    // Resolution priority: wreck → buoy → open water. Both marker
+    // layers use the same tap radius so a tie favours the wreck (rarer
+    // / structure usually beats a data station for the angler's
+    // intent), but in practice they sit at distinct lat/lons.
+    final wreck = _wreckAt(tap);
+    if (wreck != null) {
+      setState(() {
+        _selectedWreck = wreck;
+        _selectedStation = null;
+        _tap = null;
+      });
+      return;
+    }
     final station = _stationAt(tap);
     setState(() {
       if (station != null) {
         _selectedStation = station;
+        _selectedWreck = null;
         _tap = null;
       } else {
         _tap = tap;
         _selectedStation = null;
+        _selectedWreck = null;
       }
     });
   }
 
   /// Returns the loaded station whose location is within
-  /// [_buoyTapRadiusNm] of [tap], or null when the tap landed on open
-  /// water. Picks the nearest hit if multiple stations are within
+  /// [_markerTapRadiusNm] of [tap], or null when the tap landed on
+  /// open water. Picks the nearest hit if multiple stations are within
   /// range — protects against overlapping markers at low zoom.
   BuoyStation? _stationAt(LatLng tap) {
     final stations = ref.read(ndbcStationsProvider).valueOrNull;
     if (stations == null || stations.isEmpty) return null;
     BuoyStation? best;
-    var bestNm = _buoyTapRadiusNm;
+    var bestNm = _markerTapRadiusNm;
     for (final s in stations) {
       final d = s.distanceNmTo(tap);
       if (d < bestNm) {
         best = s;
+        bestNm = d;
+      }
+    }
+    return best;
+  }
+
+  /// Mirror of [_stationAt] for the wreck layer.
+  WreckRecord? _wreckAt(LatLng tap) {
+    final wrecks = ref.read(osmWrecksProvider).valueOrNull;
+    if (wrecks == null || wrecks.isEmpty) return null;
+    WreckRecord? best;
+    var bestNm = _markerTapRadiusNm;
+    for (final w in wrecks) {
+      final d = w.distanceNmTo(tap);
+      if (d < bestNm) {
+        best = w;
         bestNm = d;
       }
     }
