@@ -98,6 +98,11 @@ class _MarineChartViewState extends State<MarineChartView> {
 
   void _onMapCreated(MapLibreMapController controller) {
     _controller = controller;
+    // maplibre's Circle annotations consume tap events themselves —
+    // they don't bubble through to `onMapClick`. Subscribe to the
+    // separate per-circle channel and forward station-circle taps as
+    // chart taps so the buoy-tap routing in the chart shell sees them.
+    controller.onCircleTapped.add(_handleCircleTap);
   }
 
   void _onStyleLoaded() {
@@ -223,5 +228,16 @@ class _MarineChartViewState extends State<MarineChartView> {
 
   void _handleTap(Point<double> _, LatLng location) {
     widget.onTap?.call(location);
+  }
+
+  /// Forward taps on station circles to the same callback the open-
+  /// water tap path uses, so the chart shell's `_stationAt` lookup
+  /// resolves to the buoy. Skips the vessel circle — the user
+  /// shouldn't get a station card by tapping their own boat.
+  void _handleCircleTap(Circle circle) {
+    if (identical(circle, _vesselCircle)) return;
+    final geometry = circle.options.geometry;
+    if (geometry == null) return;
+    widget.onTap?.call(geometry);
   }
 }
