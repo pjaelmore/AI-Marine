@@ -13,25 +13,29 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
-/// Inclusive bbox for v1 Florida coverage. South to the Keys, north to
-/// the Florida–Georgia line + a few miles into Georgia for nearshore
-/// stations like Grays Reef. West to Mobile Bay (Pensacola panhandle
-/// fish like the same Gulf), east to ~250 nm offshore so the major
-/// open-water Atlantic buoys (41010 etc.) are included.
-const _minLat = 24.0;
-const _maxLat = 31.5;
-const _minLon = -88.0;
-const _maxLon = -78.0;
+/// Inclusive bbox for v1 Florida coverage. Roomy on every side so we
+/// catch the relevant neighbours: south past the Keys to ~Dry
+/// Tortugas; north a buffer over the FL–GA line for Grays Reef-type
+/// nearshore Atlantic stations; west to the central Gulf so the deep-
+/// water buoys (42001/42002/42003) and the LA/MS coast stations panhandle
+/// anglers care about are included; east to ~400 nm offshore for the
+/// open-Atlantic ring (41010 etc.).
+const _minLat = 22.0;
+const _maxLat = 32.0;
+const _minLon = -92.0;
+const _maxLon = -76.0;
 
 const _feedUrl = 'https://www.ndbc.noaa.gov/activestations.xml';
 const _outputPath = 'assets/ndbc_stations.json';
 
-/// Station "types" we care about for the chart marker layer. `buoy` and
-/// `fixed` (C-MAN coastal stations) report meteorology and waves and
-/// are the ones useful to anglers. We drop `dart` (deep-ocean tsunami
-/// warning), `tao` (tropical Pacific), `usv` (autonomous surface
-/// vehicles), and `other`.
-const _allowedTypes = {'buoy', 'fixed'};
+/// Station "types" we care about for the chart marker layer. `buoy`
+/// is the canonical offshore platform; `fixed` covers C-MAN coastal
+/// stations (lighthouses, piers); `other` catches operational stations
+/// NDBC hasn't fully categorised that still report meteorology.
+/// Excluded: `dart` (deep-ocean tsunami warning, mid-ocean), `tao`
+/// (tropical Pacific array), `usv` (autonomous surface vehicles —
+/// transient and irrelevant to a static angler).
+const _allowedTypes = {'buoy', 'fixed', 'other'};
 
 Future<void> main() async {
   stdout.writeln('Fetching $_feedUrl …');
