@@ -10,12 +10,14 @@ import '../../state/component_providers.dart';
 import '../../state/osm_ramps_provider.dart';
 import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
+import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../picker/species_chip.dart';
 import '../recommendation/boat_ramp_info_sheet.dart';
 import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
 import '../recommendation/wreck_info_sheet.dart';
+import '../trip/plan_trip_screen.dart';
 import 'marine_chart_view.dart';
 
 /// Default initial camera target — Tampa Bay, FL.
@@ -110,18 +112,22 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             rampPositions: rampPositions,
             onTap: _onChartTap,
           ),
-          const SafeArea(
+          SafeArea(
             bottom: false,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
+              padding: const EdgeInsets.fromLTRB(
                 MarineSpacing.md + 2,
                 MarineSpacing.md + 2,
                 MarineSpacing.md + 2,
                 0,
               ),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: SpeciesChip(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SpeciesChip(),
+                  _PlanTripButton(onPressed: _openTripPlanner),
+                ],
               ),
             ),
           ),
@@ -220,6 +226,12 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     });
   }
 
+  Future<void> _openTripPlanner() async {
+    await Navigator.of(context).push<String?>(
+      MaterialPageRoute(builder: (_) => const PlanTripScreen()),
+    );
+  }
+
   /// Returns the loaded station whose location is within
   /// [_markerTapRadiusNm] of [tap], or null when the tap landed on
   /// open water. Picks the nearest hit if multiple stations are within
@@ -269,5 +281,56 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       }
     }
     return best;
+  }
+}
+
+/// Top-right pill that opens [PlanTripScreen]. Same chrome as the
+/// species chip on the left so the two top affordances read as a
+/// matched pair.
+class _PlanTripButton extends StatelessWidget {
+  const _PlanTripButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: MarineSpacing.md + 2,
+            vertical: MarineSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: MarineColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: MarineColors.divider),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.add_road,
+                size: 16,
+                color: MarineColors.onDark,
+              ),
+              SizedBox(width: MarineSpacing.xs + 2),
+              Text(
+                'Plan trip',
+                style: TextStyle(
+                  color: MarineColors.onDark,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

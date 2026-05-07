@@ -69,6 +69,33 @@ class LatLngBounds with _$LatLngBounds {
   factory LatLngBounds.fromJson(Map<String, dynamic> json) =>
       _$LatLngBoundsFromJson(json);
 
+  /// Square bbox of half-diagonal [radiusNm] centred on [center]. The
+  /// trip planner uses this to derive a default trip area around the
+  /// user-picked boat ramp. North/south extent is a fixed 1°/60 nm
+  /// arc; east/west extent shrinks with cos(lat) so the box stays
+  /// roughly square at the given latitude rather than visually
+  /// stretched.
+  factory LatLngBounds.fromCenter({
+    required LatLng center,
+    required double radiusNm,
+  }) {
+    final dLat = radiusNm / _nmPerLatDegree;
+    final cosLat = math.cos(_toRadians(center.latitude)).abs();
+    // Floor the cosine so a centre exactly at a pole doesn't divide
+    // by zero; any latitude inside FL coverage stays well above this.
+    final dLon = radiusNm / (_nmPerLatDegree * math.max(cosLat, 0.01));
+    return LatLngBounds(
+      southwest: LatLng(
+        latitude: center.latitude - dLat,
+        longitude: center.longitude - dLon,
+      ),
+      northeast: LatLng(
+        latitude: center.latitude + dLat,
+        longitude: center.longitude + dLon,
+      ),
+    );
+  }
+
   /// Whether [point] falls within this rectangle, inclusive of edges.
   bool contains(LatLng point) =>
       point.latitude >= southwest.latitude &&
