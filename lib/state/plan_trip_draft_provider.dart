@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/sources/osm/boat_ramp_record.dart';
+import '../data/sources/ndbc/buoy_station.dart';
 
 /// In-progress fields the user has filled in while stepping through
 /// the "Plan a trip" wizard (slice 13a.2). The PlanTripScreen
@@ -8,18 +8,23 @@ import '../data/sources/osm/boat_ramp_record.dart';
 /// the final "Save" handler reads it once and persists a `TripPlan`
 /// via [TripPlansRepository].
 ///
+/// The trip's launch anchor is an NDBC buoy station — picking one of
+/// the bundled stations gives the user a known saltwater reference
+/// point with id + description, and the score grid + tile downloader
+/// in later slices key off `station.location` for the trip bbox.
+///
 /// Auto-disposes when the planner screen is gone so opening the
 /// wizard again starts from a clean draft.
 class PlanTripDraft {
   const PlanTripDraft({
-    this.ramp,
+    this.station,
     this.plannedStart,
     this.plannedEnd,
     this.targetSpeciesId,
     this.name,
   });
 
-  final BoatRampRecord? ramp;
+  final BuoyStation? station;
   final DateTime? plannedStart;
   final DateTime? plannedEnd;
   final String? targetSpeciesId;
@@ -28,21 +33,21 @@ class PlanTripDraft {
   /// Whether every required field has been chosen — gates the
   /// "Save" button on the review step.
   bool get isComplete =>
-      ramp != null &&
+      station != null &&
       plannedStart != null &&
       plannedEnd != null &&
       targetSpeciesId != null &&
       targetSpeciesId!.isNotEmpty;
 
   PlanTripDraft copyWith({
-    BoatRampRecord? ramp,
+    BuoyStation? station,
     DateTime? plannedStart,
     DateTime? plannedEnd,
     String? targetSpeciesId,
     String? name,
   }) {
     return PlanTripDraft(
-      ramp: ramp ?? this.ramp,
+      station: station ?? this.station,
       plannedStart: plannedStart ?? this.plannedStart,
       plannedEnd: plannedEnd ?? this.plannedEnd,
       targetSpeciesId: targetSpeciesId ?? this.targetSpeciesId,
@@ -55,8 +60,8 @@ class PlanTripDraftNotifier extends AutoDisposeNotifier<PlanTripDraft> {
   @override
   PlanTripDraft build() => const PlanTripDraft();
 
-  void setRamp(BoatRampRecord ramp) {
-    state = state.copyWith(ramp: ramp);
+  void setStation(BuoyStation station) {
+    state = state.copyWith(station: station);
   }
 
   void setTimeWindow(DateTime start, DateTime end) {

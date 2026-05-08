@@ -4,16 +4,13 @@ import 'package:maplibre_gl/maplibre_gl.dart' as ml;
 
 import '../../core/types/lat_lng.dart';
 import '../../data/sources/ndbc/buoy_station.dart';
-import '../../data/sources/osm/boat_ramp_record.dart';
 import '../../data/sources/osm/wreck_record.dart';
 import '../../state/component_providers.dart';
-import '../../state/osm_ramps_provider.dart';
 import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../picker/species_chip.dart';
-import '../recommendation/boat_ramp_info_sheet.dart';
 import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
 import '../recommendation/wreck_info_sheet.dart';
@@ -37,15 +34,6 @@ const _defaultZoom = 9.0;
 /// apart).
 const _markerTapRadiusNm = 0.5;
 
-/// Cap on the number of ramp markers rendered on the chart at once.
-/// The bundled snapshot ships ~2150 ramps; rendering all of them as
-/// maplibre Circle annotations is several minutes of native calls
-/// (each `addCircle` is ~30-50 ms on Android emulator) and chokes
-/// the app at startup. We pass the closest N to the user's vessel
-/// (or chart centre when no GPS); the trip-planner picker keeps the
-/// full list available for ramp selection.
-const _maxRampMarkers = 150;
-
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});
 
@@ -55,8 +43,7 @@ class ChartViewScreen extends ConsumerStatefulWidget {
 
 class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
   /// Open-water tap that should drive the recommendation overlay.
-  /// Mutually exclusive with [_selectedStation], [_selectedWreck],
-  /// and [_selectedRamp].
+  /// Mutually exclusive with [_selectedStation] and [_selectedWreck].
   LatLng? _tap;
 
   /// Buoy the user tapped that should drive the station info overlay.
@@ -64,10 +51,6 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
 
   /// Wreck the user tapped that should drive the wreck info overlay.
   WreckRecord? _selectedWreck;
-
-  /// Boat ramp the user tapped that should drive the ramp info
-  /// overlay.
-  BoatRampRecord? _selectedRamp;
 
   @override
   Widget build(BuildContext context) {
@@ -99,26 +82,6 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => const <ml.LatLng>[],
     );
 
-    final rampsAsync = ref.watch(osmRampsProvider);
-    // Cap the rendered marker layer at the closest [_maxRampMarkers]
-    // ramps to the user. Falls back to the chart's default centre
-    // when no GPS fix is available.
-    final rampOrigin =
-        vesselCorePosition ?? const LatLng(latitude: 27.94, longitude: -82.45);
-    final rampPositions = rampsAsync.maybeWhen(
-      data: (ramps) {
-        final sorted = [...ramps]..sort(
-            (a, b) => a
-                .distanceNmTo(rampOrigin)
-                .compareTo(b.distanceNmTo(rampOrigin)),
-          );
-        return [
-          for (final r in sorted.take(_maxRampMarkers)) ml.LatLng(r.lat, r.lon),
-        ];
-      },
-      orElse: () => const <ml.LatLng>[],
-    );
-
     return Scaffold(
       body: Stack(
         children: [
@@ -130,7 +93,6 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             vesselPosition: vesselMlPosition,
             stationPositions: stationPositions,
             wreckPositions: wreckPositions,
-            rampPositions: rampPositions,
             onTap: _onChartTap,
           ),
           SafeArea(
@@ -158,23 +120,9 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     );
   }
 
-  /// Mutually-exclusive overlay selector — ramp > wreck > station >
-  /// tap > empty hint. Only one card surface is on screen at a time.
+  /// Mutually-exclusive overlay selector — wreck > station > tap >
+  /// empty hint. Only one card surface is on screen at a time.
   Widget _activeOverlay(LatLng? vesselCorePosition) {
-    final ramp = _selectedRamp;
-    if (ramp != null) {
-      return SafeArea(
-        top: false,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: BoatRampInfoSheet(
-            ramp: ramp,
-            vesselPosition: vesselCorePosition,
-            onClose: () => setState(() => _selectedRamp = null),
-          ),
-        ),
-      );
-    }
     final wreck = _selectedWreck;
     if (wreck != null) {
       return SafeArea(
@@ -207,25 +155,12 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       latitude: location.latitude,
       longitude: location.longitude,
     );
-    // Resolution priority: ramp → wreck → buoy → open water. Ramps
-    // win ties because they're the rarest tap intent (user wants to
-    // plan a trip from THIS ramp specifically). All marker layers
-    // use the same tap radius; in practice they sit at distinct
-    // lat/lons so ties are vanishingly rare.
-    final ramp = _rampAt(tap);
-    if (ramp != null) {
-      setState(() {
-        _selectedRamp = ramp;
-        _selectedWreck = null;
-        _selectedStation = null;
-        _tap = null;
-      });
-      return;
-    }
+    // Resolution priority: wreck → buoy → open water. Markers use the
+    // same tap radius; in practice they sit at distinct lat/lons so
+    // ties are vanishingly rare.
     final wreck = _wreckAt(tap);
     if (wreck != null) {
       setState(() {
-        _selectedRamp = null;
         _selectedWreck = wreck;
         _selectedStation = null;
         _tap = null;
@@ -234,7 +169,6 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     }
     final station = _stationAt(tap);
     setState(() {
-      _selectedRamp = null;
       if (station != null) {
         _selectedStation = station;
         _selectedWreck = null;
@@ -282,22 +216,6 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       final d = w.distanceNmTo(tap);
       if (d < bestNm) {
         best = w;
-        bestNm = d;
-      }
-    }
-    return best;
-  }
-
-  /// Mirror of [_stationAt] for the boat-ramp layer.
-  BoatRampRecord? _rampAt(LatLng tap) {
-    final ramps = ref.read(osmRampsProvider).valueOrNull;
-    if (ramps == null || ramps.isEmpty) return null;
-    BoatRampRecord? best;
-    var bestNm = _markerTapRadiusNm;
-    for (final r in ramps) {
-      final d = r.distanceNmTo(tap);
-      if (d < bestNm) {
-        best = r;
         bestNm = d;
       }
     }

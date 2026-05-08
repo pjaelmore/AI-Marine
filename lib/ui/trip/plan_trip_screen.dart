@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 
 import '../../core/types/lat_lng.dart';
 import '../../core/types/trip_plan.dart';
-import '../../data/sources/osm/boat_ramp_record.dart';
+import '../../data/sources/ndbc/buoy_station.dart';
+import '../../state/component_providers.dart';
 import '../../state/engine_providers.dart';
-import '../../state/osm_ramps_provider.dart';
 import '../../state/plan_trip_draft_provider.dart';
 import '../../state/trip_providers.dart';
 import '../../state/vessel_providers.dart';
@@ -14,17 +14,19 @@ import '../design/colors.dart';
 import '../design/spacing.dart';
 import '../design/typography.dart';
 
-/// Default trip-area radius around the picked ramp, in nautical
+/// Default trip-area radius around the picked station, in nautical
 /// miles. Covers most inshore + nearshore offshore fishing; bbox
 /// dragging to expand for offshore runs lands in 13a.3.
 const _defaultTripRadiusNm = 15.0;
 
-/// 4-step "Plan a trip" wizard. Custom layout instead of Material's
-/// Stepper because the latter renders invisibly on the marine dark
-/// theme — the controls + circles use light-mode colours that get
-/// lost against `surface = deepMarine`. We render a header strip
-/// showing step n/4 + title, the current step body, and a fixed
-/// bottom bar with Back / Continue (or Save) buttons.
+/// 4-step "Plan a trip" wizard. The trip's launch anchor is an NDBC
+/// buoy station — picking one of the bundled stations gives a known
+/// saltwater reference point with id + description, and the score
+/// grid + tile downloader in later slices key off `station.location`
+/// for the trip bbox.
+///
+/// Custom layout instead of Material's Stepper because the latter
+/// renders invisibly on the marine dark theme.
 class PlanTripScreen extends ConsumerStatefulWidget {
   const PlanTripScreen({super.key});
 
@@ -37,7 +39,7 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
   bool _saving = false;
 
   static const _stepTitles = [
-    'Boat ramp',
+    'NDBC station',
     'Time window',
     'Target species',
     'Review',
@@ -50,8 +52,6 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
     return Scaffold(
       backgroundColor: MarineColors.deepMarine,
       appBar: AppBar(
-        // Slightly elevated so the AppBar is visible against the
-        // deepMarine scaffold background.
         backgroundColor: MarineColors.surfaceElevated,
         foregroundColor: MarineColors.onDark,
         title: const Text('Plan a trip'),
@@ -91,10 +91,10 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
   Widget _stepBody(PlanTripDraft draft) {
     switch (_step) {
       case 0:
-        return _RampStep(
-          selected: draft.ramp,
-          onPick: (r) {
-            ref.read(planTripDraftProvider.notifier).setRamp(r);
+        return _StationStep(
+          selected: draft.station,
+          onPick: (s) {
+            ref.read(planTripDraftProvider.notifier).setStation(s);
             setState(() => _step = 1);
           },
         );
@@ -119,7 +119,7 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
 
   bool _canAdvanceTo(int target, PlanTripDraft draft) {
     if (target <= 0) return true;
-    if (target >= 1 && draft.ramp == null) return false;
+    if (target >= 1 && draft.station == null) return false;
     if (target >= 2 &&
         (draft.plannedStart == null || draft.plannedEnd == null)) {
       return false;
@@ -136,22 +136,22 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
     if (!draft.isComplete) return;
     setState(() => _saving = true);
     try {
-      final ramp = draft.ramp!;
+      final station = draft.station!;
       final bounds = LatLngBounds.fromCenter(
-        center: ramp.location,
+        center: station.location,
         radiusNm: _defaultTripRadiusNm,
       );
       final plan = TripPlan(
         id: 'trip-${DateTime.now().toUtc().millisecondsSinceEpoch}',
         name: draft.name?.trim().isNotEmpty ?? false
             ? draft.name!
-            : _autoName(draft, ramp),
+            : _autoName(draft, station),
         bounds: bounds,
         plannedStart: draft.plannedStart!.toUtc(),
         plannedEnd: draft.plannedEnd!.toUtc(),
         targetSpeciesId: draft.targetSpeciesId!,
         createdAt: DateTime.now().toUtc(),
-        cacheStatus: TripCacheStatus(rampId: ramp.id),
+        cacheStatus: TripCacheStatus(stationId: station.id),
       );
       await ref.read(tripPlansRepositoryProvider).save(plan);
       ref.read(activeTripIdProvider.notifier).state = plan.id;
@@ -163,12 +163,10 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
     }
   }
 
-  String _autoName(PlanTripDraft draft, BoatRampRecord ramp) {
-    final rampLabel =
-        ramp.name?.trim().isNotEmpty ?? false ? ramp.name! : 'Ramp ${ramp.id}';
+  String _autoName(PlanTripDraft draft, BuoyStation station) {
     final dateFmt = DateFormat('MMM d');
     final start = draft.plannedStart!.toLocal();
-    return '$rampLabel — ${dateFmt.format(start)}';
+    return 'NDBC ${station.id} — ${dateFmt.format(start)}';
   }
 }
 
@@ -266,12 +264,8 @@ class _BottomBar extends StatelessWidget {
                 child: const Text('Back'),
               ),
             const Spacer(),
-            // The marine theme sets ElevatedButton.minimumSize to
-            // Size.fromHeight(48) — a full-width button. That works
-            // in a Column but blows up inside a Row (button demands
-            // infinite width while the Row passes unbounded
-            // constraints). Override to a finite-width minimum so
-            // these inline buttons size to their intrinsic content.
+            // Override marine theme's full-width minimumSize so these
+            // inline buttons size to intrinsic content.
             if (isLast)
               ElevatedButton(
                 onPressed: canSave ? onSave : null,
@@ -301,28 +295,28 @@ class _BottomBar extends StatelessWidget {
   }
 }
 
-class _RampStep extends ConsumerStatefulWidget {
-  const _RampStep({required this.selected, required this.onPick});
+class _StationStep extends ConsumerStatefulWidget {
+  const _StationStep({required this.selected, required this.onPick});
 
-  final BoatRampRecord? selected;
-  final ValueChanged<BoatRampRecord> onPick;
+  final BuoyStation? selected;
+  final ValueChanged<BuoyStation> onPick;
 
   @override
-  ConsumerState<_RampStep> createState() => _RampStepState();
+  ConsumerState<_StationStep> createState() => _StationStepState();
 }
 
-class _RampStepState extends ConsumerState<_RampStep> {
+class _StationStepState extends ConsumerState<_StationStep> {
   String _query = '';
 
   @override
   Widget build(BuildContext context) {
-    final rampsAsync = ref.watch(osmRampsProvider);
+    final stationsAsync = ref.watch(ndbcStationsProvider);
     final positionAsync = ref.watch(currentPositionProvider);
     final origin = positionAsync.maybeWhen(
       data: (p) => LatLng(latitude: p.latitude, longitude: p.longitude),
       orElse: () => const LatLng(latitude: 27.94, longitude: -82.45),
     );
-    return rampsAsync.when(
+    return stationsAsync.when(
       loading: () => const Center(
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: MarineSpacing.xxl),
@@ -330,17 +324,26 @@ class _RampStepState extends ConsumerState<_RampStep> {
         ),
       ),
       error: (e, _) => Text(
-        'Could not load ramps: $e',
+        'Could not load stations: $e',
         style: const TextStyle(color: MarineColors.onDark),
       ),
-      data: (ramps) {
-        final filtered = _filterAndSort(ramps, _query, origin);
+      data: (stations) {
+        final filtered = _filterAndSort(stations, _query, origin);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              'Pick the NDBC station nearest where you plan to fish. The '
+              'trip area is a ${_defaultTripRadiusNm.toInt()} nm bbox '
+              'around the station.',
+              style: MarineTypography.bodySmall.copyWith(
+                color: MarineColors.onDark.withAlpha(180),
+              ),
+            ),
+            const SizedBox(height: MarineSpacing.md),
             TextField(
               decoration: const InputDecoration(
-                hintText: 'Search ramps by name…',
+                hintText: 'Search by station id or name…',
                 prefixIcon: Icon(Icons.search),
                 filled: true,
                 fillColor: MarineColors.surfaceElevated,
@@ -350,13 +353,13 @@ class _RampStepState extends ConsumerState<_RampStep> {
               onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: MarineSpacing.sm),
-            for (final r in filtered)
-              _RampTile(
-                ramp: r,
+            for (final s in filtered)
+              _StationTile(
+                station: s,
                 origin: origin,
                 hasGps: positionAsync.hasValue,
-                isSelected: widget.selected?.id == r.id,
-                onTap: () => widget.onPick(r),
+                isSelected: widget.selected?.id == s.id,
+                onTap: () => widget.onPick(s),
               ),
           ],
         );
@@ -364,35 +367,37 @@ class _RampStepState extends ConsumerState<_RampStep> {
     );
   }
 
-  List<BoatRampRecord> _filterAndSort(
-    List<BoatRampRecord> ramps,
+  List<BuoyStation> _filterAndSort(
+    List<BuoyStation> stations,
     String query,
     LatLng origin,
   ) {
     final q = query.trim().toLowerCase();
     final filtered = q.isEmpty
-        ? ramps
-        : ramps.where((r) {
-            final name = (r.name ?? '').toLowerCase();
-            return name.contains(q);
+        ? stations
+        : stations.where((s) {
+            return s.id.toLowerCase().contains(q) ||
+                s.name.toLowerCase().contains(q);
           }).toList();
-    final sorted = [...filtered]..sort((a, b) {
-        return a.distanceNmTo(origin).compareTo(b.distanceNmTo(origin));
-      });
-    return sorted.take(50).toList();
+    final sorted = [...filtered]..sort(
+        (a, b) => a.distanceNmTo(origin).compareTo(b.distanceNmTo(origin)),
+      );
+    // 163 stations total — render all of them; the search box plus
+    // distance sort puts the relevant ones up top either way.
+    return sorted;
   }
 }
 
-class _RampTile extends StatelessWidget {
-  const _RampTile({
-    required this.ramp,
+class _StationTile extends StatelessWidget {
+  const _StationTile({
+    required this.station,
     required this.origin,
     required this.hasGps,
     required this.isSelected,
     required this.onTap,
   });
 
-  final BoatRampRecord ramp;
+  final BuoyStation station;
   final LatLng origin;
   final bool hasGps;
   final bool isSelected;
@@ -418,12 +423,23 @@ class _RampTile extends StatelessWidget {
           ),
           child: Row(
             children: [
+              SizedBox(
+                width: 60,
+                child: Text(
+                  station.id,
+                  style: MarineTypography.bodyMedium.copyWith(
+                    color: MarineColors.actionTeal,
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      ramp.name ?? 'Unnamed ramp',
+                      station.name,
                       style: MarineTypography.bodyMedium.copyWith(
                         color: MarineColors.onDark,
                         fontWeight:
@@ -432,7 +448,7 @@ class _RampTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${ramp.distanceNmTo(origin).toStringAsFixed(1)} nm '
+                      '${station.distanceNmTo(origin).toStringAsFixed(1)} nm '
                       'from ${hasGps ? "vessel" : "default"}',
                       style: MarineTypography.bodySmall.copyWith(
                         color: MarineColors.onDark.withAlpha(150),
@@ -624,10 +640,10 @@ class _ReviewStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ramp = draft.ramp;
+    final station = draft.station;
     final start = draft.plannedStart;
     final end = draft.plannedEnd;
-    if (ramp == null || start == null || end == null) {
+    if (station == null || start == null || end == null) {
       return const Text(
         'Complete the previous steps first.',
         style: TextStyle(color: MarineColors.onDark),
@@ -635,17 +651,17 @@ class _ReviewStep extends StatelessWidget {
     }
     final fmt = DateFormat('EEE MMM d, h:mm a');
     final bounds = LatLngBounds.fromCenter(
-      center: ramp.location,
+      center: station.location,
       radiusNm: _defaultTripRadiusNm,
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _ReviewRow(label: 'Ramp', value: ramp.name ?? 'Unnamed (${ramp.id})'),
+        _ReviewRow(label: 'Station', value: '${station.id} · ${station.name}'),
         _ReviewRow(
           label: 'Trip area',
           value: '${_defaultTripRadiusNm.toInt()} nm '
-              'around ramp · ${bounds.heightNm.toStringAsFixed(0)}×'
+              'around station · ${bounds.heightNm.toStringAsFixed(0)}×'
               '${bounds.widthNm.toStringAsFixed(0)} nm',
         ),
         _ReviewRow(label: 'Start', value: fmt.format(start)),

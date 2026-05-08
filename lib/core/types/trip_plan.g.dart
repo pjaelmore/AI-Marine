@@ -38,7 +38,7 @@ Map<String, dynamic> _$$TripPlanImplToJson(_$TripPlanImpl instance) =>
 _$TripCacheStatusImpl _$$TripCacheStatusImplFromJson(
         Map<String, dynamic> json) =>
     _$TripCacheStatusImpl(
-      rampId: json['rampId'] as String?,
+      stationId: json['stationId'] as String?,
       tilesDownloaded: json['tilesDownloaded'] as bool? ?? false,
       scoreGridReady: json['scoreGridReady'] as bool? ?? false,
     );
@@ -46,7 +46,7 @@ _$TripCacheStatusImpl _$$TripCacheStatusImplFromJson(
 Map<String, dynamic> _$$TripCacheStatusImplToJson(
         _$TripCacheStatusImpl instance) =>
     <String, dynamic>{
-      'rampId': instance.rampId,
+      'stationId': instance.stationId,
       'tilesDownloaded': instance.tilesDownloaded,
       'scoreGridReady': instance.scoreGridReady,
     };

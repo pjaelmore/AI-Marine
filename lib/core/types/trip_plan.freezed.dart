@@ -352,11 +352,11 @@ TripCacheStatus _$TripCacheStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TripCacheStatus {
-  /// OSM boat-ramp id the user picked as the trip's launch anchor.
+  /// NDBC station id the user picked as the trip's launch anchor.
   /// Persisted here rather than as a first-class column so the
   /// `trip_plans` table stays generic until Phase 7 settles the
   /// pre-trip schema.
-  String? get rampId => throw _privateConstructorUsedError;
+  String? get stationId => throw _privateConstructorUsedError;
 
   /// Whether tiles for `bounds` at the configured zoom range have
   /// been downloaded. Set true by the 13b tile downloader once a
@@ -379,7 +379,7 @@ abstract class $TripCacheStatusCopyWith<$Res> {
           TripCacheStatus value, $Res Function(TripCacheStatus) then) =
       _$TripCacheStatusCopyWithImpl<$Res, TripCacheStatus>;
   @useResult
-  $Res call({String? rampId, bool tilesDownloaded, bool scoreGridReady});
+  $Res call({String? stationId, bool tilesDownloaded, bool scoreGridReady});
 }
 
 /// @nodoc
@@ -395,14 +395,14 @@ class _$TripCacheStatusCopyWithImpl<$Res, $Val extends TripCacheStatus>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? rampId = freezed,
+    Object? stationId = freezed,
     Object? tilesDownloaded = null,
     Object? scoreGridReady = null,
   }) {
     return _then(_value.copyWith(
-      rampId: freezed == rampId
-          ? _value.rampId
-          : rampId // ignore: cast_nullable_to_non_nullable
+      stationId: freezed == stationId
+          ? _value.stationId
+          : stationId // ignore: cast_nullable_to_non_nullable
               as String?,
       tilesDownloaded: null == tilesDownloaded
           ? _value.tilesDownloaded
@@ -424,7 +424,7 @@ abstract class _$$TripCacheStatusImplCopyWith<$Res>
       __$$TripCacheStatusImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? rampId, bool tilesDownloaded, bool scoreGridReady});
+  $Res call({String? stationId, bool tilesDownloaded, bool scoreGridReady});
 }
 
 /// @nodoc
@@ -438,14 +438,14 @@ class __$$TripCacheStatusImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? rampId = freezed,
+    Object? stationId = freezed,
     Object? tilesDownloaded = null,
     Object? scoreGridReady = null,
   }) {
     return _then(_$TripCacheStatusImpl(
-      rampId: freezed == rampId
-          ? _value.rampId
-          : rampId // ignore: cast_nullable_to_non_nullable
+      stationId: freezed == stationId
+          ? _value.stationId
+          : stationId // ignore: cast_nullable_to_non_nullable
               as String?,
       tilesDownloaded: null == tilesDownloaded
           ? _value.tilesDownloaded
@@ -463,17 +463,19 @@ class __$$TripCacheStatusImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TripCacheStatusImpl implements _TripCacheStatus {
   const _$TripCacheStatusImpl(
-      {this.rampId, this.tilesDownloaded = false, this.scoreGridReady = false});
+      {this.stationId,
+      this.tilesDownloaded = false,
+      this.scoreGridReady = false});
 
   factory _$TripCacheStatusImpl.fromJson(Map<String, dynamic> json) =>
       _$$TripCacheStatusImplFromJson(json);
 
-  /// OSM boat-ramp id the user picked as the trip's launch anchor.
+  /// NDBC station id the user picked as the trip's launch anchor.
   /// Persisted here rather than as a first-class column so the
   /// `trip_plans` table stays generic until Phase 7 settles the
   /// pre-trip schema.
   @override
-  final String? rampId;
+  final String? stationId;
 
   /// Whether tiles for `bounds` at the configured zoom range have
   /// been downloaded. Set true by the 13b tile downloader once a
@@ -490,7 +492,7 @@ class _$TripCacheStatusImpl implements _TripCacheStatus {
 
   @override
   String toString() {
-    return 'TripCacheStatus(rampId: $rampId, tilesDownloaded: $tilesDownloaded, scoreGridReady: $scoreGridReady)';
+    return 'TripCacheStatus(stationId: $stationId, tilesDownloaded: $tilesDownloaded, scoreGridReady: $scoreGridReady)';
   }
 
   @override
@@ -498,7 +500,8 @@ class _$TripCacheStatusImpl implements _TripCacheStatus {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$TripCacheStatusImpl &&
-            (identical(other.rampId, rampId) || other.rampId == rampId) &&
+            (identical(other.stationId, stationId) ||
+                other.stationId == stationId) &&
             (identical(other.tilesDownloaded, tilesDownloaded) ||
                 other.tilesDownloaded == tilesDownloaded) &&
             (identical(other.scoreGridReady, scoreGridReady) ||
@@ -508,7 +511,7 @@ class _$TripCacheStatusImpl implements _TripCacheStatus {
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, rampId, tilesDownloaded, scoreGridReady);
+      Object.hash(runtimeType, stationId, tilesDownloaded, scoreGridReady);
 
   @JsonKey(ignore: true)
   @override
@@ -527,7 +530,7 @@ class _$TripCacheStatusImpl implements _TripCacheStatus {
 
 abstract class _TripCacheStatus implements TripCacheStatus {
   const factory _TripCacheStatus(
-      {final String? rampId,
+      {final String? stationId,
       final bool tilesDownloaded,
       final bool scoreGridReady}) = _$TripCacheStatusImpl;
 
@@ -536,11 +539,11 @@ abstract class _TripCacheStatus implements TripCacheStatus {
 
   @override
 
-  /// OSM boat-ramp id the user picked as the trip's launch anchor.
+  /// NDBC station id the user picked as the trip's launch anchor.
   /// Persisted here rather than as a first-class column so the
   /// `trip_plans` table stays generic until Phase 7 settles the
   /// pre-trip schema.
-  String? get rampId;
+  String? get stationId;
   @override
 
   /// Whether tiles for `bounds` at the configured zoom range have

@@ -101,7 +101,6 @@ flutter:
   assets:
     - assets/map_styles/
     - assets/ndbc_stations.json
-    - assets/osm_ramps.json
     - assets/osm_wrecks.json
     - assets/tide_stations.json
     - assets/species/

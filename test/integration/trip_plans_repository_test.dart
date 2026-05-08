@@ -49,7 +49,7 @@ void main() {
     () async {
       final plan = _trip(
         cacheStatus: const TripCacheStatus(
-          rampId: 'node/12345',
+          stationId: '41009',
           tilesDownloaded: true,
         ),
       );

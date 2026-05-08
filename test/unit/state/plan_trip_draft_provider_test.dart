@@ -1,13 +1,13 @@
-import 'package:ai_marine_engine/data/sources/osm/boat_ramp_record.dart';
+import 'package:ai_marine_engine/data/sources/ndbc/buoy_station.dart';
 import 'package:ai_marine_engine/state/plan_trip_draft_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _ramp = BoatRampRecord(
-  id: 'node/1',
-  name: 'Test Ramp',
-  lat: 27.5,
-  lon: -82.5,
+const _station = BuoyStation(
+  id: '41009',
+  name: 'CANAVERAL 20 NM East of Cape Canaveral, FL',
+  lat: 28.508,
+  lon: -80.185,
 );
 
 void main() {
@@ -16,7 +16,7 @@ void main() {
       var draft = const PlanTripDraft();
       expect(draft.isComplete, isFalse);
 
-      draft = draft.copyWith(ramp: _ramp);
+      draft = draft.copyWith(station: _station);
       expect(draft.isComplete, isFalse);
 
       draft = draft.copyWith(plannedStart: DateTime.utc(2026, 5, 10, 6));
@@ -31,7 +31,7 @@ void main() {
 
     test('returns false when targetSpeciesId is the empty string', () {
       final draft = const PlanTripDraft().copyWith(
-        ramp: _ramp,
+        station: _station,
         plannedStart: DateTime.utc(2026, 5, 10, 6),
         plannedEnd: DateTime.utc(2026, 5, 10, 18),
         targetSpeciesId: '',
@@ -45,19 +45,19 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final draft = container.read(planTripDraftProvider);
-      expect(draft.ramp, isNull);
+      expect(draft.station, isNull);
       expect(draft.plannedStart, isNull);
       expect(draft.plannedEnd, isNull);
       expect(draft.targetSpeciesId, isNull);
     });
 
-    test('setRamp / setTimeWindow / setSpecies write the draft fields', () {
+    test('setStation / setTimeWindow / setSpecies write the draft fields', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(planTripDraftProvider.notifier);
 
-      notifier.setRamp(_ramp);
-      expect(container.read(planTripDraftProvider).ramp, _ramp);
+      notifier.setStation(_station);
+      expect(container.read(planTripDraftProvider).station, _station);
 
       notifier.setTimeWindow(
         DateTime.utc(2026, 5, 10, 6),
@@ -77,11 +77,11 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(planTripDraftProvider.notifier);
-      notifier.setRamp(_ramp);
+      notifier.setStation(_station);
       notifier.setSpecies('red-drum');
       notifier.reset();
       final after = container.read(planTripDraftProvider);
-      expect(after.ramp, isNull);
+      expect(after.station, isNull);
       expect(after.targetSpeciesId, isNull);
       expect(after.isComplete, isFalse);
     });

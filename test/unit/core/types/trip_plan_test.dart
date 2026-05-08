@@ -50,7 +50,7 @@ void main() {
     test('preserves every field through encode + decode', () {
       final plan = _trip(
         cacheStatus: const TripCacheStatus(
-          rampId: 'node/12345',
+          stationId: '41009',
           tilesDownloaded: true,
           scoreGridReady: false,
         ),
@@ -69,9 +69,9 @@ void main() {
   });
 
   group('TripCacheStatus — defaults', () {
-    test('rampId defaults to null, flags default to false', () {
+    test('stationId defaults to null, flags default to false', () {
       const status = TripCacheStatus();
-      expect(status.rampId, isNull);
+      expect(status.stationId, isNull);
       expect(status.tilesDownloaded, isFalse);
       expect(status.scoreGridReady, isFalse);
     });

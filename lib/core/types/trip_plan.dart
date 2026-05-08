@@ -48,18 +48,18 @@ class TripPlan with _$TripPlan {
       !time.isBefore(plannedStart) && !time.isAfter(plannedEnd);
 }
 
-/// Pre-trip pre-fetch progress + ramp anchor, encoded into the trip
-/// row's `cacheStatusJson` text column. Keeping it freezed lets us
-/// extend keys (tile coverage %, score grid resolution) without
+/// Pre-trip pre-fetch progress + station anchor, encoded into the
+/// trip row's `cacheStatusJson` text column. Keeping it freezed lets
+/// us extend keys (tile coverage %, score grid resolution) without
 /// touching the Drift schema — the column stays a generic JSON blob.
 @freezed
 class TripCacheStatus with _$TripCacheStatus {
   const factory TripCacheStatus({
-    /// OSM boat-ramp id the user picked as the trip's launch anchor.
+    /// NDBC station id the user picked as the trip's launch anchor.
     /// Persisted here rather than as a first-class column so the
     /// `trip_plans` table stays generic until Phase 7 settles the
     /// pre-trip schema.
-    String? rampId,
+    String? stationId,
 
     /// Whether tiles for `bounds` at the configured zoom range have
     /// been downloaded. Set true by the 13b tile downloader once a
