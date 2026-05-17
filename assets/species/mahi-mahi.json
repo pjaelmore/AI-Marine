@@ -8,23 +8,35 @@
   "migrationModel": {
     "spatialRange": {
       "rings": [[
-        {"latitude": 24.0, "longitude": -83.5},
-        {"latitude": 31.0, "longitude": -83.5},
+        {"latitude": 25.1, "longitude": -80.3},
+        {"latitude": 25.8, "longitude": -80.1},
+        {"latitude": 27.2, "longitude": -80.0},
+        {"latitude": 28.4, "longitude": -80.3},
+        {"latitude": 29.2, "longitude": -80.8},
+        {"latitude": 30.3, "longitude": -81.2},
+        {"latitude": 31.0, "longitude": -81.0},
         {"latitude": 31.0, "longitude": -78.0},
         {"latitude": 24.0, "longitude": -78.0},
-        {"latitude": 24.0, "longitude": -83.5}
+        {"latitude": 24.0, "longitude": -80.3},
+        {"latitude": 25.1, "longitude": -80.3}
       ]]
     },
     "populations": [],
     "regionalCurves": [{
-      "regionId": "florida-offshore",
+      "regionId": "florida-atlantic-offshore",
       "regionPolygon": {
         "rings": [[
-          {"latitude": 24.0, "longitude": -83.5},
-          {"latitude": 31.0, "longitude": -83.5},
+          {"latitude": 25.1, "longitude": -80.3},
+          {"latitude": 25.8, "longitude": -80.1},
+          {"latitude": 27.2, "longitude": -80.0},
+          {"latitude": 28.4, "longitude": -80.3},
+          {"latitude": 29.2, "longitude": -80.8},
+          {"latitude": 30.3, "longitude": -81.2},
+          {"latitude": 31.0, "longitude": -81.0},
           {"latitude": 31.0, "longitude": -78.0},
           {"latitude": 24.0, "longitude": -78.0},
-          {"latitude": 24.0, "longitude": -83.5}
+          {"latitude": 24.0, "longitude": -80.3},
+          {"latitude": 25.1, "longitude": -80.3}
         ]]
       },
       "weeklyValues": [0.15,0.15,0.15,0.20,0.20,0.25,0.30,0.35,0.45,0.55,0.65,0.75,0.85,0.90,0.95,1.00,1.00,1.00,1.00,0.95,0.90,0.85,0.80,0.75,0.70,0.65,0.60,0.55,0.50,0.45,0.40,0.35,0.35,0.40,0.45,0.45,0.40,0.35,0.30,0.25,0.20,0.20,0.20,0.20,0.20,0.20,0.18,0.18,0.15,0.15,0.15,0.15]
@@ -35,7 +47,7 @@
   "conditionProfile": {
     "optimalTemp": {"minF": 80.0, "maxF": 82.0, "idealF": 81.0},
     "toleratedTemp": {"minF": 65.0, "maxF": 84.0, "idealF": 81.0},
-    "depthPreference": {"minFt": 0.0, "maxFt": 280.0, "idealFt": 3.0},
+    "depthPreference": {"minFt": 50.0, "maxFt": 800.0, "idealFt": 180.0},
     "structurePreferences": [
       {"type": "weedLine", "weight": 1.0},
       {"type": "ripCurrent", "weight": 0.8},

@@ -7,13 +7,13 @@ import '../../data/species/models/species_record.dart';
 import '../conditions/conditions_service.dart';
 import 'contributors/recent_catches_contributor.dart';
 import 'contributors/structure_proximity_contributor.dart';
-import 'contributors/time_of_day_contributor.dart';
 import 'migration_base_probability.dart';
 import 'migration_gate.dart';
 import 'modifiers/barometric_trend_modifier.dart';
 import 'modifiers/depth_modifier.dart';
 import 'modifiers/solunar_window_modifier.dart';
 import 'modifiers/tide_phase_modifier.dart';
+import 'modifiers/time_of_day_modifier.dart';
 import 'modifiers/water_temp_modifier.dart';
 import 'modifiers/wind_speed_modifier.dart';
 
@@ -196,6 +196,24 @@ class ProbabilityCalculator {
       modifierConfidences.add(depth.confidence);
     }
 
+    // Time-of-day is a modifier (not a contributor) because the wrong
+    // hour should drag the score down, not "just not add a bonus." A
+    // species with no `timeOfDayPreferences` configured returns null
+    // and is skipped — same contract as the missing-data branches
+    // above.
+    final timeOfDay = evaluateTimeOfDayModifier(
+      time: time,
+      preferences: species.conditionProfile.timeOfDayPreferences,
+    );
+    if (timeOfDay != null) {
+      modifiers.add(timeOfDay);
+      // Time-of-day is a derived signal, not a sensor reading — no
+      // station can be "unavailable." Treat it as a high-confidence
+      // computation so it doesn't drag the breakdown confidence
+      // average down when other sensors are also reporting.
+      modifierConfidences.add(1.0);
+    }
+
     // Geometric mean of modifier values, scaled to the 0–10 envelope.
     final double geometricMean;
     if (modifiers.isEmpty) {
@@ -211,11 +229,10 @@ class ProbabilityCalculator {
         base * geometricMean * (_scoreScaleMax / _modifierEnvelopeMax);
 
     // ── 5. Contributors — additive bonuses. ────────────────────────
+    // Time-of-day was a contributor through Phase 5; promoted to a
+    // modifier so the wrong hour actually penalizes (see
+    // [evaluateTimeOfDayModifier]).
     final contributors = <ContributorApplication>[
-      evaluateTimeOfDayContributor(
-        time: time,
-        preferences: species.conditionProfile.timeOfDayPreferences,
-      ),
       // Structure: getStructure returns unavailable today (Phase 7+),
       // but we still surface the row in the breakdown with value 0
       // and a "type unknown" description — transparency over silence.

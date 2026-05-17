@@ -368,12 +368,9 @@ void main() {
     );
   });
 
-  group('ProbabilityCalculator — contributors add on top', () {
-    test(
-      'time-of-day contributor adds when lookup hour is in a feeding window',
-      () async {
-        final svc = _FakeConditionsService();
-        final speciesWithWindows = SpeciesRecord(
+  group('ProbabilityCalculator — time-of-day modifier wiring', () {
+    SpeciesRecord withWindows(List<TimeOfDayPreference> windows) =>
+        SpeciesRecord(
           id: 'test',
           scientificName: 'Test',
           commonNames: const ['test'],
@@ -390,27 +387,100 @@ void main() {
               ),
             ],
           ),
-          conditionProfile: _profile.copyWith(
-            timeOfDayPreferences: const [
-              TimeOfDayPreference(startHour: 17, endHour: 20, weight: 0.8),
-            ],
-          ),
+          conditionProfile: _profile.copyWith(timeOfDayPreferences: windows),
           regulatoryProfile: const RegulatoryProfile(),
           confidence: ConfidenceLevel.exploratory,
         );
+
+    test(
+      'hour inside a feeding window surfaces a >1.0 time_of_day modifier',
+      () async {
+        // Empty FakeConditionsService → no other modifiers fire.
+        // Time-of-day modifier is the only entry in the breakdown.
+        final svc = _FakeConditionsService();
         final calc = ProbabilityCalculator(conditions: svc);
         final r = await calc.scoreLocation(
-          species: speciesWithWindows,
+          species: withWindows(const [
+            TimeOfDayPreference(startHour: 17, endHour: 20, weight: 0.8),
+          ]),
           location: _bostonHarbor,
           time: _refTime, // 18:00 UTC, inside [17, 20]
         );
-        // raw = 5.0 (base 1 × neutral GM 1 × 5)
-        // additiveTotal = time-of-day 0.8 + recent catches 0.0 = 0.8
-        // final = 5.8
-        expect(r.reasoning.additiveTotal, closeTo(0.8, 1e-9));
-        expect(r.finalScore, closeTo(5.8, 1e-9));
+        final tod = r.reasoning.modifiers
+            .where((m) => m.name == 'time_of_day')
+            .toList();
+        expect(tod, hasLength(1));
+        // weight 0.8 → 0.7 + 0.8 * 0.8 = 1.34
+        expect(tod.first.value, closeTo(1.34, 1e-9));
+        // No contributors fire (no catches, no structure data).
+        expect(r.reasoning.additiveTotal, 0);
+        // raw = base 1.0 × GM 1.34 × 5 = 6.7
+        expect(
+          r.reasoning.rawScoreBeforeContributors,
+          closeTo(6.7, 1e-9),
+        );
       },
     );
+
+    test(
+      'hour outside every window drags the score below the neutral baseline',
+      () async {
+        // Without the time-of-day promotion, a no-other-conditions
+        // score would sit at 5.0 (base × neutral GM × 5). With the
+        // outside-window penalty (0.4 → only modifier), GM = 0.4,
+        // raw = base 1.0 × 0.4 × 5 = 2.0. This is the mahi-at-night
+        // regression test.
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: withWindows(const [
+            TimeOfDayPreference(startHour: 6, endHour: 10, weight: 1.0),
+            TimeOfDayPreference(startHour: 16, endHour: 19, weight: 0.9),
+          ]),
+          location: _bostonHarbor,
+          time: DateTime.utc(2026, 5, 22, 23), // outside every window
+        );
+        final tod =
+            r.reasoning.modifiers.singleWhere((m) => m.name == 'time_of_day');
+        expect(tod.value, closeTo(0.4, 1e-9));
+        expect(r.reasoning.rawScoreBeforeContributors, closeTo(2.0, 1e-9));
+        expect(r.finalScore, lessThan(5.0));
+      },
+    );
+
+    test(
+      'species with no timeOfDayPreferences → modifier is omitted',
+      () async {
+        // _profile defaults to an empty preferences list. The modifier
+        // should be skipped entirely (transparency over silently neutral)
+        // and the score should match the pre-promotion "no signal"
+        // baseline.
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final tod = r.reasoning.modifiers.where((m) => m.name == 'time_of_day');
+        expect(tod, isEmpty);
+      },
+    );
+
+    test('contributors block no longer carries a time_of_day entry', () async {
+      // Regression guard against re-introducing it as a contributor.
+      final svc = _FakeConditionsService();
+      final calc = ProbabilityCalculator(conditions: svc);
+      final r = await calc.scoreLocation(
+        species: withWindows(const [
+          TimeOfDayPreference(startHour: 17, endHour: 20, weight: 0.8),
+        ]),
+        location: _bostonHarbor,
+        time: _refTime,
+      );
+      final names = r.reasoning.contributors.map((c) => c.name).toList();
+      expect(names, isNot(contains('time_of_day')));
+    });
   });
 
   group('ProbabilityCalculator — depth modifier wiring', () {
