@@ -7,10 +7,12 @@ import '../../data/sources/ndbc/buoy_station.dart';
 import '../../data/sources/osm/wreck_record.dart';
 import '../../state/component_providers.dart';
 import '../../state/engine_providers.dart';
+import '../../state/heatmap_grid_provider.dart';
 import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
 import '../design/colors.dart';
 import '../design/spacing.dart';
+import '../design/typography.dart';
 import '../picker/species_chip.dart';
 import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
@@ -98,7 +100,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => const <ml.LatLng>[],
     );
 
-    final heatmapCells = _watchHeatmapCells(ref);
+    final heatmapState = _resolveHeatmapState(ref);
 
     return Scaffold(
       body: Stack(
@@ -111,7 +113,7 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             vesselPosition: vesselMlPosition,
             stationPositions: stationPositions,
             wreckPositions: wreckPositions,
-            heatmapCells: heatmapCells,
+            heatmapCells: heatmapState.cells,
             onTap: _onChartTap,
             onCameraIdle: _onCameraIdle,
           ),
@@ -124,12 +126,22 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
                 MarineSpacing.md + 2,
                 0,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SpeciesChip(),
-                  _PlanTripButton(onPressed: _openTripPlanner),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SpeciesChip(),
+                      _PlanTripButton(onPressed: _openTripPlanner),
+                    ],
+                  ),
+                  const SizedBox(height: MarineSpacing.sm),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _HeatmapStatusBadge(state: heatmapState),
+                  ),
                 ],
               ),
             ),
@@ -224,14 +236,15 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
     setState(() => _viewportBounds = core);
   }
 
-  /// Watches [scoreGridProvider] for the current viewport + species +
-  /// time, and converts the resulting [ScoreResult] list into heatmap
-  /// cells via [buildHeatmapCells]. Empty list while bounds are
-  /// unknown or the grid is loading / errored — the chart just shows
-  /// no overlay until cells resolve.
-  List<HeatmapCellSpec> _watchHeatmapCells(WidgetRef ref) {
+  /// Watches [heatmapGridProvider] (the resilient one — per-cell
+  /// failures don't tank the whole grid) and resolves to a small
+  /// status record the chart shell consumes for both the rendered
+  /// cells AND the status badge in the top bar.
+  _HeatmapResolved _resolveHeatmapState(WidgetRef ref) {
     final bounds = _viewportBounds;
-    if (bounds == null) return const [];
+    if (bounds == null) {
+      return const _HeatmapResolved.waiting('Waiting for viewport…');
+    }
     final speciesId = ref.watch(selectedSpeciesIdProvider);
     final time = ref.watch(selectedTimeProvider);
     final query = (
@@ -240,10 +253,14 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       time: time,
       resolutionNm: _heatmapResolutionNm,
     );
-    final gridAsync = ref.watch(scoreGridProvider(query));
-    return gridAsync.maybeWhen(
-      data: (grid) => buildHeatmapCells(grid, _heatmapResolutionNm),
-      orElse: () => const [],
+    final gridAsync = ref.watch(heatmapGridProvider(query));
+    return gridAsync.when(
+      loading: () => const _HeatmapResolved.loading('Scoring heatmap…'),
+      error: (e, _) => _HeatmapResolved.error('Heatmap error: $e'),
+      data: (grid) {
+        final cells = buildHeatmapCells(grid, _heatmapResolutionNm);
+        return _HeatmapResolved.data(cells, grid.length, cells.length);
+      },
     );
   }
 
@@ -280,6 +297,114 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       }
     }
     return best;
+  }
+}
+
+/// Snapshot of the heatmap-grid provider for one render — the cells
+/// to paint plus a short status string for the badge above the chart.
+class _HeatmapResolved {
+  const _HeatmapResolved._({
+    required this.cells,
+    required this.label,
+    required this.tone,
+    this.totalCells,
+    this.drawnCells,
+  });
+
+  const _HeatmapResolved.waiting(String label)
+      : this._(cells: const [], label: label, tone: _Tone.idle);
+
+  const _HeatmapResolved.loading(String label)
+      : this._(cells: const [], label: label, tone: _Tone.loading);
+
+  const _HeatmapResolved.error(String label)
+      : this._(cells: const [], label: label, tone: _Tone.error);
+
+  const _HeatmapResolved.data(
+    List<HeatmapCellSpec> cells,
+    int totalCells,
+    int drawnCells,
+  ) : this._(
+          cells: cells,
+          label: '',
+          tone: _Tone.data,
+          totalCells: totalCells,
+          drawnCells: drawnCells,
+        );
+
+  final List<HeatmapCellSpec> cells;
+  final String label;
+  final _Tone tone;
+  final int? totalCells;
+  final int? drawnCells;
+}
+
+enum _Tone { idle, loading, data, error }
+
+/// Compact chip below the species + plan-trip row showing the
+/// heatmap's current state — loading / cell count / error. Visible
+/// even on an empty heatmap so the user knows the engine ran.
+class _HeatmapStatusBadge extends StatelessWidget {
+  const _HeatmapStatusBadge({required this.state});
+
+  final _HeatmapResolved state;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = state.tone;
+    final color = switch (tone) {
+      _Tone.error => MarineColors.warnAmber,
+      _Tone.data => MarineColors.actionTeal,
+      _ => MarineColors.onDark.withAlpha(180),
+    };
+    final text = tone == _Tone.data
+        ? 'Heatmap: ${state.drawnCells} / ${state.totalCells} cells'
+        : state.label;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MarineSpacing.md,
+        vertical: MarineSpacing.xs + 2,
+      ),
+      decoration: BoxDecoration(
+        color: MarineColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: MarineColors.divider),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (tone == _Tone.loading)
+            const SizedBox(
+              width: 12,
+              height: 12,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  MarineColors.actionTeal,
+                ),
+              ),
+            )
+          else
+            Icon(
+              tone == _Tone.error ? Icons.error_outline : Icons.layers_outlined,
+              size: 14,
+              color: color,
+            ),
+          const SizedBox(width: MarineSpacing.xs + 2),
+          Flexible(
+            child: Text(
+              text,
+              style: MarineTypography.label.copyWith(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
