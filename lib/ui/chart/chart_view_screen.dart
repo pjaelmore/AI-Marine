@@ -6,6 +6,7 @@ import '../../core/types/lat_lng.dart';
 import '../../data/sources/ndbc/buoy_station.dart';
 import '../../data/sources/osm/wreck_record.dart';
 import '../../state/component_providers.dart';
+import '../../state/engine_providers.dart';
 import '../../state/osm_wrecks_provider.dart';
 import '../../state/vessel_providers.dart';
 import '../design/colors.dart';
@@ -15,15 +16,17 @@ import '../recommendation/recommendation_overlay.dart';
 import '../recommendation/station_overlay.dart';
 import '../recommendation/wreck_info_sheet.dart';
 import '../trip/plan_trip_screen.dart';
+import 'heatmap_palette.dart';
 import 'marine_chart_view.dart';
 
-/// Default initial camera target — Tampa Bay, FL.
+/// Default initial camera target — Cape Canaveral, FL.
 ///
-/// The v1 species coverage is Florida inshore + offshore (snook, redfish,
-/// tarpon, snapper, etc.) so the chart opens over the central west coast
-/// where the calibration tuple was tuned. Replaced by user_preferences
-/// home-waters once that lands in a later phase.
-const _defaultCenter = ml.LatLng(27.94, -82.45);
+/// Opens slightly offshore (~10 nm east of the cape) so both the coast
+/// and the offshore NDBC ring (41009 Canaveral 20NM East, 41010, etc.)
+/// are visible at zoom 9. The v1 species coverage is Florida saltwater
+/// generally; the user_preferences home-waters override lands in a
+/// later phase.
+const _defaultCenter = ml.LatLng(28.4, -80.4);
 const _defaultZoom = 9.0;
 
 /// A tap within this many nautical miles of a buoy or wreck marker is
@@ -33,6 +36,14 @@ const _defaultZoom = 9.0;
 /// bleeding into adjacent markers (real FL features are spaced miles
 /// apart).
 const _markerTapRadiusNm = 0.5;
+
+/// Heatmap-grid resolution in nautical miles. 8 nm at zoom 9 gives
+/// roughly 25–50 cells across the visible viewport — coarse enough
+/// to render quickly with cold caches (~10 s on first paint), fine
+/// enough to surface where the score peaks are. Tightenable to the
+/// Phase-6 0.6 nm target once the score grid is cached offline by
+/// the slice 13b–d tile / score pre-fetch.
+const _heatmapResolutionNm = 8.0;
 
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});
@@ -51,6 +62,11 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
 
   /// Wreck the user tapped that should drive the wreck info overlay.
   WreckRecord? _selectedWreck;
+
+  /// Latest viewport bounds reported by [MarineChartView]'s
+  /// `onCameraIdle`. Drives the heatmap grid lookup. Null until the
+  /// chart's first idle event after style load.
+  LatLngBounds? _viewportBounds;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +98,8 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
       orElse: () => const <ml.LatLng>[],
     );
 
+    final heatmapCells = _watchHeatmapCells(ref);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -93,7 +111,9 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
             vesselPosition: vesselMlPosition,
             stationPositions: stationPositions,
             wreckPositions: wreckPositions,
+            heatmapCells: heatmapCells,
             onTap: _onChartTap,
+            onCameraIdle: _onCameraIdle,
           ),
           SafeArea(
             bottom: false,
@@ -184,6 +204,46 @@ class _ChartViewScreenState extends ConsumerState<ChartViewScreen> {
   Future<void> _openTripPlanner() async {
     await Navigator.of(context).push<String?>(
       MaterialPageRoute(builder: (_) => const PlanTripScreen()),
+    );
+  }
+
+  /// MapLibreMap reports the camera has settled. Capture the visible
+  /// bounds in state so the heatmap-grid lookup keys against them.
+  void _onCameraIdle(ml.LatLngBounds bounds) {
+    final core = LatLngBounds(
+      southwest: LatLng(
+        latitude: bounds.southwest.latitude,
+        longitude: bounds.southwest.longitude,
+      ),
+      northeast: LatLng(
+        latitude: bounds.northeast.latitude,
+        longitude: bounds.northeast.longitude,
+      ),
+    );
+    if (_viewportBounds == core) return;
+    setState(() => _viewportBounds = core);
+  }
+
+  /// Watches [scoreGridProvider] for the current viewport + species +
+  /// time, and converts the resulting [ScoreResult] list into heatmap
+  /// cells via [buildHeatmapCells]. Empty list while bounds are
+  /// unknown or the grid is loading / errored — the chart just shows
+  /// no overlay until cells resolve.
+  List<HeatmapCellSpec> _watchHeatmapCells(WidgetRef ref) {
+    final bounds = _viewportBounds;
+    if (bounds == null) return const [];
+    final speciesId = ref.watch(selectedSpeciesIdProvider);
+    final time = ref.watch(selectedTimeProvider);
+    final query = (
+      speciesId: speciesId,
+      bbox: bounds,
+      time: time,
+      resolutionNm: _heatmapResolutionNm,
+    );
+    final gridAsync = ref.watch(scoreGridProvider(query));
+    return gridAsync.maybeWhen(
+      data: (grid) => buildHeatmapCells(grid, _heatmapResolutionNm),
+      orElse: () => const [],
     );
   }
 

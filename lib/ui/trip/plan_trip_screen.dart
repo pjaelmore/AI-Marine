@@ -314,7 +314,7 @@ class _StationStepState extends ConsumerState<_StationStep> {
     final positionAsync = ref.watch(currentPositionProvider);
     final origin = positionAsync.maybeWhen(
       data: (p) => LatLng(latitude: p.latitude, longitude: p.longitude),
-      orElse: () => const LatLng(latitude: 27.94, longitude: -82.45),
+      orElse: () => const LatLng(latitude: 28.4, longitude: -80.4),
     );
     return stationsAsync.when(
       loading: () => const Center(
