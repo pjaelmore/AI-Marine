@@ -11,6 +11,7 @@ import '../../data/sources/ndbc/buoy_observation.dart';
 import '../../data/sources/ndbc/ndbc_adapter.dart';
 import '../../data/sources/nws_forecast/nws_adapter.dart';
 import '../../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
+import '../../data/sources/open_topo_data/open_topo_data_adapter.dart';
 import '../../data/sources/solunar/solunar_adapter.dart';
 import '../../data/sources/source_adapter.dart';
 import '../../data/sources/tides_currents/tide_phase_computer.dart';
@@ -33,6 +34,7 @@ class ConditionsServiceImpl implements ConditionsService {
     required this.nws,
     required this.solunar,
     this.openMeteo,
+    this.bathymetry,
     this.catches,
     this.cache,
   });
@@ -47,6 +49,12 @@ class ConditionsServiceImpl implements ConditionsService {
   /// through to this model-derived SST source so offshore points get
   /// a real reading instead of "no data."
   final OpenMeteoMarineAdapter? openMeteo;
+
+  /// OpenTopoData GEBCO bathymetry source. When null, `getDepth` stays
+  /// in the Phase 3 "unavailable" placeholder mode; when wired, depth
+  /// queries route through this adapter so the depth modifier can
+  /// finally fire against species `depthPreference` profiles.
+  final OpenTopoDataAdapter? bathymetry;
 
   final CatchesDao? catches;
 
@@ -335,8 +343,31 @@ class ConditionsServiceImpl implements ConditionsService {
 
   @override
   Future<ConditionResult<double>> getDepth(LatLng loc) async {
-    // Depth is sourced from ENC chart bathymetry / NMEA 2000; not in v1.
-    return _unavailableDouble(DateTime.now().toUtc());
+    final bathy = bathymetry;
+    if (bathy == null) {
+      // No adapter wired — preserve the Phase 3 placeholder behavior
+      // for tests and bare-bones service configurations.
+      return _unavailableDouble(DateTime.now().toUtc());
+    }
+    final result = await _cachedFetch<double>(
+      key: 'depth:${_locKey(loc)}',
+      dataType: 'depth',
+      source: 'open_topo_data',
+      toJsonT: (v) => v,
+      fromJsonT: (j) => (j as num).toDouble(),
+      fetch: () async {
+        if (!bathy.canServe(loc, DateTime.now().toUtc())) return null;
+        try {
+          return await bathy.fetch(loc, DateTime.now().toUtc());
+        } on SourceException {
+          // Land taps and network failures both flow through here —
+          // the calculator surfaces the "no bathymetry" placeholder
+          // either way.
+          return null;
+        }
+      },
+    );
+    return result ?? _unavailableDouble(DateTime.now().toUtc());
   }
 
   @override

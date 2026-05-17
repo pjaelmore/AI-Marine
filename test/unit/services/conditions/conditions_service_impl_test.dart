@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,6 +9,7 @@ import 'package:ai_marine_engine/data/sources/ndbc/buoy_station.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/ndbc_adapter.dart';
 import 'package:ai_marine_engine/data/sources/nws_forecast/nws_adapter.dart';
 import 'package:ai_marine_engine/data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
+import 'package:ai_marine_engine/data/sources/open_topo_data/open_topo_data_adapter.dart';
 import 'package:ai_marine_engine/data/sources/solunar/solunar_adapter.dart';
 import 'package:ai_marine_engine/data/sources/tides_currents/tide_station.dart';
 import 'package:ai_marine_engine/data/sources/tides_currents/tides_currents_adapter.dart';
@@ -105,6 +107,7 @@ String _nwsForecastFixture() => File(
 ConditionsServiceImpl _buildService({
   required Map<String, String> routes,
   bool wireOpenMeteo = false,
+  bool wireBathymetry = false,
 }) {
   final dio = Dio()..httpClientAdapter = _RoutingStub(routes);
   final ndbc = NdbcAdapter(http: dio)
@@ -119,6 +122,7 @@ ConditionsServiceImpl _buildService({
     nws: nws,
     solunar: solunar,
     openMeteo: wireOpenMeteo ? OpenMeteoMarineAdapter(http: dio) : null,
+    bathymetry: wireBathymetry ? OpenTopoDataAdapter(http: dio) : null,
   );
 }
 
@@ -301,7 +305,9 @@ void main() {
       expect(r.source, DataSource.unavailable);
     });
 
-    test('getDepth', () async {
+    test('getDepth with no bathymetry wired stays unavailable', () async {
+      // Back-compat: services constructed without bathymetry preserve
+      // the Phase 3 behavior so legacy test fixtures keep passing.
       final r = await svc.getDepth(_bostonHarbor);
       expect(r.source, DataSource.unavailable);
     });
@@ -311,6 +317,69 @@ void main() {
       expect(r.source, DataSource.unavailable);
       expect(r.value.type, StructureType.unknown);
     });
+  });
+
+  group('getDepth — OpenTopoData bathymetry', () {
+    String gebcoOcean({num elevation = -45}) => jsonEncode({
+          'status': 'OK',
+          'results': [
+            {
+              'elevation': elevation,
+              'location': {'lat': 42.36, 'lng': -70.55},
+              'dataset': 'gebco2020',
+            },
+          ],
+        });
+
+    String gebcoLand({num elevation = 12}) => jsonEncode({
+          'status': 'OK',
+          'results': [
+            {
+              'elevation': elevation,
+              'location': {'lat': 42.36, 'lng': -70.55},
+              'dataset': 'gebco2020',
+            },
+          ],
+        });
+
+    test(
+      'returns depth in feet from GEBCO when wired and the tap is offshore',
+      () async {
+        final svc = _buildService(
+          routes: {'api.opentopodata.org': gebcoOcean(elevation: -45)},
+          wireBathymetry: true,
+        );
+        final r = await svc.getDepth(_bostonHarbor);
+        expect(r.source, DataSource.openTopoData);
+        expect(r.value, closeTo(147.638, 1e-3)); // 45 m → 147.638 ft
+        expect(r.unit, 'ft');
+      },
+    );
+
+    test(
+      'returns unavailable when the GEBCO sample is on land',
+      () async {
+        final svc = _buildService(
+          routes: {'api.opentopodata.org': gebcoLand(elevation: 12)},
+          wireBathymetry: true,
+        );
+        final r = await svc.getDepth(_bostonHarbor);
+        // The adapter treats positive elevation as a SourceException so
+        // the depth modifier never sees a misleading zero — service
+        // surfaces the unavailable placeholder.
+        expect(r.source, DataSource.unavailable);
+      },
+    );
+
+    test(
+      'returns unavailable when the GEBCO API fails',
+      () async {
+        // No route registered → 404 → SourceException → unavailable.
+        final svc = _buildService(routes: {}, wireBathymetry: true);
+        final r = await svc.getDepth(_bostonHarbor);
+        expect(r.source, DataSource.unavailable);
+      },
+    );
   });
 
   group('getRecentCatches', () {

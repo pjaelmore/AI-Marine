@@ -10,6 +10,7 @@ import '../data/sources/ndbc/buoy_station.dart';
 import '../data/sources/ndbc/ndbc_adapter.dart';
 import '../data/sources/nws_forecast/nws_adapter.dart';
 import '../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
+import '../data/sources/open_topo_data/open_topo_data_adapter.dart';
 import '../data/sources/solunar/solunar_adapter.dart';
 import '../data/sources/tides_currents/tides_currents_adapter.dart';
 import '../services/conditions/conditions_service.dart';
@@ -55,6 +56,13 @@ final solunarAdapterProvider = Provider<SolunarAdapter>((ref) {
 /// setup.
 final openMeteoMarineAdapterProvider = Provider<OpenMeteoMarineAdapter>((ref) {
   return OpenMeteoMarineAdapter(http: ref.watch(dioProvider));
+});
+
+/// OpenTopoData GEBCO bathymetry adapter — global ocean depth lookup
+/// so the depth modifier can fire against species `depthPreference`
+/// profiles. Static-data source; no auth.
+final openTopoDataAdapterProvider = Provider<OpenTopoDataAdapter>((ref) {
+  return OpenTopoDataAdapter(http: ref.watch(dioProvider));
 });
 
 /// Four-tier cache manager (TDD §2.1.4). Composed once per app session.
@@ -105,6 +113,7 @@ final conditionsServiceProvider = FutureProvider<ConditionsService>((
     nws: nws,
     solunar: solunar,
     openMeteo: ref.watch(openMeteoMarineAdapterProvider),
+    bathymetry: ref.watch(openTopoDataAdapterProvider),
     catches: db.catchesDao,
     cache: ref.watch(cacheManagerProvider),
   );

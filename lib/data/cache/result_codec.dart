@@ -22,6 +22,9 @@ String encodeConditionResult<T>(
     'fA': r.fetchedAt.millisecondsSinceEpoch,
     'vU': r.validUntil.millisecondsSinceEpoch,
     'c': r.confidence,
+    // Optional fields — only emit when set so old cache rows don't
+    // grow new keys gratuitously.
+    if (r.observedAt != null) 'oA': r.observedAt!.millisecondsSinceEpoch,
   });
 }
 
@@ -33,6 +36,7 @@ ConditionResult<T> decodeConditionResult<T>(
   T Function(Object? rawValue) fromJsonT,
 ) {
   final m = jsonDecode(json) as Map<String, dynamic>;
+  final observedAtRaw = m['oA'];
   return ConditionResult<T>(
     value: fromJsonT(m['v']),
     unit: m['unit'] as String,
@@ -47,5 +51,11 @@ ConditionResult<T> decodeConditionResult<T>(
       isUtc: true,
     ),
     confidence: (m['c'] as num).toDouble(),
+    observedAt: observedAtRaw == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(
+            observedAtRaw as int,
+            isUtc: true,
+          ),
   );
 }
