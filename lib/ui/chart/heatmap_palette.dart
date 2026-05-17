@@ -27,40 +27,31 @@ class HeatmapPaletteStop {
   final double opacity;
 }
 
-/// Five-stop heatmap palette from TDD §10.2.2. Amber for tepid 4–7
-/// scores, transitioning through olive at the 7.0 inflection, up to
-/// deep teal-green for peak 9.0+. Scores under 4.0 render as
-/// transparent (no cell).
+/// Three-stop heatmap palette focused on "actually good" spots —
+/// olive transition at the 7.0 inflection, teal-mid for solid 7.5–9.0
+/// fishing, deep teal for peak 9.0+. Scores under 7.0 render no cell
+/// so the chart isn't drowned in tepid amber where fishing is just
+/// "fine." TDD §10.2.2's amber bands are intentionally omitted — the
+/// heatmap surfaces *recommendations*, not "here's everywhere I
+/// scored you something."
 const heatmapPalette = <HeatmapPaletteStop>[
-  HeatmapPaletteStop(
-    minScore: 4.0,
-    maxScore: 5.5,
-    color: MarineColors.warnAmber,
-    opacity: 0.20,
-  ),
-  HeatmapPaletteStop(
-    minScore: 5.5,
-    maxScore: 7.0,
-    color: MarineColors.warnAmber,
-    opacity: 0.35,
-  ),
   HeatmapPaletteStop(
     minScore: 7.0,
     maxScore: 7.5,
-    color: Color(0xFF7B8A4F), // olive midpoint between amber and teal
-    opacity: 0.30,
+    color: Color(0xFF7B8A4F), // olive transition
+    opacity: 0.35,
   ),
   HeatmapPaletteStop(
     minScore: 7.5,
     maxScore: 9.0,
     color: MarineColors.actionTeal,
-    opacity: 0.35,
+    opacity: 0.45,
   ),
   HeatmapPaletteStop(
     minScore: 9.0,
     maxScore: 10.001, // inclusive of a perfect 10
     color: MarineColors.actionTeal,
-    opacity: 0.45,
+    opacity: 0.65,
   ),
 ];
 

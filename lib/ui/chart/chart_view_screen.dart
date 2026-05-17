@@ -39,13 +39,13 @@ const _defaultZoom = 9.0;
 /// apart).
 const _markerTapRadiusNm = 0.5;
 
-/// Heatmap-grid resolution in nautical miles. 8 nm at zoom 9 gives
-/// roughly 25–50 cells across the visible viewport — coarse enough
-/// to render quickly with cold caches (~10 s on first paint), fine
-/// enough to surface where the score peaks are. Tightenable to the
-/// Phase-6 0.6 nm target once the score grid is cached offline by
-/// the slice 13b–d tile / score pre-fetch.
-const _heatmapResolutionNm = 8.0;
+/// Heatmap-grid resolution in nautical miles. 12 nm at zoom 9 gives
+/// roughly 15–25 cells across the visible viewport — coarse enough
+/// that the cold-cache pass finishes in a few seconds, fine enough
+/// to surface where the score peaks are. Tightenable to the Phase-6
+/// 0.6 nm target once the score grid is cached offline by the slice
+/// 13b–d tile / score pre-fetch.
+const _heatmapResolutionNm = 12.0;
 
 class ChartViewScreen extends ConsumerStatefulWidget {
   const ChartViewScreen({super.key});
