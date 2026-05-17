@@ -224,15 +224,57 @@ void main() {
     );
 
     testWidgets(
-      'empty modifiers list shows the no-data fallback label',
+      'empty modifiers list shows the no-modifiers fallback label',
       (tester) async {
         await tester.pumpWidget(
           _harness(RecommendationCardSheet(result: _scoreFor())),
         );
+        expect(find.text('NO MODIFIERS FIRED'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'unavailable modifiers route to the muted "No data here" subsection',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            RecommendationCardSheet(
+              result: _scoreFor(
+                modifiers: [
+                  // One active modifier so the user still sees a bar.
+                  _mod(name: 'water_temperature', value: 1.8),
+                  // Two unavailable rows the calculator would surface
+                  // when the sensors went unavailable.
+                  const ModifierApplication(
+                    name: 'depth',
+                    value: 0,
+                    rangeMin: 0,
+                    rangeMax: 2,
+                    description: 'No bathymetry data for this location',
+                    available: false,
+                  ),
+                  const ModifierApplication(
+                    name: 'tide_phase',
+                    value: 0,
+                    rangeMin: 0,
+                    rangeMax: 2,
+                    description: 'No tide station in range',
+                    available: false,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        expect(find.text('NO DATA HERE'), findsOneWidget);
+        expect(find.text('NO DATA'), findsNWidgets(2));
         expect(
-          find.text('NO MODIFIERS FIRED (DATA UNAVAILABLE)'),
+          find.text('No bathymetry data for this location'),
           findsOneWidget,
         );
+        expect(find.text('No tide station in range'), findsOneWidget);
+        // Unavailable rows must not render the multiplier number.
+        expect(find.text('×0.00'), findsNothing);
       },
     );
   });

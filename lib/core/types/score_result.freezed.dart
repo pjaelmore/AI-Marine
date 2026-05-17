@@ -198,6 +198,7 @@ mixin _$ModifierApplication {
   double get rangeMin => throw _privateConstructorUsedError;
   double get rangeMax => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
+  bool get available => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -216,7 +217,8 @@ abstract class $ModifierApplicationCopyWith<$Res> {
       double value,
       double rangeMin,
       double rangeMax,
-      String description});
+      String description,
+      bool available});
 }
 
 /// @nodoc
@@ -237,6 +239,7 @@ class _$ModifierApplicationCopyWithImpl<$Res, $Val extends ModifierApplication>
     Object? rangeMin = null,
     Object? rangeMax = null,
     Object? description = null,
+    Object? available = null,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -259,6 +262,10 @@ class _$ModifierApplicationCopyWithImpl<$Res, $Val extends ModifierApplication>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
+      available: null == available
+          ? _value.available
+          : available // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -276,7 +283,8 @@ abstract class _$$ModifierApplicationImplCopyWith<$Res>
       double value,
       double rangeMin,
       double rangeMax,
-      String description});
+      String description,
+      bool available});
 }
 
 /// @nodoc
@@ -295,6 +303,7 @@ class __$$ModifierApplicationImplCopyWithImpl<$Res>
     Object? rangeMin = null,
     Object? rangeMax = null,
     Object? description = null,
+    Object? available = null,
   }) {
     return _then(_$ModifierApplicationImpl(
       name: null == name
@@ -317,6 +326,10 @@ class __$$ModifierApplicationImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
+      available: null == available
+          ? _value.available
+          : available // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -329,7 +342,8 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
       required this.value,
       required this.rangeMin,
       required this.rangeMax,
-      required this.description});
+      required this.description,
+      this.available = true});
 
   factory _$ModifierApplicationImpl.fromJson(Map<String, dynamic> json) =>
       _$$ModifierApplicationImplFromJson(json);
@@ -344,10 +358,13 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
   final double rangeMax;
   @override
   final String description;
+  @override
+  @JsonKey()
+  final bool available;
 
   @override
   String toString() {
-    return 'ModifierApplication(name: $name, value: $value, rangeMin: $rangeMin, rangeMax: $rangeMax, description: $description)';
+    return 'ModifierApplication(name: $name, value: $value, rangeMin: $rangeMin, rangeMax: $rangeMax, description: $description, available: $available)';
   }
 
   @override
@@ -362,13 +379,15 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
             (identical(other.rangeMax, rangeMax) ||
                 other.rangeMax == rangeMax) &&
             (identical(other.description, description) ||
-                other.description == description));
+                other.description == description) &&
+            (identical(other.available, available) ||
+                other.available == available));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, name, value, rangeMin, rangeMax, description);
+  int get hashCode => Object.hash(
+      runtimeType, name, value, rangeMin, rangeMax, description, available);
 
   @JsonKey(ignore: true)
   @override
@@ -391,7 +410,8 @@ abstract class _ModifierApplication implements ModifierApplication {
       required final double value,
       required final double rangeMin,
       required final double rangeMax,
-      required final String description}) = _$ModifierApplicationImpl;
+      required final String description,
+      final bool available}) = _$ModifierApplicationImpl;
 
   factory _ModifierApplication.fromJson(Map<String, dynamic> json) =
       _$ModifierApplicationImpl.fromJson;
@@ -406,6 +426,8 @@ abstract class _ModifierApplication implements ModifierApplication {
   double get rangeMax;
   @override
   String get description;
+  @override
+  bool get available;
   @override
   @JsonKey(ignore: true)
   _$$ModifierApplicationImplCopyWith<_$ModifierApplicationImpl> get copyWith =>

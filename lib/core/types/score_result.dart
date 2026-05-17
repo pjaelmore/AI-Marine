@@ -21,6 +21,15 @@ class GateResult with _$GateResult {
 /// One modifier's contribution to the multiplicative product. [value] is
 /// the multiplier (>1 boosts, <1 dampens, ==1 neutral); [rangeMin] and
 /// [rangeMax] frame the bar visualisation in the recommendation card.
+///
+/// **[available] = false** marks a modifier that surfaces in the breakdown
+/// for transparency but **is excluded from the geometric mean**. Used when
+/// a sensor returned `DataSource.unavailable` (no NDBC station in range,
+/// no bathymetry, etc.) — the calculator emits a placeholder row so the
+/// user can see *what data is missing* rather than the calculator silently
+/// dropping the dimension. TDD §2.1.3 says "skip the modifier" — that
+/// rule was about not penalizing with a fake neutral 1.0, not about
+/// hiding the gap from the user.
 @freezed
 class ModifierApplication with _$ModifierApplication {
   const factory ModifierApplication({
@@ -29,6 +38,7 @@ class ModifierApplication with _$ModifierApplication {
     required double rangeMin,
     required double rangeMax,
     required String description,
+    @Default(true) bool available,
   }) = _ModifierApplication;
 
   factory ModifierApplication.fromJson(Map<String, dynamic> json) =>

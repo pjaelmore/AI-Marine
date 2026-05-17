@@ -61,17 +61,22 @@ ModifierApplication? evaluateTimeOfDayModifier({
     }
   }
 
+  final windowList = preferences
+      .map((p) => '${_hh(p.startHour)}–${_hh(p.endHour)}')
+      .join(', ');
   final double value;
   final String description;
   if (bestMatch == null) {
     value = _outsideWindowFloor;
-    description = 'Outside feeding windows (hour ${_hh(hour)})';
+    description = 'Outside feeding windows — hour ${_hh(hour)} '
+        '(species feeds $windowList)';
   } else {
     final w = bestWeight.clamp(0.0, 1.0);
     value = 0.7 + w * 0.8;
     description = 'Hour ${_hh(hour)} inside feeding window '
         '${_hh(bestMatch.startHour)}–${_hh(bestMatch.endHour)} '
-        '(weight ${w.toStringAsFixed(2)})';
+        '(weight ${w.toStringAsFixed(2)}; '
+        'species feeds $windowList)';
   }
 
   return ModifierApplication(

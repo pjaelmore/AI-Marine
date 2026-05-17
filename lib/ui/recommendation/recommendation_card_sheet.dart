@@ -302,11 +302,13 @@ class _ContributorsBlock extends StatelessWidget {
   }
 }
 
-/// Modifiers section — splits boosting / dampening / unverified into
-/// labelled subsections. Boosting (value > 1) appears first because
-/// it's what the user came to learn ("why is this spot good?"); the
-/// dampening section explains the ceiling; unverified rows surface
-/// last so the user sees what *isn't* peer-reviewed.
+/// Modifiers section — splits boosting / dampening / unavailable /
+/// unverified into labelled subsections. Boosting (value > 1) appears
+/// first because it's what the user came to learn ("why is this spot
+/// good?"); dampening explains the ceiling; *unavailable* rows surface
+/// next so the user can see what data is missing (no NDBC station, no
+/// bathymetry, etc.); unverified rows come last so the user sees what
+/// *isn't* peer-reviewed.
 class _ModifiersBlock extends StatelessWidget {
   const _ModifiersBlock({
     required this.result,
@@ -320,9 +322,12 @@ class _ModifiersBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final boosting = <ModifierApplication>[];
     final dampening = <ModifierApplication>[];
+    final unavailable = <ModifierApplication>[];
     final unverified = <ModifierApplication>[];
     for (final m in result.reasoning.modifiers) {
-      if (unverifiedNames.contains(m.name)) {
+      if (!m.available) {
+        unavailable.add(m);
+      } else if (unverifiedNames.contains(m.name)) {
         unverified.add(m);
       } else if (m.value >= 1.0) {
         boosting.add(m);
@@ -342,14 +347,21 @@ class _ModifiersBlock extends StatelessWidget {
           const _SectionLabel("What's dampening"),
           ...dampening.map((m) => ModifierBarTile(modifier: m)),
         ],
+        if (unavailable.isNotEmpty) ...[
+          const _SectionLabel('No data here'),
+          ...unavailable.map((m) => ModifierBarTile(modifier: m)),
+        ],
         if (unverified.isNotEmpty) ...[
           const _SectionLabel('Tracked but unverified'),
           ...unverified.map(
             (m) => ModifierBarTile(modifier: m, unverified: true),
           ),
         ],
-        if (boosting.isEmpty && dampening.isEmpty && unverified.isEmpty)
-          const _SectionLabel('No modifiers fired (data unavailable)'),
+        if (boosting.isEmpty &&
+            dampening.isEmpty &&
+            unavailable.isEmpty &&
+            unverified.isEmpty)
+          const _SectionLabel('No modifiers fired'),
       ],
     );
   }

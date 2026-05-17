@@ -111,6 +111,83 @@ void main() {
     );
   });
 
+  group('ModifierBarTile — unavailable row', () {
+    ModifierApplication unavailable(String name, String description) =>
+        ModifierApplication(
+          name: name,
+          value: 0,
+          rangeMin: 0,
+          rangeMax: 2,
+          description: description,
+          available: false,
+        );
+
+    testWidgets('renders the NO DATA badge and humanized name', (tester) async {
+      await tester.pumpWidget(
+        _harness(
+          ModifierBarTile(
+            modifier: unavailable('depth', 'No bathymetry data for this spot'),
+          ),
+        ),
+      );
+      expect(find.text('NO DATA'), findsOneWidget);
+      expect(find.text('Depth'), findsOneWidget);
+    });
+
+    testWidgets(
+      'surfaces the calculator-provided reason so the user knows *why*',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            ModifierBarTile(
+              modifier: unavailable(
+                'water_temperature',
+                'No NDBC station in range',
+              ),
+            ),
+          ),
+        );
+        expect(find.text('No NDBC station in range'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'unavailable row deliberately omits the multiplier number and the bar',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            ModifierBarTile(
+              modifier: unavailable('tide_phase', 'No tide station in range'),
+            ),
+          ),
+        );
+        // The whole point of the muted row: no ×N.NN value, since the
+        // modifier didn't actually fire.
+        expect(find.text('×0.00'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'unavailable takes precedence over `unverified` parameter',
+      (tester) async {
+        // If the species data is unverified AND the sensor is out,
+        // showing UNVERIFIED would imply we have a reading we're unsure
+        // about — but we have no reading at all. The unavailable row
+        // is the truer signal.
+        await tester.pumpWidget(
+          _harness(
+            ModifierBarTile(
+              modifier: unavailable('solunar_window', 'Solunar unavailable'),
+              unverified: true,
+            ),
+          ),
+        );
+        expect(find.text('NO DATA'), findsOneWidget);
+        expect(find.text('UNVERIFIED'), findsNothing);
+      },
+    );
+  });
+
   group('ModifierBarTile — unverified row', () {
     testWidgets('renders the UNVERIFIED badge and humanized name',
         (tester) async {

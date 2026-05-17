@@ -264,10 +264,10 @@ void main() {
     test(
       'no conditions available → score = base × 1.0 (neutral GM) × 5',
       () async {
-        // Curve at 1.0 → base = 1.0. No modifiers → GM defaults to 1.0.
-        // No contributors fire (catches empty, structure unavailable,
-        // time-of-day has no preferences in _profile so contributes 0).
-        // Expected raw = 1.0 × 1.0 × 5 = 5.0.
+        // Curve at 1.0 → base = 1.0. Every sensor returns unavailable
+        // so every modifier row is `available: false`. GM is computed
+        // over the empty *active* set → defaults to 1.0. Expected raw
+        // = 1.0 × 1.0 × 5 = 5.0.
         final svc = _FakeConditionsService();
         final calc = ProbabilityCalculator(conditions: svc);
         final r = await calc.scoreLocation(
@@ -276,7 +276,12 @@ void main() {
           time: _refTime,
         );
         expect(r.reasoning.baseProbability, 1.0);
-        expect(r.reasoning.modifiers, isEmpty);
+        // Placeholder rows are surfaced for transparency — none active.
+        expect(
+          r.reasoning.modifiers.where((m) => m.available),
+          isEmpty,
+        );
+        expect(r.reasoning.modifiers, isNotEmpty);
         expect(r.reasoning.rawScoreBeforeContributors, closeTo(5.0, 1e-9));
         expect(r.finalScore, closeTo(5.0, 1e-9));
         expect(
@@ -337,7 +342,8 @@ void main() {
         // product = 2 * 0.4 * 2 * 1 * 1 = 1.6
         // GM = 1.6^(1/5) = 1.6^0.2 ≈ 1.0986
         // raw = 1.0 * 1.0986 * 5 ≈ 5.493
-        expect(r.reasoning.modifiers, hasLength(5));
+        final active = r.reasoning.modifiers.where((m) => m.available).toList();
+        expect(active, hasLength(5));
         expect(r.reasoning.rawScoreBeforeContributors, closeTo(5.493, 0.01));
         expect(
           r.confidence,
@@ -449,12 +455,11 @@ void main() {
     );
 
     test(
-      'species with no timeOfDayPreferences → modifier is omitted',
+      'species with no timeOfDayPreferences → row present but available: false',
       () async {
         // _profile defaults to an empty preferences list. The modifier
-        // should be skipped entirely (transparency over silently neutral)
-        // and the score should match the pre-promotion "no signal"
-        // baseline.
+        // surfaces in the breakdown for transparency but is excluded
+        // from the math — same contract as a missing sensor reading.
         final svc = _FakeConditionsService();
         final calc = ProbabilityCalculator(conditions: svc);
         final r = await calc.scoreLocation(
@@ -462,8 +467,9 @@ void main() {
           location: _bostonHarbor,
           time: _refTime,
         );
-        final tod = r.reasoning.modifiers.where((m) => m.name == 'time_of_day');
-        expect(tod, isEmpty);
+        final tod =
+            r.reasoning.modifiers.singleWhere((m) => m.name == 'time_of_day');
+        expect(tod.available, isFalse);
       },
     );
 
@@ -503,10 +509,11 @@ void main() {
     );
 
     test(
-      'unavailable depth → modifier is omitted from the breakdown',
+      'unavailable depth → row present but marked unavailable',
       () async {
-        // No depth set → fake returns unavailable. Modifier should
-        // be skipped entirely (transparency over silently neutral).
+        // No depth set → fake returns unavailable. The placeholder row
+        // shows the user "no bathymetry for this location" rather than
+        // silently dropping the dimension from the breakdown.
         final svc = _FakeConditionsService();
         final calc = ProbabilityCalculator(conditions: svc);
         final r = await calc.scoreLocation(
@@ -514,8 +521,66 @@ void main() {
           location: _bostonHarbor,
           time: _refTime,
         );
-        final depthMod = r.reasoning.modifiers.where((m) => m.name == 'depth');
-        expect(depthMod, isEmpty);
+        final depthMod =
+            r.reasoning.modifiers.singleWhere((m) => m.name == 'depth');
+        expect(depthMod.available, isFalse);
+        expect(depthMod.description, contains('bathymetry'));
+      },
+    );
+  });
+
+  group('ProbabilityCalculator — unavailable modifier transparency', () {
+    test(
+      'every known modifier surfaces a row even when all sensors are out',
+      () async {
+        // The user must be able to see which signals are *missing*, not
+        // just which ones fired. With every sensor unavailable and an
+        // empty time-of-day preferences list on the species, the seven
+        // canonical modifier rows should still all appear.
+        final svc = _FakeConditionsService();
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final names = r.reasoning.modifiers.map((m) => m.name).toSet();
+        expect(
+          names,
+          containsAll([
+            'water_temperature',
+            'tide_phase',
+            'wind_speed',
+            'barometric_trend',
+            'solunar_window',
+            'depth',
+            'time_of_day',
+          ]),
+        );
+        expect(
+          r.reasoning.modifiers.every((m) => !m.available),
+          isTrue,
+          reason: 'no sensor data → every row should be `available: false`',
+        );
+      },
+    );
+
+    test(
+      'unavailable rows are excluded from the geometric mean math',
+      () async {
+        // Only water-temp is available. Without proper filtering, the
+        // unavailable rows (value=0) would zero out the product and
+        // tank the score. Real GM should be just the water-temp value.
+        final svc = _FakeConditionsService(waterTemp: _ok(64, _refTime));
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        // water_temp 64°F is mid-plateau → modifier 2.0 → GM 2.0.
+        // raw = 1.0 × 2.0 × 5 = 10.0, clamped to 10 by the envelope.
+        expect(r.reasoning.rawScoreBeforeContributors, closeTo(10.0, 1e-9));
       },
     );
   });

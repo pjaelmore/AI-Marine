@@ -28,6 +28,7 @@ _$ModifierApplicationImpl _$$ModifierApplicationImplFromJson(
       rangeMin: (json['rangeMin'] as num).toDouble(),
       rangeMax: (json['rangeMax'] as num).toDouble(),
       description: json['description'] as String,
+      available: json['available'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$$ModifierApplicationImplToJson(
@@ -38,6 +39,7 @@ Map<String, dynamic> _$$ModifierApplicationImplToJson(
       'rangeMin': instance.rangeMin,
       'rangeMax': instance.rangeMax,
       'description': instance.description,
+      'available': instance.available,
     };
 
 _$ContributorApplicationImpl _$$ContributorApplicationImplFromJson(

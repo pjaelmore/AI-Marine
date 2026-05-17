@@ -135,7 +135,17 @@ class ProbabilityCalculator {
     final structure = await structureF;
     final catches = await catchesF;
 
-    // ── 4. Modifiers — skip any whose input is unavailable. ────────
+    // ── 4. Modifiers ──────────────────────────────────────────────
+    // Every modifier the calculator knows about gets a row in the
+    // breakdown — present sensors compute a real value; absent sensors
+    // emit an [available: false] placeholder so the card can show the
+    // user *what data is missing* (e.g. "Water temperature — no NDBC
+    // station in range") rather than silently dropping the dimension.
+    //
+    // Unavailable rows are filtered out of the geometric-mean math
+    // below — TDD §2.1.3 (missing data is "skip the modifier in the
+    // math," not "penalize with fake neutral 1.0"). The placeholder
+    // exists for *transparency*, not for the score.
     final modifiers = <ModifierApplication>[];
     final modifierConfidences = <double>[];
 
@@ -148,6 +158,13 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(waterTemp.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'water_temperature',
+          'No water-temperature reading at this location',
+        ),
+      );
     }
 
     if (tide.source != DataSource.unavailable) {
@@ -158,11 +175,25 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(tide.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'tide_phase',
+          'No tide station in range',
+        ),
+      );
     }
 
     if (wind.source != DataSource.unavailable) {
       modifiers.add(evaluateWindSpeedModifier(wind: wind.value));
       modifierConfidences.add(wind.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'wind_speed',
+          'No wind reading at this location',
+        ),
+      );
     }
 
     if (baro.source != DataSource.unavailable) {
@@ -173,6 +204,13 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(baro.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'barometric_trend',
+          'No barometric reading at this location',
+        ),
+      );
     }
 
     if (solunar.source != DataSource.unavailable) {
@@ -184,6 +222,13 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(solunar.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'solunar_window',
+          'Solunar table unavailable',
+        ),
+      );
     }
 
     if (depth.source != DataSource.unavailable) {
@@ -194,13 +239,19 @@ class ProbabilityCalculator {
         ),
       );
       modifierConfidences.add(depth.confidence);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'depth',
+          'No bathymetry data for this location',
+        ),
+      );
     }
 
     // Time-of-day is a modifier (not a contributor) because the wrong
     // hour should drag the score down, not "just not add a bonus." A
     // species with no `timeOfDayPreferences` configured returns null
-    // and is skipped — same contract as the missing-data branches
-    // above.
+    // and is treated as unavailable so the row still surfaces.
     final timeOfDay = evaluateTimeOfDayModifier(
       time: time,
       preferences: species.conditionProfile.timeOfDayPreferences,
@@ -212,18 +263,30 @@ class ProbabilityCalculator {
       // computation so it doesn't drag the breakdown confidence
       // average down when other sensors are also reporting.
       modifierConfidences.add(1.0);
+    } else {
+      modifiers.add(
+        _unavailable(
+          'time_of_day',
+          'No feeding-window data for this species',
+        ),
+      );
     }
 
-    // Geometric mean of modifier values, scaled to the 0–10 envelope.
+    // Geometric mean of *available* modifier values, scaled to the
+    // 0–10 envelope. Unavailable placeholders surface in the breakdown
+    // but never participate in the math.
+    final activeModifiers =
+        modifiers.where((m) => m.available).toList(growable: false);
     final double geometricMean;
-    if (modifiers.isEmpty) {
+    if (activeModifiers.isEmpty) {
       geometricMean = 1.0; // no signal → neutral
     } else {
       var product = 1.0;
-      for (final m in modifiers) {
+      for (final m in activeModifiers) {
         product *= m.value;
       }
-      geometricMean = math.pow(product, 1.0 / modifiers.length).toDouble();
+      geometricMean =
+          math.pow(product, 1.0 / activeModifiers.length).toDouble();
     }
     final rawScore =
         base * geometricMean * (_scoreScaleMax / _modifierEnvelopeMax);
@@ -341,7 +404,7 @@ class ProbabilityCalculator {
     List<ContributorApplication> contributors,
   ) {
     final strongMods = modifiers
-        .where((m) => m.value >= 1.5)
+        .where((m) => m.available && m.value >= 1.5)
         .map((m) => m.name.replaceAll('_', ' '))
         .toList();
     final strongContribs = contributors
@@ -356,3 +419,17 @@ class ProbabilityCalculator {
     return 'Strong signals: ${all.join(', ')}.';
   }
 }
+
+/// Builds an `available: false` placeholder modifier — surfaces a row
+/// in the breakdown for transparency without contributing to the
+/// geometric mean. Used by [ProbabilityCalculator.scoreLocation] when a
+/// sensor returns `DataSource.unavailable`.
+ModifierApplication _unavailable(String name, String description) =>
+    ModifierApplication(
+      name: name,
+      value: 0,
+      rangeMin: 0,
+      rangeMax: _modifierEnvelopeMax,
+      description: description,
+      available: false,
+    );

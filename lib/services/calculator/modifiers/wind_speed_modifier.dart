@@ -48,7 +48,9 @@ ModifierApplication evaluateWindSpeedModifier({
     value: multiplier,
     rangeMin: _windSpeedModifierMin,
     rangeMax: _windSpeedModifierMax,
-    description: 'Wind ${speed.toStringAsFixed(1)} kt',
+    description: 'Wind ${speed.toStringAsFixed(1)} kt '
+        '(comfortable ≤${_comfortablePlateauKt.toStringAsFixed(0)} kt, '
+        'small-craft ${_smallCraftAdvisoryKt.toStringAsFixed(0)} kt)',
   );
 }
 

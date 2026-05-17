@@ -47,6 +47,11 @@ class ModifierBarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // [modifier.available] = false wins over [unverified]. An
+    // unavailable sensor is a more specific signal — show the user
+    // *what data is missing*, not just that the species-data weight
+    // is uncertain.
+    if (!modifier.available) return _UnavailableRow(modifier: modifier);
     if (unverified) return _UnverifiedRow(modifier: modifier);
     return _VerifiedBar(modifier: modifier);
   }
@@ -174,6 +179,93 @@ class _VerifiedBar extends StatelessWidget {
               color: MarineColors.onDark.withAlpha(170),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Compact muted row used when a sensor returned `DataSource.unavailable`.
+/// Mirrors [_UnverifiedRow] but reads "NO DATA" rather than "UNVERIFIED"
+/// — and the reason ("No NDBC station in range", "No bathymetry for
+/// this location") flows in from the calculator's `description` so the
+/// user gets the *specific* reason, not a generic "missing."
+class _UnavailableRow extends StatelessWidget {
+  const _UnavailableRow({required this.modifier});
+
+  final ModifierApplication modifier;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: MarineSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: MarineSpacing.md,
+        vertical: MarineSpacing.sm + 2,
+      ),
+      decoration: BoxDecoration(
+        color: MarineColors.onDark.withAlpha(10),
+        borderRadius: BorderRadius.circular(MarineSpacing.radiusSm),
+        border: Border(
+          left: BorderSide(
+            color: MarineColors.onDark.withAlpha(60),
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                '— ',
+                style: MarineTypography.bodyMedium.copyWith(
+                  color: MarineColors.onDark.withAlpha(100),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  _humanize(modifier.name),
+                  style: MarineTypography.bodyMedium.copyWith(
+                    color: MarineColors.onDark.withAlpha(170),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: MarineSpacing.sm,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: MarineColors.onDark.withAlpha(30),
+                  borderRadius: BorderRadius.circular(MarineSpacing.xs),
+                ),
+                child: Text(
+                  'NO DATA',
+                  style: MarineTypography.bodySmall.copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                    color: MarineColors.onDark.withAlpha(180),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (modifier.description.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Padding(
+              padding: const EdgeInsets.only(left: 14),
+              child: Text(
+                modifier.description,
+                style: MarineTypography.bodySmall.copyWith(
+                  color: MarineColors.onDark.withAlpha(130),
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -51,7 +51,9 @@ ModifierApplication evaluateBarometricTrendModifier({
     rangeMin: _barometricModifierMin,
     rangeMax: _barometricModifierMax,
     description: 'Pressure ${_trendLabel(barometric.trend)} '
-        '(${barometric.pressureMillibars.toStringAsFixed(1)} hPa)',
+        '(${barometric.pressureMillibars.toStringAsFixed(1)} hPa) — '
+        'species ${_trendLabel(barometric.trend)}-pressure factor '
+        '${multiplier.toStringAsFixed(2)}',
   );
 }
 
