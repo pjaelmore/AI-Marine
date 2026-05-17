@@ -29,6 +29,9 @@ _$ModifierApplicationImpl _$$ModifierApplicationImplFromJson(
       rangeMax: (json['rangeMax'] as num).toDouble(),
       description: json['description'] as String,
       available: json['available'] as bool? ?? true,
+      observedAt: json['observedAt'] == null
+          ? null
+          : DateTime.parse(json['observedAt'] as String),
     );
 
 Map<String, dynamic> _$$ModifierApplicationImplToJson(
@@ -40,6 +43,7 @@ Map<String, dynamic> _$$ModifierApplicationImplToJson(
       'rangeMax': instance.rangeMax,
       'description': instance.description,
       'available': instance.available,
+      'observedAt': instance.observedAt?.toIso8601String(),
     };
 
 _$ContributorApplicationImpl _$$ContributorApplicationImplFromJson(

@@ -109,6 +109,57 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      'renders the Observed time subtitle when modifier.observedAt is set',
+      (tester) async {
+        // Buoy readings can be 10–50 min old at NDBC's realtime2 cadence —
+        // the subtitle is the only signal the user has for "is this fresh
+        // or stale?"
+        final observedAt = DateTime.utc(2026, 5, 16, 23, 23); // 23:23 UTC
+        await tester.pumpWidget(
+          _harness(
+            ModifierBarTile(
+              modifier: ModifierApplication(
+                name: 'water_temperature',
+                value: 1.8,
+                rangeMin: 0,
+                rangeMax: 2,
+                description: 'Water 78°F vs optimal 80–82°F',
+                observedAt: observedAt,
+              ),
+            ),
+          ),
+        );
+        // Local time will vary by test-runner host; just assert the
+        // "Observed " prefix is present so the test is portable.
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is Text && (w.data ?? '').startsWith('Observed '),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'no Observed subtitle when modifier.observedAt is null',
+      (tester) async {
+        await tester.pumpWidget(
+          _harness(
+            ModifierBarTile(
+              modifier: _mod(name: 'time_of_day', value: 1.5),
+            ),
+          ),
+        );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is Text && (w.data ?? '').startsWith('Observed '),
+          ),
+          findsNothing,
+        );
+      },
+    );
   });
 
   group('ModifierBarTile — unavailable row', () {

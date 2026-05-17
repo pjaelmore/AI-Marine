@@ -489,6 +489,90 @@ void main() {
     });
   });
 
+  group('ProbabilityCalculator — observedAt propagation', () {
+    test(
+      'water_temp modifier carries the buoy/model observation time',
+      () async {
+        // The fake ConditionResult sets observedAt to a value distinct
+        // from fetchedAt to prove the calculator picks observedAt
+        // (not fetchedAt) when both are present.
+        final observedAt = DateTime.utc(2026, 5, 22, 17, 30);
+        final svc = _FakeConditionsService(
+          waterTemp: _ok<double>(64, _refTime).copyWith(observedAt: observedAt),
+        );
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final wt = r.reasoning.modifiers
+            .singleWhere((m) => m.name == 'water_temperature');
+        expect(wt.observedAt, observedAt);
+      },
+    );
+
+    test(
+      'falls back to fetchedAt when ConditionResult.observedAt is null',
+      () async {
+        // Defensive — older condition fixtures may not carry observedAt
+        // yet. The modifier should still stamp *something* useful so the
+        // UI subtitle doesn't disappear silently.
+        final svc = _FakeConditionsService(waterTemp: _ok(64, _refTime));
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: _species(regionalCurve: _allOnes()),
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final wt = r.reasoning.modifiers
+            .singleWhere((m) => m.name == 'water_temperature');
+        expect(wt.observedAt, isNotNull);
+      },
+    );
+
+    test(
+      'time-of-day modifier carries no observedAt — it is derived, not sensed',
+      () async {
+        final svc = _FakeConditionsService();
+        final species = SpeciesRecord(
+          id: 'test',
+          scientificName: 'Test',
+          commonNames: const ['test'],
+          schemaVersion: '1.0',
+          curationVersion: '0.0.1',
+          sizeClasses: const [],
+          migrationModel: MigrationModel(
+            spatialRange: _bostonBox(),
+            regionalCurves: [
+              RegionalPresenceCurve(
+                regionId: 'boston_harbor',
+                regionPolygon: _harborBox(),
+                weeklyValues: _allOnes(),
+              ),
+            ],
+          ),
+          conditionProfile: _profile.copyWith(
+            timeOfDayPreferences: const [
+              TimeOfDayPreference(startHour: 17, endHour: 20, weight: 0.8),
+            ],
+          ),
+          regulatoryProfile: const RegulatoryProfile(),
+          confidence: ConfidenceLevel.exploratory,
+        );
+        final calc = ProbabilityCalculator(conditions: svc);
+        final r = await calc.scoreLocation(
+          species: species,
+          location: _bostonHarbor,
+          time: _refTime,
+        );
+        final tod =
+            r.reasoning.modifiers.singleWhere((m) => m.name == 'time_of_day');
+        expect(tod.observedAt, isNull);
+      },
+    );
+  });
+
   group('ProbabilityCalculator — depth modifier wiring', () {
     test(
       'depth at species ideal surfaces a 2.0 modifier in the breakdown',

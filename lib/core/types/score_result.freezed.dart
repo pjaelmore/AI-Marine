@@ -200,6 +200,15 @@ mixin _$ModifierApplication {
   String get description => throw _privateConstructorUsedError;
   bool get available => throw _privateConstructorUsedError;
 
+  /// When the underlying observation was recorded — sourced from the
+  /// `ConditionResult.observedAt` that fed this modifier. Surfaced
+  /// in the recommendation card as an "Observed HH:mm UTC" subtitle
+  /// so the user knows whether a reading is fresh or 50 minutes old
+  /// (NDBC's 10-minute realtime2 cadence makes this material). Null
+  /// for derived/computed modifiers (time-of-day, solunar) and for
+  /// the unavailable placeholders.
+  DateTime? get observedAt => throw _privateConstructorUsedError;
+
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $ModifierApplicationCopyWith<ModifierApplication> get copyWith =>
@@ -218,7 +227,8 @@ abstract class $ModifierApplicationCopyWith<$Res> {
       double rangeMin,
       double rangeMax,
       String description,
-      bool available});
+      bool available,
+      DateTime? observedAt});
 }
 
 /// @nodoc
@@ -240,6 +250,7 @@ class _$ModifierApplicationCopyWithImpl<$Res, $Val extends ModifierApplication>
     Object? rangeMax = null,
     Object? description = null,
     Object? available = null,
+    Object? observedAt = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -266,6 +277,10 @@ class _$ModifierApplicationCopyWithImpl<$Res, $Val extends ModifierApplication>
           ? _value.available
           : available // ignore: cast_nullable_to_non_nullable
               as bool,
+      observedAt: freezed == observedAt
+          ? _value.observedAt
+          : observedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -284,7 +299,8 @@ abstract class _$$ModifierApplicationImplCopyWith<$Res>
       double rangeMin,
       double rangeMax,
       String description,
-      bool available});
+      bool available,
+      DateTime? observedAt});
 }
 
 /// @nodoc
@@ -304,6 +320,7 @@ class __$$ModifierApplicationImplCopyWithImpl<$Res>
     Object? rangeMax = null,
     Object? description = null,
     Object? available = null,
+    Object? observedAt = freezed,
   }) {
     return _then(_$ModifierApplicationImpl(
       name: null == name
@@ -330,6 +347,10 @@ class __$$ModifierApplicationImplCopyWithImpl<$Res>
           ? _value.available
           : available // ignore: cast_nullable_to_non_nullable
               as bool,
+      observedAt: freezed == observedAt
+          ? _value.observedAt
+          : observedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -343,7 +364,8 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
       required this.rangeMin,
       required this.rangeMax,
       required this.description,
-      this.available = true});
+      this.available = true,
+      this.observedAt});
 
   factory _$ModifierApplicationImpl.fromJson(Map<String, dynamic> json) =>
       _$$ModifierApplicationImplFromJson(json);
@@ -362,9 +384,19 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
   @JsonKey()
   final bool available;
 
+  /// When the underlying observation was recorded — sourced from the
+  /// `ConditionResult.observedAt` that fed this modifier. Surfaced
+  /// in the recommendation card as an "Observed HH:mm UTC" subtitle
+  /// so the user knows whether a reading is fresh or 50 minutes old
+  /// (NDBC's 10-minute realtime2 cadence makes this material). Null
+  /// for derived/computed modifiers (time-of-day, solunar) and for
+  /// the unavailable placeholders.
+  @override
+  final DateTime? observedAt;
+
   @override
   String toString() {
-    return 'ModifierApplication(name: $name, value: $value, rangeMin: $rangeMin, rangeMax: $rangeMax, description: $description, available: $available)';
+    return 'ModifierApplication(name: $name, value: $value, rangeMin: $rangeMin, rangeMax: $rangeMax, description: $description, available: $available, observedAt: $observedAt)';
   }
 
   @override
@@ -381,13 +413,15 @@ class _$ModifierApplicationImpl implements _ModifierApplication {
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.available, available) ||
-                other.available == available));
+                other.available == available) &&
+            (identical(other.observedAt, observedAt) ||
+                other.observedAt == observedAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, name, value, rangeMin, rangeMax, description, available);
+  int get hashCode => Object.hash(runtimeType, name, value, rangeMin, rangeMax,
+      description, available, observedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -411,7 +445,8 @@ abstract class _ModifierApplication implements ModifierApplication {
       required final double rangeMin,
       required final double rangeMax,
       required final String description,
-      final bool available}) = _$ModifierApplicationImpl;
+      final bool available,
+      final DateTime? observedAt}) = _$ModifierApplicationImpl;
 
   factory _ModifierApplication.fromJson(Map<String, dynamic> json) =
       _$ModifierApplicationImpl.fromJson;
@@ -428,6 +463,16 @@ abstract class _ModifierApplication implements ModifierApplication {
   String get description;
   @override
   bool get available;
+  @override
+
+  /// When the underlying observation was recorded — sourced from the
+  /// `ConditionResult.observedAt` that fed this modifier. Surfaced
+  /// in the recommendation card as an "Observed HH:mm UTC" subtitle
+  /// so the user knows whether a reading is fresh or 50 minutes old
+  /// (NDBC's 10-minute realtime2 cadence makes this material). Null
+  /// for derived/computed modifiers (time-of-day, solunar) and for
+  /// the unavailable placeholders.
+  DateTime? get observedAt;
   @override
   @JsonKey(ignore: true)
   _$$ModifierApplicationImplCopyWith<_$ModifierApplicationImpl> get copyWith =>

@@ -9,6 +9,7 @@ import '../data/cache/warm_cache.dart';
 import '../data/sources/ndbc/buoy_station.dart';
 import '../data/sources/ndbc/ndbc_adapter.dart';
 import '../data/sources/nws_forecast/nws_adapter.dart';
+import '../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
 import '../data/sources/solunar/solunar_adapter.dart';
 import '../data/sources/tides_currents/tides_currents_adapter.dart';
 import '../services/conditions/conditions_service.dart';
@@ -47,6 +48,13 @@ final nwsAdapterProvider = Provider<NwsAdapter>((ref) {
 /// Solunar adapter — pure local computation.
 final solunarAdapterProvider = Provider<SolunarAdapter>((ref) {
   return SolunarAdapter();
+});
+
+/// Open-Meteo Marine adapter — model-derived SST fallback when no NDBC
+/// buoy with a `WTMP` reading is in range. No bundled assets, no async
+/// setup.
+final openMeteoMarineAdapterProvider = Provider<OpenMeteoMarineAdapter>((ref) {
+  return OpenMeteoMarineAdapter(http: ref.watch(dioProvider));
 });
 
 /// Four-tier cache manager (TDD §2.1.4). Composed once per app session.
@@ -96,6 +104,7 @@ final conditionsServiceProvider = FutureProvider<ConditionsService>((
     tides: tides,
     nws: nws,
     solunar: solunar,
+    openMeteo: ref.watch(openMeteoMarineAdapterProvider),
     catches: db.catchesDao,
     cache: ref.watch(cacheManagerProvider),
   );

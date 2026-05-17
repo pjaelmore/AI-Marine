@@ -251,6 +251,14 @@ mixin _$ConditionResult<T> {
   DateTime get validUntil => throw _privateConstructorUsedError;
   double get confidence => throw _privateConstructorUsedError;
 
+  /// When the *underlying observation* was recorded. Distinct from
+  /// [fetchedAt] (when we hit the API) because NDBC buoys report in
+  /// 10-minute cadence so the most recent row can already be ~50
+  /// minutes old by the time the cache walks the realtime2 feed.
+  /// Null when no upstream timestamp exists (e.g. solunar — pure
+  /// local computation — or the unavailable sentinel).
+  DateTime? get observedAt => throw _privateConstructorUsedError;
+
   @JsonKey(ignore: true)
   $ConditionResultCopyWith<T, ConditionResult<T>> get copyWith =>
       throw _privateConstructorUsedError;
@@ -269,7 +277,8 @@ abstract class $ConditionResultCopyWith<T, $Res> {
       SourceDetails sourceDetails,
       DateTime fetchedAt,
       DateTime validUntil,
-      double confidence});
+      double confidence,
+      DateTime? observedAt});
 
   $SourceDetailsCopyWith<$Res> get sourceDetails;
 }
@@ -294,6 +303,7 @@ class _$ConditionResultCopyWithImpl<T, $Res, $Val extends ConditionResult<T>>
     Object? fetchedAt = null,
     Object? validUntil = null,
     Object? confidence = null,
+    Object? observedAt = freezed,
   }) {
     return _then(_value.copyWith(
       value: freezed == value
@@ -324,6 +334,10 @@ class _$ConditionResultCopyWithImpl<T, $Res, $Val extends ConditionResult<T>>
           ? _value.confidence
           : confidence // ignore: cast_nullable_to_non_nullable
               as double,
+      observedAt: freezed == observedAt
+          ? _value.observedAt
+          : observedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 
@@ -351,7 +365,8 @@ abstract class _$$ConditionResultImplCopyWith<T, $Res>
       SourceDetails sourceDetails,
       DateTime fetchedAt,
       DateTime validUntil,
-      double confidence});
+      double confidence,
+      DateTime? observedAt});
 
   @override
   $SourceDetailsCopyWith<$Res> get sourceDetails;
@@ -375,6 +390,7 @@ class __$$ConditionResultImplCopyWithImpl<T, $Res>
     Object? fetchedAt = null,
     Object? validUntil = null,
     Object? confidence = null,
+    Object? observedAt = freezed,
   }) {
     return _then(_$ConditionResultImpl<T>(
       value: freezed == value
@@ -405,6 +421,10 @@ class __$$ConditionResultImplCopyWithImpl<T, $Res>
           ? _value.confidence
           : confidence // ignore: cast_nullable_to_non_nullable
               as double,
+      observedAt: freezed == observedAt
+          ? _value.observedAt
+          : observedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -419,7 +439,8 @@ class _$ConditionResultImpl<T> implements _ConditionResult<T> {
       required this.sourceDetails,
       required this.fetchedAt,
       required this.validUntil,
-      required this.confidence});
+      required this.confidence,
+      this.observedAt});
 
   @override
   final T value;
@@ -436,9 +457,18 @@ class _$ConditionResultImpl<T> implements _ConditionResult<T> {
   @override
   final double confidence;
 
+  /// When the *underlying observation* was recorded. Distinct from
+  /// [fetchedAt] (when we hit the API) because NDBC buoys report in
+  /// 10-minute cadence so the most recent row can already be ~50
+  /// minutes old by the time the cache walks the realtime2 feed.
+  /// Null when no upstream timestamp exists (e.g. solunar — pure
+  /// local computation — or the unavailable sentinel).
+  @override
+  final DateTime? observedAt;
+
   @override
   String toString() {
-    return 'ConditionResult<$T>(value: $value, unit: $unit, source: $source, sourceDetails: $sourceDetails, fetchedAt: $fetchedAt, validUntil: $validUntil, confidence: $confidence)';
+    return 'ConditionResult<$T>(value: $value, unit: $unit, source: $source, sourceDetails: $sourceDetails, fetchedAt: $fetchedAt, validUntil: $validUntil, confidence: $confidence, observedAt: $observedAt)';
   }
 
   @override
@@ -456,7 +486,9 @@ class _$ConditionResultImpl<T> implements _ConditionResult<T> {
             (identical(other.validUntil, validUntil) ||
                 other.validUntil == validUntil) &&
             (identical(other.confidence, confidence) ||
-                other.confidence == confidence));
+                other.confidence == confidence) &&
+            (identical(other.observedAt, observedAt) ||
+                other.observedAt == observedAt));
   }
 
   @override
@@ -468,7 +500,8 @@ class _$ConditionResultImpl<T> implements _ConditionResult<T> {
       sourceDetails,
       fetchedAt,
       validUntil,
-      confidence);
+      confidence,
+      observedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -486,7 +519,8 @@ abstract class _ConditionResult<T> implements ConditionResult<T> {
       required final SourceDetails sourceDetails,
       required final DateTime fetchedAt,
       required final DateTime validUntil,
-      required final double confidence}) = _$ConditionResultImpl<T>;
+      required final double confidence,
+      final DateTime? observedAt}) = _$ConditionResultImpl<T>;
 
   @override
   T get value;
@@ -502,6 +536,15 @@ abstract class _ConditionResult<T> implements ConditionResult<T> {
   DateTime get validUntil;
   @override
   double get confidence;
+  @override
+
+  /// When the *underlying observation* was recorded. Distinct from
+  /// [fetchedAt] (when we hit the API) because NDBC buoys report in
+  /// 10-minute cadence so the most recent row can already be ~50
+  /// minutes old by the time the cache walks the realtime2 feed.
+  /// Null when no upstream timestamp exists (e.g. solunar — pure
+  /// local computation — or the unavailable sentinel).
+  DateTime? get observedAt;
   @override
   @JsonKey(ignore: true)
   _$$ConditionResultImplCopyWith<T, _$ConditionResultImpl<T>> get copyWith =>

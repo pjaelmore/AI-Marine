@@ -155,7 +155,7 @@ class ProbabilityCalculator {
           waterTempF: waterTemp.value,
           optimalTemp: species.conditionProfile.optimalTemp,
           toleratedTemp: species.conditionProfile.toleratedTemp,
-        ),
+        ).copyWith(observedAt: waterTemp.observedAt ?? waterTemp.fetchedAt),
       );
       modifierConfidences.add(waterTemp.confidence);
     } else {
@@ -172,7 +172,7 @@ class ProbabilityCalculator {
         evaluateTidePhaseModifier(
           phase: tide.value.phase,
           preference: species.conditionProfile.tidePreference,
-        ),
+        ).copyWith(observedAt: tide.observedAt ?? tide.fetchedAt),
       );
       modifierConfidences.add(tide.confidence);
     } else {
@@ -185,7 +185,10 @@ class ProbabilityCalculator {
     }
 
     if (wind.source != DataSource.unavailable) {
-      modifiers.add(evaluateWindSpeedModifier(wind: wind.value));
+      modifiers.add(
+        evaluateWindSpeedModifier(wind: wind.value)
+            .copyWith(observedAt: wind.observedAt ?? wind.fetchedAt),
+      );
       modifierConfidences.add(wind.confidence);
     } else {
       modifiers.add(
@@ -201,7 +204,7 @@ class ProbabilityCalculator {
         evaluateBarometricTrendModifier(
           barometric: baro.value,
           sensitivity: species.conditionProfile.weatherSensitivity,
-        ),
+        ).copyWith(observedAt: baro.observedAt ?? baro.fetchedAt),
       );
       modifierConfidences.add(baro.confidence);
     } else {
@@ -236,7 +239,7 @@ class ProbabilityCalculator {
         evaluateDepthModifier(
           depthFt: depth.value,
           preference: species.conditionProfile.depthPreference,
-        ),
+        ).copyWith(observedAt: depth.observedAt ?? depth.fetchedAt),
       );
       modifierConfidences.add(depth.confidence);
     } else {

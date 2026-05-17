@@ -39,6 +39,15 @@ class ModifierApplication with _$ModifierApplication {
     required double rangeMax,
     required String description,
     @Default(true) bool available,
+
+    /// When the underlying observation was recorded — sourced from the
+    /// `ConditionResult.observedAt` that fed this modifier. Surfaced
+    /// in the recommendation card as an "Observed HH:mm UTC" subtitle
+    /// so the user knows whether a reading is fresh or 50 minutes old
+    /// (NDBC's 10-minute realtime2 cadence makes this material). Null
+    /// for derived/computed modifiers (time-of-day, solunar) and for
+    /// the unavailable placeholders.
+    DateTime? observedAt,
   }) = _ModifierApplication;
 
   factory ModifierApplication.fromJson(Map<String, dynamic> json) =>

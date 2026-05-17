@@ -13,14 +13,17 @@ import 'ndbc_parser.dart';
 /// NDBC buoy adapter — TDD §5.2.
 ///
 /// Resolves a query location to the nearest active station within a
-/// configurable distance threshold (30 nm default per §5.2.4), fetches
+/// configurable distance threshold (60 nm default — bumped from §5.2.4's
+/// 30 nm so offshore queries have a better chance of landing inside the
+/// FL buoy network's coverage; Open-Meteo Marine handles points beyond
+/// this radius via the Conditions Service fallback), fetches
 /// the realtime2 feed, parses the latest observation row, and wraps it
 /// in a [ConditionResult] with the spec'd 60-minute TTL.
 class NdbcAdapter extends SourceAdapter<BuoyObservation> {
   NdbcAdapter({
     required Dio http,
     List<BuoyStation>? stations,
-    double maxDistanceNm = 30,
+    double maxDistanceNm = 60,
   })  : _http = http,
         _stations = stations ?? const <BuoyStation>[],
         _maxDistanceNm = maxDistanceNm;
@@ -101,6 +104,7 @@ class NdbcAdapter extends SourceAdapter<BuoyObservation> {
         fetchedAt: fetchedAt,
         validUntil: fetchedAt.add(defaultTtl),
         confidence: _confidenceFromDistance(station.distanceNmTo(location)),
+        observedAt: observation.timestamp,
       );
     } on DioException catch (e) {
       throw SourceException(
@@ -131,11 +135,14 @@ class NdbcAdapter extends SourceAdapter<BuoyObservation> {
   }
 }
 
-/// Linear confidence falloff across the 30 nm acceptance radius:
-/// 1.0 at the station, 0.5 at the threshold. Keeps the engine from
-/// trusting a far-away buoy as much as a nearby one.
+/// Linear confidence falloff across the acceptance radius: 1.0 at
+/// the station, 0.5 at the half-radius midpoint, 0.0 at the edge.
+/// Keeps the engine from trusting a far-away buoy as much as a nearby
+/// one. The 60 nm half-point matches the Phase 6 acceptance radius —
+/// a buoy on the edge of range carries half the confidence of one
+/// directly underneath the query.
 double _confidenceFromDistance(double distanceNm) {
-  const halfPoint = 30.0;
+  const halfPoint = 60.0;
   final scaled = 1.0 - (distanceNm / (halfPoint * 2));
   return scaled.clamp(0.0, 1.0);
 }

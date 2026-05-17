@@ -11,6 +11,7 @@ enum DataSource {
   noaaMarineForecast,
   noaaEnc,
   noaaCoastWatchSst, // Phase 2
+  openMeteoMarine,
   nmea2000Gateway, // Phase 2
   computedLocal,
   cached,
@@ -59,6 +60,14 @@ class ConditionResult<T> with _$ConditionResult<T> {
     required DateTime fetchedAt,
     required DateTime validUntil,
     required double confidence,
+
+    /// When the *underlying observation* was recorded. Distinct from
+    /// [fetchedAt] (when we hit the API) because NDBC buoys report in
+    /// 10-minute cadence so the most recent row can already be ~50
+    /// minutes old by the time the cache walks the realtime2 feed.
+    /// Null when no upstream timestamp exists (e.g. solunar — pure
+    /// local computation — or the unavailable sentinel).
+    DateTime? observedAt,
   }) = _ConditionResult<T>;
 
   /// Sentinel result for "no source could satisfy this query."

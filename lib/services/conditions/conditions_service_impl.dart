@@ -10,6 +10,7 @@ import '../../data/database/daos/catches_dao.dart';
 import '../../data/sources/ndbc/buoy_observation.dart';
 import '../../data/sources/ndbc/ndbc_adapter.dart';
 import '../../data/sources/nws_forecast/nws_adapter.dart';
+import '../../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
 import '../../data/sources/solunar/solunar_adapter.dart';
 import '../../data/sources/source_adapter.dart';
 import '../../data/sources/tides_currents/tide_phase_computer.dart';
@@ -31,6 +32,7 @@ class ConditionsServiceImpl implements ConditionsService {
     required this.tides,
     required this.nws,
     required this.solunar,
+    this.openMeteo,
     this.catches,
     this.cache,
   });
@@ -39,6 +41,13 @@ class ConditionsServiceImpl implements ConditionsService {
   final TidesAndCurrentsAdapter tides;
   final NwsAdapter nws;
   final SolunarAdapter solunar;
+
+  /// Open-Meteo Marine SST fallback. When null, water-temp lookups
+  /// stop at NDBC (Phase 6 behavior); when wired, NDBC misses fall
+  /// through to this model-derived SST source so offshore points get
+  /// a real reading instead of "no data."
+  final OpenMeteoMarineAdapter? openMeteo;
+
   final CatchesDao? catches;
 
   /// Optional four-tier cache. When null, every method goes straight
@@ -104,12 +113,29 @@ class ConditionsServiceImpl implements ConditionsService {
       toJsonT: (v) => v,
       fromJsonT: (j) => (j as num).toDouble(),
       fetch: () async {
-        if (!ndbc.canServe(loc, time)) return null;
+        // Tier 1: nearest NDBC buoy. Higher fidelity (real reading,
+        // confidence scaled by distance), preferred when available.
+        if (ndbc.canServe(loc, time)) {
+          try {
+            final r = await ndbc.fetch(loc, time);
+            final c = r.value.waterTempC;
+            if (c != null) {
+              return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
+            }
+            // Buoy is in range but didn't report `WTMP` this cycle —
+            // common for wave-only stations. Fall through to model SST.
+          } on SourceException {
+            // Network or parsing failure — also fall through.
+          }
+        }
+        // Tier 2: Open-Meteo global SST. Wider coverage than NDBC, at
+        // a lower confidence flag so the breakdown reflects the
+        // model-derived nature of the number.
+        final om = openMeteo;
+        if (om == null) return null;
+        if (!om.canServe(loc, time)) return null;
         try {
-          final r = await ndbc.fetch(loc, time);
-          final c = r.value.waterTempC;
-          if (c == null) return null;
-          return _wrapDoubleFromBuoy(r, value: c * 1.8 + 32, unit: 'F');
+          return await om.fetch(loc, time);
         } on SourceException {
           return null;
         }
@@ -428,5 +454,8 @@ ConditionResult<double> _wrapDoubleFromBuoy(
     fetchedAt: source.fetchedAt,
     validUntil: source.validUntil,
     confidence: source.confidence,
+    // Preserve the buoy's own measurement time — 10-minute realtime2
+    // cadence means the wrapped value can already be 50+ minutes old.
+    observedAt: source.observedAt ?? source.value.timestamp,
   );
 }

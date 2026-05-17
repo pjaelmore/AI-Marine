@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/types/score_result.dart';
 import '../design/colors.dart';
@@ -179,10 +180,29 @@ class _VerifiedBar extends StatelessWidget {
               color: MarineColors.onDark.withAlpha(170),
             ),
           ),
+          if (modifier.observedAt != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              _observedAtLabel(modifier.observedAt!),
+              style: MarineTypography.bodySmall.copyWith(
+                color: MarineColors.onDark.withAlpha(120),
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
+}
+
+/// "Observed h:mm a" in local time — buoy readings can be 10–50 min
+/// old at NDBC's realtime2 cadence, so showing when the reading
+/// landed matters more than showing when we fetched it.
+String _observedAtLabel(DateTime observedAt) {
+  final local = observedAt.toLocal();
+  final t = DateFormat('h:mm a').format(local);
+  return 'Observed $t';
 }
 
 /// Compact muted row used when a sensor returned `DataSource.unavailable`.

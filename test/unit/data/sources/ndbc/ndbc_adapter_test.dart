@@ -71,7 +71,7 @@ void main() {
       expect(adapter.canServe(_bostonHarbor, DateTime.now()), isTrue);
     });
 
-    test('canServe returns false beyond the 30 nm threshold', () {
+    test('canServe returns false beyond the acceptance radius', () {
       final dio = Dio()..httpClientAdapter = _StubAdapter();
       final adapter = NdbcAdapter(http: dio)
         ..seedStationsForTesting([_bostonStation, _montaukStation]);

@@ -7,6 +7,7 @@ import 'package:ai_marine_engine/core/types/lat_lng.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/buoy_station.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/ndbc_adapter.dart';
 import 'package:ai_marine_engine/data/sources/nws_forecast/nws_adapter.dart';
+import 'package:ai_marine_engine/data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
 import 'package:ai_marine_engine/data/sources/solunar/solunar_adapter.dart';
 import 'package:ai_marine_engine/data/sources/tides_currents/tide_station.dart';
 import 'package:ai_marine_engine/data/sources/tides_currents/tides_currents_adapter.dart';
@@ -66,6 +67,30 @@ const _bostonTideStation = TideStation(
 String _ndbcFixture() =>
     File('test/fixtures/http_responses/ndbc_44013.txt').readAsStringSync();
 
+/// Buoy reading with WTMP marked missing (`MM`) — wave-only stations,
+/// sensor outages, and edge-of-window QC drops all produce this shape.
+/// Drives the "fall through to Open-Meteo" code path in `getWaterTemp`.
+String _ndbcFixtureNoWtmp() =>
+    '#YY  MM DD hh mm WDIR WSPD GST  WVHT   DPD   APD MWD   PRES  ATMP  '
+    'WTMP  DEWP  VIS PTDY  TIDE\n'
+    '#yr  mo dy hr mn degT m/s  m/s     m   sec   sec degT   hPa  degC  '
+    'degC  degC  nmi  hPa    ft\n'
+    '2026 05 16 19 00 320  7.0  8.0    MM    MM    MM  MM 1006.1   7.0    '
+    'MM   4.5   MM -1.2    MM\n';
+
+/// Open-Meteo Marine response with one sample at the test target hour.
+String _openMeteoFixture() => '''
+{
+  "latitude": 42.36,
+  "longitude": -70.55,
+  "hourly_units": {"time": "iso8601", "sea_surface_temperature": "°C"},
+  "hourly": {
+    "time": ["2026-05-16T18:00", "2026-05-16T19:00", "2026-05-16T20:00"],
+    "sea_surface_temperature": [26.8, 27.0, 27.2]
+  }
+}
+''';
+
 String _tidesFixture() =>
     File('test/fixtures/http_responses/tides_8443970.json').readAsStringSync();
 
@@ -79,6 +104,7 @@ String _nwsForecastFixture() => File(
 
 ConditionsServiceImpl _buildService({
   required Map<String, String> routes,
+  bool wireOpenMeteo = false,
 }) {
   final dio = Dio()..httpClientAdapter = _RoutingStub(routes);
   final ndbc = NdbcAdapter(http: dio)
@@ -92,6 +118,7 @@ ConditionsServiceImpl _buildService({
     tides: tides,
     nws: nws,
     solunar: solunar,
+    openMeteo: wireOpenMeteo ? OpenMeteoMarineAdapter(http: dio) : null,
   );
 }
 
@@ -122,6 +149,60 @@ void main() {
       final r = await svc.getWaterTemp(_bostonHarbor, DateTime.now());
       expect(r.source, DataSource.unavailable);
     });
+
+    test(
+      'falls through to Open-Meteo when NDBC returns no WTMP — '
+      'this is the offshore-FL case that was silently dropping the row',
+      () async {
+        final svc = _buildService(
+          routes: {
+            // NDBC fixture without WTMP — buoy is in range but its
+            // latest realtime2 row has no water-temp column.
+            '/realtime2/': _ndbcFixtureNoWtmp(),
+            // Open-Meteo Marine returns a plausible SST sample.
+            'marine-api.open-meteo.com': _openMeteoFixture(),
+          },
+          wireOpenMeteo: true,
+        );
+        final r = await svc.getWaterTemp(
+          _bostonHarbor,
+          DateTime.utc(2026, 5, 16, 19),
+        );
+        expect(r.source, DataSource.openMeteoMarine);
+        // 27.0 °C → 80.6 °F
+        expect(r.value, closeTo(80.6, 0.1));
+      },
+    );
+
+    test(
+      'falls through to Open-Meteo when no NDBC station is in range',
+      () async {
+        final svc = _buildService(
+          routes: {
+            'marine-api.open-meteo.com': _openMeteoFixture(),
+          },
+          wireOpenMeteo: true,
+        );
+        final r = await svc.getWaterTemp(
+          const LatLng(latitude: 0, longitude: 0), // mid-Pacific
+          DateTime.utc(2026, 5, 16, 19),
+        );
+        expect(r.source, DataSource.openMeteoMarine);
+      },
+    );
+
+    test(
+      'still returns unavailable when both NDBC and Open-Meteo fail',
+      () async {
+        // No routes at all → both adapters 404.
+        final svc = _buildService(routes: {}, wireOpenMeteo: true);
+        final r = await svc.getWaterTemp(
+          _bostonHarbor,
+          DateTime.utc(2026, 5, 16, 19),
+        );
+        expect(r.source, DataSource.unavailable);
+      },
+    );
   });
 
   group('getTideState', () {
