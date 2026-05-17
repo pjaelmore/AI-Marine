@@ -10,6 +10,7 @@ import '../../data/database/daos/catches_dao.dart';
 import '../../data/sources/ndbc/buoy_observation.dart';
 import '../../data/sources/ndbc/ndbc_adapter.dart';
 import '../../data/sources/nws_forecast/nws_adapter.dart';
+import '../../data/sources/bundled_bathymetry/bundled_bathymetry_adapter.dart';
 import '../../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
 import '../../data/sources/open_topo_data/open_topo_data_adapter.dart';
 import '../../data/sources/solunar/solunar_adapter.dart';
@@ -35,6 +36,7 @@ class ConditionsServiceImpl implements ConditionsService {
     required this.solunar,
     this.openMeteo,
     this.bathymetry,
+    this.bundledBathymetry,
     this.catches,
     this.cache,
   });
@@ -50,11 +52,15 @@ class ConditionsServiceImpl implements ConditionsService {
   /// a real reading instead of "no data."
   final OpenMeteoMarineAdapter? openMeteo;
 
-  /// OpenTopoData GEBCO bathymetry source. When null, `getDepth` stays
-  /// in the Phase 3 "unavailable" placeholder mode; when wired, depth
-  /// queries route through this adapter so the depth modifier can
-  /// finally fire against species `depthPreference` profiles.
+  /// OpenTopoData GEBCO bathymetry source — the global (~450 m)
+  /// fallback for water outside the bundled FL tile set.
   final OpenTopoDataAdapter? bathymetry;
+
+  /// Bundled FL bathymetry (GMRT-sourced, ~16–90 m, offline). Tier 1
+  /// for depth inside the FL tile set; falls through to [bathymetry]
+  /// (GEBCO) elsewhere. Offline-first because depth matters most
+  /// offshore where there's no cell signal.
+  final BundledBathymetryAdapter? bundledBathymetry;
 
   final CatchesDao? catches;
 
@@ -344,7 +350,8 @@ class ConditionsServiceImpl implements ConditionsService {
   @override
   Future<ConditionResult<double>> getDepth(LatLng loc) async {
     final bathy = bathymetry;
-    if (bathy == null) {
+    final bundled = bundledBathymetry;
+    if (bathy == null && bundled == null) {
       // No adapter wired — preserve the Phase 3 placeholder behavior
       // for tests and bare-bones service configurations.
       return _unavailableDouble(DateTime.now().toUtc());
@@ -352,19 +359,31 @@ class ConditionsServiceImpl implements ConditionsService {
     final result = await _cachedFetch<double>(
       key: 'depth:${_locKey(loc)}',
       dataType: 'depth',
-      source: 'open_topo_data',
+      source: 'bathymetry',
       toJsonT: (v) => v,
       fromJsonT: (j) => (j as num).toDouble(),
       fetch: () async {
-        if (!bathy.canServe(loc, DateTime.now().toUtc())) return null;
-        try {
-          return await bathy.fetch(loc, DateTime.now().toUtc());
-        } on SourceException {
-          // Land taps and network failures both flow through here —
-          // the calculator surfaces the "no bathymetry" placeholder
-          // either way.
-          return null;
+        final now = DateTime.now().toUtc();
+        // Tier 1: bundled FL grid (offline, ~16–90 m, no network).
+        // The whole point of bundling is that this works offshore
+        // with no cell signal.
+        if (bundled != null && bundled.canServe(loc, now)) {
+          try {
+            return await bundled.fetch(loc, now);
+          } on SourceException {
+            // Off the FL tile set, on land, or unsurveyed cell —
+            // fall through to the global GEBCO source.
+          }
         }
+        // Tier 2: live OpenTopoData GEBCO (global, ~450 m).
+        if (bathy != null && bathy.canServe(loc, now)) {
+          try {
+            return await bathy.fetch(loc, now);
+          } on SourceException {
+            return null;
+          }
+        }
+        return null;
       },
     );
     return result ?? _unavailableDouble(DateTime.now().toUtc());

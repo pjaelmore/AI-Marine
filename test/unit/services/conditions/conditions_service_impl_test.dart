@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:ai_marine_engine/core/types/condition_result.dart';
 import 'package:ai_marine_engine/core/types/conditions.dart';
 import 'package:ai_marine_engine/core/types/lat_lng.dart';
+import 'package:ai_marine_engine/data/sources/bundled_bathymetry/bundled_bathymetry_adapter.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/buoy_station.dart';
 import 'package:ai_marine_engine/data/sources/ndbc/ndbc_adapter.dart';
 import 'package:ai_marine_engine/data/sources/nws_forecast/nws_adapter.dart';
@@ -108,6 +109,7 @@ ConditionsServiceImpl _buildService({
   required Map<String, String> routes,
   bool wireOpenMeteo = false,
   bool wireBathymetry = false,
+  BundledBathymetryAdapter? bundled,
 }) {
   final dio = Dio()..httpClientAdapter = _RoutingStub(routes);
   final ndbc = NdbcAdapter(http: dio)
@@ -123,8 +125,60 @@ ConditionsServiceImpl _buildService({
     solunar: solunar,
     openMeteo: wireOpenMeteo ? OpenMeteoMarineAdapter(http: dio) : null,
     bathymetry: wireBathymetry ? OpenTopoDataAdapter(http: dio) : null,
+    bundledBathymetry: bundled,
   );
 }
+
+/// 2×2 synthetic FL tile, SW (28°N,81°W), 0.5° cells.
+///   NW=-30 m (98.4 ft)  NE=-60 m (196.9 ft)
+///   SW=+5 m (land)      SE=nodata
+Uint8List _encodeFlTile() {
+  const header = 34;
+  const data = [-30, -60, 5, -32768];
+  final bytes = Uint8List(header + data.length * 2);
+  final bd = ByteData.sublistView(bytes);
+  bd.setUint32(0, 0x54424C46, Endian.little);
+  bd.setUint16(4, 1, Endian.little);
+  bd.setUint16(6, 2, Endian.little);
+  bd.setFloat64(8, 28, Endian.little);
+  bd.setFloat64(16, -81, Endian.little);
+  bd.setFloat64(24, 0.5, Endian.little);
+  bd.setInt16(32, -32768, Endian.little);
+  for (var i = 0; i < data.length; i++) {
+    bd.setInt16(header + i * 2, data[i], Endian.little);
+  }
+  return bytes;
+}
+
+BundledBathymetryAdapter _flBundled() {
+  final assets = <String, Uint8List>{
+    'assets/bathymetry/fl/manifest.json': Uint8List.fromList(
+      utf8.encode(
+        jsonEncode({
+          'version': 1,
+          'tileDir': 'assets/bathymetry/fl',
+          'cellsPerSide': 2,
+          'cellSizeDeg': 0.5,
+          'nodata': -32768,
+          'tiles': [
+            {'lat': 28, 'lon': -81},
+          ],
+        }),
+      ),
+    ),
+    'assets/bathymetry/fl/N28_W81.bin.gz':
+        Uint8List.fromList(gzip.encode(_encodeFlTile())),
+  };
+  return BundledBathymetryAdapter(
+    assetLoader: (path) async {
+      final b = assets[path];
+      if (b == null) throw Exception('not found: $path');
+      return b;
+    },
+  );
+}
+
+const _flOcean = LatLng(latitude: 28.75, longitude: -80.25); // NE cell
 
 void main() {
   group('getWaterTemp', () {
@@ -378,6 +432,78 @@ void main() {
         final svc = _buildService(routes: {}, wireBathymetry: true);
         final r = await svc.getDepth(_bostonHarbor);
         expect(r.source, DataSource.unavailable);
+      },
+    );
+  });
+
+  group('getDepth — bundled FL bathymetry (tier 1)', () {
+    test(
+      'bundled grid serves FL depth without any network call',
+      () async {
+        // No GEBCO route registered — proves the bundled adapter,
+        // not the network, answered. This is the offshore-no-signal
+        // case the whole bundling effort exists for.
+        final svc = _buildService(
+          routes: {},
+          wireBathymetry: true,
+          bundled: _flBundled(),
+        );
+        final r = await svc.getDepth(_flOcean);
+        expect(r.source, DataSource.bundledBathymetry);
+        expect(r.value, closeTo(196.85, 1e-1)); // 60 m → 196.85 ft
+      },
+    );
+
+    test(
+      'falls through to GEBCO when the bundled cell is land',
+      () async {
+        final svc = _buildService(
+          routes: {
+            'api.opentopodata.org': jsonEncode({
+              'status': 'OK',
+              'results': [
+                {
+                  'elevation': -20,
+                  'location': {'lat': 28.25, 'lng': -80.75},
+                },
+              ],
+            }),
+          },
+          wireBathymetry: true,
+          bundled: _flBundled(),
+        );
+        // 28.25,-80.75 = SW cell = +5 m land in the bundled tile →
+        // SourceException → GEBCO answers instead.
+        final r = await svc.getDepth(
+          const LatLng(latitude: 28.25, longitude: -80.75),
+        );
+        expect(r.source, DataSource.openTopoData);
+        expect(r.value, closeTo(65.617, 1e-2)); // 20 m → 65.617 ft
+      },
+    );
+
+    test(
+      'falls through to GEBCO outside the FL tile set',
+      () async {
+        final svc = _buildService(
+          routes: {
+            'api.opentopodata.org': jsonEncode({
+              'status': 'OK',
+              'results': [
+                {
+                  'elevation': -45,
+                  'location': {'lat': 42.36, 'lng': -70.55},
+                },
+              ],
+            }),
+          },
+          wireBathymetry: true,
+          bundled: _flBundled(),
+        );
+        // Boston is outside the FL box → bundled.canServe false →
+        // GEBCO.
+        final r = await svc.getDepth(_bostonHarbor);
+        expect(r.source, DataSource.openTopoData);
       },
     );
   });

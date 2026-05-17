@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "tileDir": "assets/bathymetry/fl",
+  "cellsPerSide": 1200,
+  "cellSizeDeg": 0.0008333333333333334,
+  "nodata": -32768,
+  "_note": "Placeholder. Run `fvm dart run scripts/build_fl_bathymetry.dart` to generate the real tile set; until then `tiles` is empty and the conditions service falls back to OpenTopoData GEBCO.",
+  "tiles": []
+}

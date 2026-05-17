@@ -8,6 +8,7 @@ import '../data/cache/live_sensor_buffer.dart';
 import '../data/cache/warm_cache.dart';
 import '../data/sources/ndbc/buoy_station.dart';
 import '../data/sources/ndbc/ndbc_adapter.dart';
+import '../data/sources/bundled_bathymetry/bundled_bathymetry_adapter.dart';
 import '../data/sources/nws_forecast/nws_adapter.dart';
 import '../data/sources/open_meteo_marine/open_meteo_marine_adapter.dart';
 import '../data/sources/open_topo_data/open_topo_data_adapter.dart';
@@ -65,6 +66,15 @@ final openTopoDataAdapterProvider = Provider<OpenTopoDataAdapter>((ref) {
   return OpenTopoDataAdapter(http: ref.watch(dioProvider));
 });
 
+/// Bundled FL bathymetry adapter — offline ~16–90 m depth from the
+/// gzipped tile set under `assets/bathymetry/fl/`. No-op (canServe →
+/// false) until `scripts/build_fl_bathymetry.dart` has generated the
+/// asset; the conditions service falls back to GEBCO meanwhile.
+final bundledBathymetryAdapterProvider =
+    Provider<BundledBathymetryAdapter>((ref) {
+  return BundledBathymetryAdapter();
+});
+
 /// Four-tier cache manager (TDD §2.1.4). Composed once per app session.
 /// Live and hot tiers are in-memory and disposed with the provider; warm
 /// and cold are Drift-backed and survive restart.
@@ -114,6 +124,7 @@ final conditionsServiceProvider = FutureProvider<ConditionsService>((
     solunar: solunar,
     openMeteo: ref.watch(openMeteoMarineAdapterProvider),
     bathymetry: ref.watch(openTopoDataAdapterProvider),
+    bundledBathymetry: ref.watch(bundledBathymetryAdapterProvider),
     catches: db.catchesDao,
     cache: ref.watch(cacheManagerProvider),
   );

@@ -13,6 +13,7 @@ enum DataSource {
   noaaCoastWatchSst, // Phase 2
   openMeteoMarine,
   openTopoData,
+  bundledBathymetry,
   nmea2000Gateway, // Phase 2
   computedLocal,
   cached,

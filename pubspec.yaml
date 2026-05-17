@@ -104,6 +104,7 @@ flutter:
     - assets/osm_wrecks.json
     - assets/tide_stations.json
     - assets/species/
+    - assets/bathymetry/fl/
   #   - assets/species/_common/
   #   - assets/tide_stations.json
   #   - assets/nws_zones.json
